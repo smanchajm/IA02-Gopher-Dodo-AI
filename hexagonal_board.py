@@ -33,13 +33,24 @@ def grid_generation(n: int):
     for ligne in grid:
         ligne.insert(n, 0)
 
-    for ligne in grid:
-        print(ligne)
     return grid
 
 
+def display_grid(grid):
+    for row in grid:
+        for cell in row:
+            # Coloration en rouge si == -1
+            if cell == -1:
+                print("\033[91m", end="")
+            print(str(cell).rjust(2), end=" ")
+            print("\033[0m", end="")
+        print()
+
+
 def main():
-    grid_generation(3)
+    n = 6
+    resultat = grid_generation(n)
+    display_grid(resultat)
     pass
 
 
