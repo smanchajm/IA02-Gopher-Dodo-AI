@@ -1,9 +1,34 @@
+# Module concernant la grille hexagonale de jeu
 from typing import List
 
 # Structures de données
 
 # 0 représente une case vide, 1 représente une case marquée par rouge et 2 une case marquée par bleu
 Grid = tuple[tuple[int, ...], ...]
+
+
+# Quelques constantes
+DRAW = 0
+EMPTY = 0
+X = 1
+O = 2
+
+# Exemples de Grid
+GRID1 = (
+    (-1, -1, -1, -1, -1, -1, 0, 0, 1, 0, 0, 0, 0),
+    (-1, -1, -1, -1, -1, 0, 0, 1, 0, 0, 0, 0, 0),
+    (-1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (-1, -1, -1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0),
+    (-1, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0),
+    (0, 0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0, -1),
+    (0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, -1, -1),
+    (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1),
+    (0, 0, 0, 2, 0, 0, 0, 0, 0, -1, -1, -1, -1),
+    (0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1),
+    (0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1),
+)
 
 
 # Conversion
@@ -17,18 +42,22 @@ def grid_list_to_grid_tuple(grid: list[list[int]]) -> Grid:
     return tuple(tuple(i) for i in grid)
 
 
+# Génération d'une grille vide hexagonale de taille n
 def grid_generation(n: int) -> Grid:
-    # Création d'un tableau 2n * 2n
+    # Création d'un tableau 2(n-1) * 2(n-1)
     m = n - 1
     grid = [[-1] * (2 * m) for _ in range(2 * m)]
 
     # Remplissage d'une grille vide
+    # Remplissage de la première moitié de la grille
     for r in range(m):
         for q in range(m - r, 2 * m):
             grid[r][q] = 0
+    # Remplissage de la seconde moitié de la grille
     for r in range(m):
         for q in range(2 * m - r - 1):
             grid[r + m][q] = 0
+    # Ajout d'une colonne et d'une ligne de 0 au milieu de la grille
     grid.insert(m, [-0] * (2 * m))
     for ligne in grid:
         ligne.insert(m, 0)
@@ -36,14 +65,20 @@ def grid_generation(n: int) -> Grid:
     return grid_list_to_grid_tuple(grid)
 
 
-# Attention les coordonnées sont inversées : Dans l'exemple on a colonne puis ligne alors que dans tableau on a ligne
-# puis colonne
+# Attention les coordonnées sont inversées : Dans l'exemple, nous avons colonne puis ligne alors que dans le tableau
+# nous avons ligne puis colonne
 def display_grid(grid: Grid):
     for row in grid:
         for cell in row:
-            # Coloration en rouge si == -1
+            # Coloration en noir si == -1
             if cell == -1:
-                print("\033[91m", end="")
+                print("\033[30m", end="")
+            # Coloration en bleu si == 1
+            if cell == 1:
+                print("\033[34m", end="")
+            # Coloration en rouge si == 2
+            if cell == 2:
+                print("\033[31m", end="")
             print(str(cell).rjust(2), end=" ")
             print("\033[0m", end="")
         print()
@@ -51,10 +86,17 @@ def display_grid(grid: Grid):
 
 # Conversion de coordonnées allant de 0 à 2n à des coordonnées allant de -n à n
 def convert(q: int, r: int, n) -> (int, int):
-    return -q + n - 1, - n + r + 1
+    return -q + n - 1, -n + r + 1
 
 
-hex_directions: List[tuple[int, int]] = [(1, 0), (1, 1), (0, -1), (-1, 0), (-1, -1), (0, 1)]
+directions_case_neighbors: List[tuple[int, int]] = [
+    (1, 0),
+    (1, 1),
+    (0, -1),
+    (-1, 0),
+    (-1, -1),
+    (0, 1),
+]
 
 
 # Voisins d'une case selon certaines directions
@@ -64,17 +106,24 @@ def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
 
 def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, int]], n):
     neighbors: List[tuple[int, int]] = hex_neighbor(q, r, directions)
-    res_grid: list[list[int]] = grid_tuple_to_grid_list(grid)
 
     for i, row in enumerate(grid):
         for j, cell in enumerate(row):
-            # Coloration en rouge si == -1
+            # Coloration en noir si == -1
             if cell == -1:
-                print("\033[91m", end="")
+                print("\033[30m", end="")
+            # Coloration en vert si c'est un voisin
             if convert(i, j, n) in neighbors:
                 print("\033[92m", end="")
+            # Coloration en rose element sélectionné
             if convert(i, j, n) == (q, r):
                 print("\033[95m", end="")
+            # Coloration en bleu si == 1
+            elif cell == 1:
+                print("\033[34m", end="")
+            # Coloration en rouge si == 2
+            elif cell == 2:
+                print("\033[31m", end="")
             print(str(cell).rjust(2), end=" ")
             print("\033[0m", end="")
         print()
@@ -83,8 +132,8 @@ def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, in
 def main():
     n = 7
     res = grid_generation(n)
-    display_neighbors(res, -4, -5, hex_directions, n)
-
+    print(res)
+    display_neighbors(GRID1, -4, -5, directions_case_neighbors, n)
 
     pass
 
