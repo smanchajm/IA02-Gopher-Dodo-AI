@@ -49,20 +49,15 @@ def init_grid_dodo(n: int) -> State:
     compteur = compteur - 2*n + 1
 
     # Remplissage des cases de départ pour le joueur 2 (triangle inférieur)
-    for i in range(n, 2*n - 1):
-        for j in range(0, 2*n-2-(n-i)):
+    for i in range(n, 2*n):
+        for j in range(0, 2*n-1-(i-n)):
             try:
-                if (state[compteur][0][0]+state[compteur][0][1]) >= (2*n + (n//5) - (i-n)):
+                if (state[compteur][0][0]+state[compteur][0][1]) >= (2*n +(n-4)-(i-n)):
                     state[compteur] = (state[compteur][0], 2)
                 compteur += 1
             except:
                 pass
-
-    # Dernière case
-    try:
-        state[compteur] = (state[compteur][0], 2)
-    except:
-        pass
+    
     return state
 
 def display_state(state: State, n: int):
@@ -96,11 +91,8 @@ def display_state(state: State, n: int):
     print("\033[0m")
 
 def main():
-    n = 6
+    n = 100
     state = init_grid_dodo(n)
-    # display_state(state, n)
-    display_state(state,n)
-    # count number of cells for each player
     player1 = 0
     player2 = 0
     for cell, player in state:
@@ -109,8 +101,7 @@ def main():
         elif player == 2:
             player2 += 1
 
-    print(f"Player 1: {player1}")
-    print(f"Player 2: {player2}")
+    print(f"Même nombre de jetons pour les 2 joueurs : {player1 == player2}")
 
 if __name__ == "__main__":
     main()
