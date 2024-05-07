@@ -1,5 +1,4 @@
 # Module concernant la réalisation du jeu DoDo
-
 from typing import List, NamedTuple, Set
 from collections import namedtuple
 import hexagonal_board as hex
@@ -21,7 +20,6 @@ Time = int
 DRAW = 0
 EMPTY = 0
 
-
 UP_DIRECTIONS: List[tuple[int, int]] = [
     (1, 0),
     (1, 1),
@@ -37,11 +35,9 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
 player1 = 1  # Player bleu
 player2 = 2  # Player rouge
 
-
 # Initialisation Grille DoDo
 def init_grid_dodo(n: int) -> hex.Grid:
     grid: hex.Grid = hex.grid_generation(n)
-
 
 # Règles du DoDo
 
@@ -63,15 +59,12 @@ def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
 
     return list(actions)
 
-
 def main():
     n = 7
     res = hex.grid_generation(n)
     hex.display_neighbors(hex.GRID2, 3, 3, UP_DIRECTIONS, n)
     print(legals_dodo(hex.GRID2, player1, UP_DIRECTIONS))
-
     pass
-
 
 if __name__ == "__main__":
     main()
