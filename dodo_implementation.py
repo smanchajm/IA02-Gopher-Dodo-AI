@@ -22,11 +22,6 @@ DRAW = 0
 EMPTY = 0
 
 
-State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
-State = list[tuple[tuple[int, int], Player]]
-Grid = tuple[tuple[int, ...], ...]
-
-
 UP_DIRECTIONS: List[tuple[int, int]] = [
     (1, 0),
     (1, 1),
