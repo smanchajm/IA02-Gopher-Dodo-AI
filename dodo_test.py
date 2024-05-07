@@ -40,16 +40,29 @@ def init_grid_dodo(n: int) -> State:
     compteur = 0
     
     # Remplissage des cases de départ pour le joueur 1 (triangle supérieur)
-    for j in range(0, n):
-        state[compteur] = (state[compteur][0], 1)
-        compteur += 1
-
-    for i in range(1, n):
+    for i in range(0, n):
         for j in range(0, n+i):
             if (state[compteur][0][0]+state[compteur][0][1]) < 2*n-i:
                 state[compteur] = (state[compteur][0], 1)
             compteur += 1
 
+    compteur = compteur - 2*n + 1
+
+    # Remplissage des cases de départ pour le joueur 2 (triangle inférieur)
+    for i in range(n, 2*n - 1):
+        for j in range(0, 2*n-2-(n-i)):
+            try:
+                if (state[compteur][0][0]+state[compteur][0][1]) >= (2*n + (n//5) - (i-n)):
+                    state[compteur] = (state[compteur][0], 2)
+                compteur += 1
+            except:
+                pass
+
+    # Dernière case
+    try:
+        state[compteur] = (state[compteur][0], 2)
+    except:
+        pass
     return state
 
 def display_state(state: State, n: int):
@@ -79,13 +92,25 @@ def display_state(state: State, n: int):
                 print("\033[31m2", end=" ")
             compteur += 1
         print("")
+    # Reset color
+    print("\033[0m")
 
 def main():
-    n = 4
+    n = 6
     state = init_grid_dodo(n)
     # display_state(state, n)
-    print(state)
     display_state(state,n)
+    # count number of cells for each player
+    player1 = 0
+    player2 = 0
+    for cell, player in state:
+        if player == 1:
+            player1 += 1
+        elif player == 2:
+            player2 += 1
+
+    print(f"Player 1: {player1}")
+    print(f"Player 2: {player2}")
 
 if __name__ == "__main__":
     main()
