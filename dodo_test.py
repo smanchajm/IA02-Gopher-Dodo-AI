@@ -56,7 +56,7 @@ def init_grid_dodo(n: int) -> State:
                     state[compteur] = (state[compteur][0], 2)
                 compteur += 1
             except:
-                pass
+                break
     
     return state
 
@@ -91,8 +91,9 @@ def display_state(state: State, n: int):
     print("\033[0m")
 
 def main():
-    n = 100
+    n = 1000
     state = init_grid_dodo(n)
+    # display_state(state, n)
     player1 = 0
     player2 = 0
     for cell, player in state:
