@@ -6,7 +6,7 @@ This project was carried out as part of the IA02 (Problem-Solving and Logic Prog
 These two games were created by Mark Steere.
 
 ## Rules 
-Both games are played on a hexagonal board. The implementation is freely inspired by *Red Blob Games [Implementation of hex Grid](https://www.redblobgames.com/grids/hexagons/)*.
+Both games are played on a hexagonal board. The implementation is freely inspired by *Red Blob Games [Implementation of hex Grid](https://www.redblobgames.com/grids/hexagons/).
 
 * **[Dodo Rules](https://www.redblobgames.com/grids/hexagons/)***.
 * **[Gopher Rules](https://www.marksteeregames.com/Dodo_rules.pdf)**.
