@@ -68,6 +68,28 @@ def grid_generation(n: int) -> Grid:
 
     return grid_list_to_grid_tuple(grid)
 
+Cell = tuple[int, int]
+Player = int  # 1 ou 2
+State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
+
+
+# Generation de l'état de départ avec la nouvelle structure de données
+def grid_generation_test(n: int) -> State:
+    res: State = []
+    m = n-1
+
+    # Remplissage d'une grille vide
+    # Remplissage de la première moitié de la grille
+    for r in range(n-1, -1, -1):
+        for q in range(r - m, n):
+            res.append(((q, r), 0))
+    # Remplissage de la seconde moitié de la grille
+    for r in range(-1, -n, -1):
+        for q in range(-m, n+r):
+            res.append(((q, r), 0))
+
+    return res
+
 
 # Attention les coordonnées sont inversées : Dans l'exemple, nous avons colonne puis ligne alors que dans le tableau
 # nous avons ligne puis colonne
@@ -136,8 +158,11 @@ def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, in
 def main():
     n = 7
     res = grid_generation(n)
-    print(res)
-    display_neighbors(GRID2, 3, 3, directions_case_neighbors, n)
+    #print(res)
+    #display_neighbors(GRID2, 3, 3, directions_case_neighbors, n)
+    print(grid_generation_test(7))
+    print(len(grid_generation_test(7)))
+
 
     pass
 
