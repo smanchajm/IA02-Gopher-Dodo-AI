@@ -1,10 +1,9 @@
 # Module concernant la réalisation du jeu DoDo
-from typing import List, NamedTuple, Set
-from collections import namedtuple
-import hexagonal_board as hex
+from typing import List, Set
+import hexagonal_board as hexa
 
 # Structures de données
-State = hex.Grid
+Grid = hexa.Grid
 
 # Types de base utilisés par l'arbitre
 Environment = ...  # Ensemble des données utiles (cache, état de jeu...) pour
@@ -16,9 +15,11 @@ State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
 Score = int
 Time = int
 
+
 # Quelques constantes
 DRAW = 0
 EMPTY = 0
+
 
 UP_DIRECTIONS: List[tuple[int, int]] = [
     (1, 0),
@@ -36,13 +37,14 @@ player1 = 1  # Player bleu
 player2 = 2  # Player rouge
 
 # Initialisation Grille DoDo
-def init_grid_dodo(n: int) -> hex.Grid:
-    grid: hex.Grid = hex.grid_generation(n)
+def init_grid_dodo(n: int) -> Grid:
+    grid: hexa.Grid = hexa.grid_generation(n)
+
 
 # Règles du DoDo
 
-# Fonction retournant les actions possibles d'un joueur pour un état donné
-# À optimiser pour améliorer la complexité
+
+# Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
 def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
     actions: Set[ActionDodo] = set()  # On utilise un ensemble pour garantir l'unicité
 
@@ -51,7 +53,7 @@ def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
         for j, element in enumerate(ligne):
             # Si la case est occupée par un jeton du player
             if element == player:
-                neighbors = hex.hex_neighbor(i, j, directions)
+                neighbors = hexa.hex_neighbor(i, j, directions)
                 for neighbor in neighbors:
                     # Ajouter un voisin si
                     if grid[neighbor[0]][neighbor[1]] == 0:
@@ -59,12 +61,14 @@ def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
 
     return list(actions)
 
+
 def main():
     n = 7
-    res = hex.grid_generation(n)
-    hex.display_neighbors(hex.GRID2, 3, 3, UP_DIRECTIONS, n)
-    print(legals_dodo(hex.GRID2, player1, UP_DIRECTIONS))
+    res = hexa.grid_generation(n)
+    hexa.display_neighbors(hexa.GRID2, 3, 3, UP_DIRECTIONS, n)
+    print(legals_dodo(hexa.GRID2, player1, UP_DIRECTIONS))
     pass
+
 
 if __name__ == "__main__":
     main()
