@@ -4,6 +4,7 @@ Cell = tuple[int, int]
 Player = int  # 1 ou 2
 State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
 
+
 # Create a hexagonal grid
 def grid_generation(n: int) -> np.ndarray:
 
@@ -26,12 +27,14 @@ def grid_generation(n: int) -> np.ndarray:
 
     return grid
 
+
 def grid_to_state(grid: np.ndarray) -> State:
     state = []
     for r in range(0, len(grid)):
         for q in range(0, len(grid[r])):
             state.append((grid[r][q], 0))
     return state
+
 
 def init_grid_dodo(n: int) -> State:
     grid = grid_generation(n)
@@ -59,6 +62,7 @@ def init_grid_dodo(n: int) -> State:
                 break
     
     return state
+
 
 def display_state(state: State, n: int):
     # on parcourt toute la grille
@@ -90,8 +94,9 @@ def display_state(state: State, n: int):
     # Reset color
     print("\033[0m")
 
+
 def main():
-    n = 1000
+    n = 7
     state = init_grid_dodo(n)
     # display_state(state, n)
     player1 = 0
@@ -103,6 +108,7 @@ def main():
             player2 += 1
 
     print(f"Même nombre de jetons pour les 2 joueurs : {player1 == player2}")
+
 
 if __name__ == "__main__":
     main()
