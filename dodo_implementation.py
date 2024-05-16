@@ -37,6 +37,7 @@ player1 = 1  # Player bleu
 player2 = 2  # Player rouge
 
 
+# Fonction de génération de grille pour le jeu DoDo --> en cours de réalisation
 def grid_generation_dodo(n: int) -> Grid:
     # Création d'un tableau 2(n-1) * 2(n-1)
     m = n - 1
@@ -65,16 +66,13 @@ def grid_generation_dodo(n: int) -> Grid:
     return hexa.grid_list_to_grid_tuple(grid)
 
 
-
-
-
-
 # Règles du DoDo
 
 
 # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
-def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
+def legals_dodo(grid: Grid, player: Player, directions) -> list[ActionDodo]:
     actions: Set[ActionDodo] = set()  # On utilise un ensemble pour garantir l'unicité
+    temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
 
     # On parcourt l'ensemble des cases de la grille
     for i, ligne in enumerate(grid):
@@ -84,18 +82,22 @@ def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
                 neighbors = hexa.hex_neighbor(i, j, directions)
                 for neighbor in neighbors:
                     # Ajouter un voisin si
-                    if grid[neighbor[0]][neighbor[1]] == 0:
-                        actions.add(((i, j), neighbor))
+                    r = neighbor[0]
+                    q = neighbor[1]
+                    if 0 <= r < len(grid) and 0 <= q < len(grid[0]):
+                        if grid[neighbor[0]][neighbor[1]] == 0:
+                            actions.add(((i, j), neighbor))
+                            temp_grid[r][q] = 4
+    hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
 
     return list(actions)
 
 
 def main():
     n = 7
-    hexa.display_grid(grid_generation_dodo(n))
-    #res = hexa.grid_generation(n)
-    #hexa.display_neighbors(hexa.GRID2, 3, 3, UP_DIRECTIONS, n)
-    #print(legals_dodo(hexa.GRID2, player1, UP_DIRECTIONS))
+    init_grid = hexa.INIT_GRID
+    hexa.display_neighbors(init_grid, 6, 0, UP_DIRECTIONS, n)
+    print(legals_dodo(init_grid, player2, UP_DIRECTIONS))
     pass
 
 

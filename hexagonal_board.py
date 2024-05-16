@@ -89,18 +89,18 @@ def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, in
             # Coloration en noir si == -1
             if cell == -1:
                 print("\033[30m", end="")
-            # Coloration en vert si c'est un voisin
-            if convert(i, j, n) in neighbors:
-                print("\033[92m", end="")
-            # Coloration en rose element sélectionné
-            if convert(i, j, n) == (q, r):
-                print("\033[95m", end="")
             # Coloration en bleu si == 1
             elif cell == 1:
                 print("\033[34m", end="")
             # Coloration en rouge si == 2
             elif cell == 2:
                 print("\033[31m", end="")
+            # Coloration en vert si c'est un voisin
+            if (i, j) in neighbors:
+                print("\033[92m", end="")
+            # Coloration en rose element sélectionné
+            if (i, j) == (q, r):
+                print("\033[95m", end="")
             print(str(cell).rjust(2), end=" ")
             print("\033[0m", end="")
         print()
@@ -134,6 +134,9 @@ def display_grid(grid: Grid):
             # Coloration en noir si == -1
             if cell == -1:
                 print("\033[30m", end="")
+            # Coloration en vert si == 4
+            if cell == 4:
+                print("\033[92m", end="")
             # Coloration en bleu si == 1
             if cell == 1:
                 print("\033[34m", end="")
@@ -162,7 +165,8 @@ directions_case_neighbors: List[tuple[int, int]] = [
 
 # Voisins d'une case selon certaines directions
 def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
-    return [(q + dq, r + dr) for dq, dr in directions]
+
+    return [(q - dq, r + dr) for dq, dr in directions]
 
 
 def main():
