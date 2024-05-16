@@ -170,22 +170,7 @@ def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
 
 
 def main():
-    n = 7
-    #print(grid_generation(n))
-    #print(len(grid_generation(n)))
-    #display_grid(grid_generation(n))
     display_grid(INIT_GRID)
-
-    player1 = 0
-    player2 = 0
-    for row in INIT_GRID:
-        for cell in row:
-            if cell == 1:
-                player1 += 1
-            elif cell == 2:
-                player2 += 1
-    print(player1, player2)
-
     pass
 
 

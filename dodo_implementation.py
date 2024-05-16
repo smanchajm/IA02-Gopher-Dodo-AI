@@ -1,5 +1,6 @@
 # Module concernant la réalisation du jeu DoDo
-from typing import List, Set
+import random
+from typing import List, Set, Callable, Union
 import hexagonal_board as hexa
 
 # Structures de données
@@ -10,16 +11,17 @@ Environment = ...  # Ensemble des données utiles (cache, état de jeu...) pour
 # que votre IA puisse jouer (objet, dictionnaire, autre...)
 Cell = tuple[int, int]
 ActionDodo = tuple[Cell, Cell]  # case de départ -> case d'arrivée
+ActionGopher = Cell
+Action = Union[ActionGopher, ActionDodo]
 Player = int  # 1 ou 2
 State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
 Score = int
 Time = int
-
+Strategy = Callable[[Grid, Player], Action]
 
 # Quelques constantes
 DRAW = 0
 EMPTY = 0
-
 
 UP_DIRECTIONS: List[tuple[int, int]] = [
     (1, 0),
@@ -47,7 +49,7 @@ def grid_generation_dodo(n: int) -> Grid:
     # Remplissage de la première moitié de la grille
     for r in range(m):
         for q in range(m - r, 2 * m):
-            if r < m-1 and q >= m:
+            if r < m - 1 and q >= m:
                 grid[r][q] = 1
             else:
                 grid[r][q] = 0
@@ -88,17 +90,19 @@ def legals_dodo(grid: Grid, player: Player, directions) -> list[ActionDodo]:
                         if grid[neighbor[0]][neighbor[1]] == 0:
                             actions.add(((i, j), neighbor))
                             temp_grid[r][q] = 4
-    hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
+    #hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
 
     return list(actions)
 
 
 # Fonction retournant Vrai si nous sommes dans un état final (fin de partie)
-def final_dodo(grid: Grid, player: Player, directions) -> bool:
-    if legals_dodo(grid, player, directions):
-        return True
+def final_dodo(grid: Grid) -> int:
+    if not legals_dodo(grid, player1, DOWN_DIRECTIONS):
+        return 1
+    elif not legals_dodo(grid, player2, UP_DIRECTIONS):
+        return -1
     else:
-        return False
+        return 0
 
 
 def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
@@ -108,12 +112,52 @@ def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
     return hexa.grid_list_to_grid_tuple(temp_grid)
 
 
+# Strategies
+def strategy_first_legal_dodo(grid: Grid, player: Player) -> Action:
+    if player == player1:
+        return legals_dodo(grid, player, DOWN_DIRECTIONS)[0]
+    else:
+        return legals_dodo(grid, player, UP_DIRECTIONS)[0]
+
+
+def strategy_random_dodo(grid: Grid, player: Player) -> Action:
+    if player == player1:
+        return random.choice(legals_dodo(grid, player, DOWN_DIRECTIONS))
+    else:
+        return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
+
+
+# Boucle de jeu Dodo
+def dodo(strategy_1: Strategy, strategy_2: Strategy, debug: bool = False) -> Score:
+    actual_grid: Grid = hexa.INIT_GRID
+    current_player: Player = 1
+    current_action: Action
+
+    #hexa.display_grid(actual_grid)
+    while not (final_dodo(actual_grid) == 1 or final_dodo(actual_grid) == -1):
+        if current_player == 1:
+            current_action = strategy_1(actual_grid, current_player)
+        else:
+            current_action = strategy_2(actual_grid, current_player)
+        actual_grid = play_dodo(actual_grid, current_player, current_action)
+        if current_player == 1:
+            current_player = 2
+        else:
+            current_player = 1
+        hexa.display_grid(actual_grid)
+
+    return final_dodo(actual_grid)
+
+
 def main():
     n = 7
     init_grid = hexa.INIT_GRID
-    #hexa.display_neighbors(init_grid, 6, 0, UP_DIRECTIONS, n)
-    print(legals_dodo(init_grid, player2, UP_DIRECTIONS))
-    print(legals_dodo(play_dodo(init_grid, player2, ((6, 0), (5, 1))), player2, UP_DIRECTIONS))
+    # hexa.display_neighbors(init_grid, 6, 0, UP_DIRECTIONS, n)
+    # print(legals_dodo(init_grid, player2, UP_DIRECTIONS))
+    # print(final_dodo(init_grid))
+    # print(legals_dodo(play_dodo(init_grid, player2, ((6, 0), (5, 1))), player2, UP_DIRECTIONS))
+
+    print(dodo(strategy_random_dodo, strategy_first_legal_dodo, False))
 
     pass
 
