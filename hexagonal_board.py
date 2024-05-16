@@ -129,7 +129,16 @@ def grid_generation(n: int) -> Grid:
 
 
 def display_grid(grid: Grid):
-    for row in grid:
+    # Affichage de l'indice de la colonne
+    print(str("").rjust(5), end=" ")
+    for j, cell in enumerate(grid[0]):
+        print(str(j).rjust(2), end=" ")
+    print("")
+
+    for i, row in enumerate(grid):
+        # Affichage de l'indice de la ligne
+        print(str(i).rjust(2), end=" ")
+        print(str("|").rjust(2), end=" ")
         for cell in row:
             # Coloration en noir si == -1
             if cell == -1:
@@ -146,6 +155,7 @@ def display_grid(grid: Grid):
             print(str(cell).rjust(2), end=" ")
             print("\033[0m", end="")
         print()
+    print("")
 
 
 # Conversion de coordonnées allant de 0 à 2n à des coordonnées allant de -n à n

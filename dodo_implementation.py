@@ -132,9 +132,11 @@ def dodo(strategy_1: Strategy, strategy_2: Strategy, debug: bool = False) -> Sco
     actual_grid: Grid = hexa.INIT_GRID
     current_player: Player = 1
     current_action: Action
+    nb_iterations: int = 0
 
-    #hexa.display_grid(actual_grid)
     while not (final_dodo(actual_grid) == 1 or final_dodo(actual_grid) == -1):
+        nb_iterations += 1
+        print(f"Iteration \033[36m {nb_iterations}\033[0m.")
         if current_player == 1:
             current_action = strategy_1(actual_grid, current_player)
         else:
@@ -157,7 +159,7 @@ def main():
     # print(final_dodo(init_grid))
     # print(legals_dodo(play_dodo(init_grid, player2, ((6, 0), (5, 1))), player2, UP_DIRECTIONS))
 
-    print(dodo(strategy_random_dodo, strategy_first_legal_dodo, False))
+    print(dodo(strategy_random_dodo, strategy_random_dodo, False))
 
     pass
 
