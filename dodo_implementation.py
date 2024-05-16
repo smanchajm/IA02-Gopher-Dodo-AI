@@ -36,9 +36,37 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
 player1 = 1  # Player bleu
 player2 = 2  # Player rouge
 
-# Initialisation Grille DoDo
-def init_grid_dodo(n: int) -> Grid:
-    grid: hexa.Grid = hexa.grid_generation(n)
+
+def grid_generation_dodo(n: int) -> Grid:
+    # Création d'un tableau 2(n-1) * 2(n-1)
+    m = n - 1
+    grid = [[-1] * (2 * m) for _ in range(2 * m)]
+
+    # Remplissage d'une grille vide
+    # Remplissage de la première moitié de la grille
+    for r in range(m):
+        for q in range(m - r, 2 * m):
+            if r < m-1 and q >= m:
+                grid[r][q] = 1
+            else:
+                grid[r][q] = 0
+    # Remplissage de la seconde moitié de la grille
+    for r in range(m):
+        for q in range(2 * m - r - 1):
+            if r >= 1 and q < m:
+                grid[r + m][q] = 2
+            else:
+                grid[r + m][q] = 0
+    # Ajout d'une colonne et d'une ligne de 0 au milieu de la grille
+    grid.insert(m, [-0] * (2 * m))
+    for ligne in grid:
+        ligne.insert(m, 0)
+
+    return hexa.grid_list_to_grid_tuple(grid)
+
+
+
+
 
 
 # Règles du DoDo
@@ -64,9 +92,10 @@ def legals_dodo(grid: State, player: Player, directions) -> list[ActionDodo]:
 
 def main():
     n = 7
-    res = hexa.grid_generation(n)
-    hexa.display_neighbors(hexa.GRID2, 3, 3, UP_DIRECTIONS, n)
-    print(legals_dodo(hexa.GRID2, player1, UP_DIRECTIONS))
+    hexa.display_grid(grid_generation_dodo(n))
+    #res = hexa.grid_generation(n)
+    #hexa.display_neighbors(hexa.GRID2, 3, 3, UP_DIRECTIONS, n)
+    #print(legals_dodo(hexa.GRID2, player1, UP_DIRECTIONS))
     pass
 
 

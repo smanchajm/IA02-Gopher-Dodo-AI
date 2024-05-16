@@ -98,7 +98,7 @@ def display_state(state: State, n: int):
 def main():
     n = 7
     state = init_grid_dodo(n)
-    # display_state(state, n)
+    display_state(state, n)
     player1 = 0
     player2 = 0
     for cell, player in state:
@@ -106,6 +106,7 @@ def main():
             player1 += 1
         elif player == 2:
             player2 += 1
+    print(player1)
 
     print(f"Même nombre de jetons pour les 2 joueurs : {player1 == player2}")
 

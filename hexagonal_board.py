@@ -43,7 +43,36 @@ GRID2 = (
 )
 
 
-# Fonctions avec l'ancienne structure de données
+# Exemple de grille initiale de taille 7
+INIT_GRID = (
+     (-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1),
+     (-1, -1, -1, -1, -1, 0, 1, 1, 1, 1, 1, 1, 1),
+     (-1, -1, -1, -1, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+     (-1, -1, -1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1),
+     (-1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1),
+     (-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1),
+     (2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1),
+     (2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1),
+     (2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, -1, -1),
+     (2, 2, 2, 2, 2, 0, 0, 0, 0, 0, -1, -1, -1),
+     (2, 2, 2, 2, 2, 2, 0, 0, 0, -1, -1, -1, -1),
+     (2, 2, 2, 2, 2, 2, 2, 0, -1, -1, -1, -1, -1),
+     (2, 2, 2, 2, 2, 2, 2, -1, -1, -1, -1, -1, -1)
+)
+
+
+# Fonctions utilitaires
+
+# Fonctions de coloration de texte
+def coloration_red(text: str) -> str:
+    return "\033[31m" + text + "\033[0m"
+
+
+def coloration_blue(text: str) -> str:
+    return "\033[34m" + text + "\033[0m"
+
+
+# Fonctions de création de grille
 def grid_tuple_to_grid_list(grid: Grid) -> list[list[int]]:
     return [list(i) for i in grid]
 
@@ -138,10 +167,20 @@ def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
 
 def main():
     n = 7
-    print(grid_generation(n))
-    print(len(grid_generation(n)))
-    display_grid(grid_generation(n))
-    display_grid(GRID1)
+    #print(grid_generation(n))
+    #print(len(grid_generation(n)))
+    #display_grid(grid_generation(n))
+    display_grid(INIT_GRID)
+
+    player1 = 0
+    player2 = 0
+    for row in INIT_GRID:
+        for cell in row:
+            if cell == 1:
+                player1 += 1
+            elif cell == 2:
+                player2 += 1
+    print(player1, player2)
 
     pass
 
