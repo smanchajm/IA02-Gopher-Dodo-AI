@@ -93,11 +93,28 @@ def legals_dodo(grid: Grid, player: Player, directions) -> list[ActionDodo]:
     return list(actions)
 
 
+# Fonction retournant Vrai si nous sommes dans un état final (fin de partie)
+def final_dodo(grid: Grid, player: Player, directions) -> bool:
+    if legals_dodo(grid, player, directions):
+        return True
+    else:
+        return False
+
+
+def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
+    temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
+    temp_grid[action[0][0]][action[0][1]] = 0
+    temp_grid[action[1][0]][action[1][1]] = player
+    return hexa.grid_list_to_grid_tuple(temp_grid)
+
+
 def main():
     n = 7
     init_grid = hexa.INIT_GRID
-    hexa.display_neighbors(init_grid, 6, 0, UP_DIRECTIONS, n)
+    #hexa.display_neighbors(init_grid, 6, 0, UP_DIRECTIONS, n)
     print(legals_dodo(init_grid, player2, UP_DIRECTIONS))
+    print(legals_dodo(play_dodo(init_grid, player2, ((6, 0), (5, 1))), player2, UP_DIRECTIONS))
+
     pass
 
 
