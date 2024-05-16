@@ -1,15 +1,14 @@
-# Module concernant la réalisation du jeu DoDo
+""" Module concernant la réalisation du jeu DoDo """
 import random
 from typing import List, Set, Callable, Union
 import hexagonal_board as hexa
 from grid import *
 
-
 # Structures de données
 Grid = hexa.Grid
 
 # Types de base utilisés par l'arbitre
-Environment = ...  # Ensemble des données utiles (cache, état de jeu...) pour
+# Environment = ...  # Ensemble des données utiles (cache, état de jeu...) pour
 # que votre IA puisse jouer (objet, dictionnaire, autre...)
 Cell = tuple[int, int]
 ActionDodo = tuple[Cell, Cell]  # case de départ -> case d'arrivée
@@ -37,8 +36,8 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
     (-1, -1),
 ]
 
-player1 = 1  # Player bleu
-player2 = 2  # Player rouge
+PLAYER1: Player = 1  # Player bleu
+PLAYER2: Player = 2  # Player rouge
 
 
 # Règles du DoDo
@@ -67,9 +66,9 @@ def legals_dodo(grid: Grid, player: Player, directions) -> list[ActionDodo]:
 
 # Fonction retournant Vrai si nous sommes dans un état final (fin de partie)
 def final_dodo(grid: Grid) -> int:
-    if not legals_dodo(grid, player1, DOWN_DIRECTIONS):
+    if not legals_dodo(grid, PLAYER1, DOWN_DIRECTIONS):
         return 1
-    elif not legals_dodo(grid, player2, UP_DIRECTIONS):
+    elif not legals_dodo(grid, PLAYER2, UP_DIRECTIONS):
         return -1
     else:
         return 0
@@ -84,21 +83,23 @@ def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
 
 # Strategies
 def strategy_first_legal_dodo(grid: Grid, player: Player) -> Action:
-    if player == player1:
+    if player == PLAYER1:
         return legals_dodo(grid, player, DOWN_DIRECTIONS)[0]
     else:
         return legals_dodo(grid, player, UP_DIRECTIONS)[0]
 
 
 def strategy_random_dodo(grid: Grid, player: Player) -> Action:
-    if player == player1:
+    if player == PLAYER1:
         return random.choice(legals_dodo(grid, player, DOWN_DIRECTIONS))
     else:
         return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
 
 
 # Boucle de jeu Dodo
-def dodo(strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False) -> Score:
+def dodo(
+        strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False
+) -> Score:
     actual_grid: Grid = init_grid
     current_player: Player = 1
     current_action: Action

@@ -11,6 +11,7 @@ Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 
 # Fonctions utilitaires
 
+
 # Fonctions de coloration de texte
 def coloration_red(text: str) -> str:
     return "\033[31m" + text + "\033[0m"
@@ -134,4 +135,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
