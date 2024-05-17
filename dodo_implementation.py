@@ -1,5 +1,6 @@
 """ Module concernant la réalisation du jeu DoDo """
 import random
+import time
 from typing import Dict, List, Set, Callable, Union, Tuple
 import hexagonal_board as hexa
 from grid import *
@@ -8,10 +9,9 @@ from grid import *
 Grid = hexa.Grid
 
 # Types de base utilisés par l'arbitre
-# Environment = ...  # Ensemble des données utiles (cache, état de jeu...) pour
-# que votre IA puisse jouer (objet, dictionnaire, autre...)
+# Environment = ...  # type de l'environnement (objet, dictionnaire, autre...)
 Cell = tuple[int, int]
-ActionDodo = tuple[Cell, Cell]  # case de départ -> case d'arrivée
+ActionDodo = tuple[Cell, Cell]  # case de départ → case d'arrivée
 ActionGopher = Cell
 Action = Union[ActionGopher, ActionDodo]
 Player = int  # 1 ou 2
@@ -21,7 +21,6 @@ Time = int
 Strategy = Callable[[Grid, Player], Action]
 
 # Quelques constantes
-DRAW = 0
 EMPTY = 0
 
 UP_DIRECTIONS: List[tuple[int, int]] = [
@@ -40,6 +39,8 @@ PLAYER1: Player = 1  # Player bleu
 PLAYER2: Player = 2  # Player rouge
 
 minimax_cache: Dict[Tuple[Grid, int, bool, Player], Tuple[int, ActionDodo]] = {}
+
+
 # Règles du DoDo
 
 
@@ -95,6 +96,38 @@ def strategy_random_dodo(grid: Grid, player: Player) -> Action:
     else:
         return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
 
+
+# Minimax Strategy (sans cache)
+def minmax_action(grid: Grid, player: Player, depth: int = 0) -> tuple[float, Action]:
+    player1: Player = PLAYER1
+    player2: Player = PLAYER2
+
+    if depth == 0 or final_dodo(grid) != 0:
+        return final_dodo(grid), (-1, -1)  # On retourne le score de la grille
+
+    if player == 1:  # maximazing player
+        best = (float("-inf"), (-1, -1))
+        for item in legals_dodo(grid, player, DOWN_DIRECTIONS):
+            tmp = play_dodo(grid, player, item)
+            returned_values = minmax_action(tmp, player2, depth - 1)
+            if max(best[0], returned_values[0]) == returned_values[0]:
+                best = (returned_values[0], item)
+        return best
+
+    if player == 2:  # minimizing player
+        best = (float("inf"), (-1, -1))
+        for item in legals_dodo(grid, player, UP_DIRECTIONS):
+            tmp = play_dodo(grid, player, item)
+            returned_values = minmax_action(tmp, player1, depth - 1)
+            if min(best[0], returned_values[0]) == returned_values[0]:
+                best = (returned_values[0], item)
+        return best
+
+
+def strategy_minmax(grid: Grid, player: Player) -> Action:
+    return minmax_action(grid, player, 5)[1]
+
+
 # Boucle de jeu Dodo
 def dodo(
         strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False
@@ -103,9 +136,13 @@ def dodo(
     current_player: Player = 1
     current_action: Action
     nb_iterations: int = 0
+    total_time_start = time.time()  # Chronomètre
 
     while not (final_dodo(actual_grid) == 1 or final_dodo(actual_grid) == -1):
         nb_iterations += 1
+        iteration_time_start = time.time()  # Chronomètre une itération de jeu
+        print(f"Iteration \033[36m {nb_iterations}\033[0m.")
+        hexa.display_grid(actual_grid)
         if current_player == 1:
             current_action = strategy_1(actual_grid, current_player)
         else:
@@ -116,15 +153,18 @@ def dodo(
         else:
             current_player = 1
 
-    print(f"Iteration \033[36m {nb_iterations}\033[0m.")
-    # hexa.display_grid(actual_grid)
+        iteration_time_end = time.time()  # Fin du chronomètre pour la durée de cette itération
+        print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
+
+    total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
+    print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
 
     return final_dodo(actual_grid)
 
 
 def main():
     init_grid = INIT_GRID
-    print(dodo(strategy_random_dodo, strategy_random_dodo, init_grid, False))
+    print(dodo(strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
     pass
 
 

@@ -1,4 +1,4 @@
-# Module concernant la grille hexagonale de jeu
+""" Module concernant la grille hexagonale de jeu """
 from typing import List
 from grid import *
 
@@ -30,7 +30,7 @@ def grid_list_to_grid_tuple(grid: list[list[int]]) -> Grid:
     return tuple(tuple(i) for i in grid)
 
 
-def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, int]], n):
+def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, int]]):
     neighbors: List[tuple[int, int]] = hex_neighbor(q, r, directions)
 
     for i, row in enumerate(grid):
@@ -107,7 +107,7 @@ def display_grid(grid: Grid):
     print("")
 
 
-# Conversion de coordonnées allant de 0 à 2n à des coordonnées allant de -n à n
+# Conversion de coordonnées allant de 0 à 2n à des coordonnées allant de -n à n.
 def convert(q: int, r: int, n) -> (int, int):
     return -q + n - 1, -n + r + 1
 
@@ -126,12 +126,3 @@ directions_case_neighbors: List[tuple[int, int]] = [
 def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
 
     return [(q - dq, r + dr) for dq, dr in directions]
-
-
-def main():
-    display_grid(INIT_GRID)
-    pass
-
-
-if __name__ == "__main__":
-    main()
