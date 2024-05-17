@@ -15,6 +15,7 @@
 * possible d'implémenter des méthode mixtes : en utilisant Alpha-Bêta pour les premiers coups lorsque le facteur de branchement est élevé, puis en passant à MCTS pour des recherches plus profondes lorsque le temps le permet
 * Gestion des symétries
 * Gestion du câche (mémoïsation)
+* Calculer le nb de coup minimum pour gagner --> pas nécessaire de faire final avant 
 
   ## heuristiques :
   *  helpful heuristics to be found, for instance splitting your pieces is typically unfavourable.
