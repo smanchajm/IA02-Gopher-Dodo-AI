@@ -5,6 +5,24 @@ This project was carried out as part of the IA02 (Problem-Solving and Logic Prog
 
 These two games were created by Mark Steere.
 
+## ToDo
+
+- [ ] Implémentation du jeu 
+  - [x] Grille
+  - [x] Dodo rules
+  - [ ] Gopher rules
+  - [ ] Envireonnement 
+- [ ] différentes stratégies
+  - [x] minmax simple
+  - [ ] alpha-beta simple
+  - [ ] fonction d'évaluation
+- [ ] optimisations
+  - [ ] multithreading
+  - [ ] symétries
+  - [ ] cache    
+  
+
+
 ## Rules 
 Both games are played on a hexagonal board. The implementation is freely inspired by *Red Blob Games [Implementation of hex Grid](https://www.redblobgames.com/grids/hexagons/).
 
