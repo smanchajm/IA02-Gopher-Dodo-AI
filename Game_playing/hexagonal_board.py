@@ -122,3 +122,4 @@ directions_case_neighbors: List[tuple[int, int]] = [
 def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
 
     return [(q - dq, r + dr) for dq, dr in directions]
+
