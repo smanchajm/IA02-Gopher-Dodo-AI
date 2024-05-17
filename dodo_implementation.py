@@ -1,6 +1,6 @@
 """ Module concernant la réalisation du jeu DoDo """
 import random
-from typing import List, Set, Callable, Union
+from typing import Dict, List, Set, Callable, Union, Tuple
 import hexagonal_board as hexa
 from grid import *
 
@@ -39,7 +39,7 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
 PLAYER1: Player = 1  # Player bleu
 PLAYER2: Player = 2  # Player rouge
 
-
+minimax_cache: Dict[Tuple[Grid, int, bool, Player], Tuple[int, ActionDodo]] = {}
 # Règles du DoDo
 
 
@@ -95,7 +95,6 @@ def strategy_random_dodo(grid: Grid, player: Player) -> Action:
     else:
         return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
 
-
 # Boucle de jeu Dodo
 def dodo(
         strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False
@@ -118,7 +117,7 @@ def dodo(
             current_player = 1
 
     print(f"Iteration \033[36m {nb_iterations}\033[0m.")
-    hexa.display_grid(actual_grid)
+    # hexa.display_grid(actual_grid)
 
     return final_dodo(actual_grid)
 
