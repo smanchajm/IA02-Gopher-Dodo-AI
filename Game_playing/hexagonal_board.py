@@ -2,8 +2,6 @@
 from typing import List
 from structures import *
 
-# Structures de données
-
 
 # Fonctions utilitaires
 
@@ -119,7 +117,7 @@ directions_case_neighbors: List[tuple[int, int]] = [
 
 
 # Voisins d'une case selon certaines directions
-def hex_neighbor(q, r, directions) -> List[tuple[int, int]]:
+def hex_neighbor(q: int, r: int, directions: Directions) -> List[tuple[int, int]]:
 
     return [(q - dq, r + dr) for dq, dr in directions]
 
