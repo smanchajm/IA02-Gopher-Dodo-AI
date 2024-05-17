@@ -77,12 +77,14 @@ class GameDodo:
         return list(actions)
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
-    def final_dodo(self, grid: Grid) -> int:
+    def final_dodo(self, grid: Grid, debug: bool = False) -> int:
         if not self.legals_dodo(grid, self.max_player):
-            print(self.legals_dodo(grid, self.max_player))
+            if debug:
+                print(self.legals_dodo(grid, self.max_player))
             return 1
         elif not self.legals_dodo(grid, self.min_player):
-            print(self.legals_dodo(grid, self.min_player))
+            if debug:
+                print(self.legals_dodo(grid, self.min_player))
             return -1
         else:
             return 0

@@ -17,7 +17,8 @@ def dodo(
     while not (env.final_dodo(actual_grid) == 1 or env.final_dodo(actual_grid) == -1):
         nb_iterations += 1
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
-        print(f"Iteration \033[36m {nb_iterations}\033[0m.")
+        if debug:
+            print(f"Iteration \033[36m {nb_iterations}\033[0m.")
         if current_player.id == 1:
             current_action = strategy_1(env, current_player, actual_grid)
         else:
@@ -27,13 +28,17 @@ def dodo(
             current_player = env.min_player
         else:
             current_player = env.max_player
-        hexa.display_grid(actual_grid)
+        
+        if debug:
+            hexa.display_grid(actual_grid)
 
         iteration_time_end = time.time()  # Fin du chronomètre pour la durée de cette itération
-        print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
+        if debug:
+            print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
-    print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
+    if debug:
+        print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
     return env.final_dodo(actual_grid)
 
 
