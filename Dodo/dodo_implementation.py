@@ -32,6 +32,25 @@ minimax_cache: Dict[Tuple[Grid, int, bool, Player], Tuple[int, ActionDodo]] = {}
 
 
 # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
+def legals_dodo(grid: Grid, player: Player, directions) -> list[ActionDodo]:
+    actions: Set[ActionDodo] = set()  # On utilise un ensemble pour garantir l'unicité
+
+    # On parcourt l'ensemble des cases de la grille
+    for i, ligne in enumerate(grid):
+        for j, element in enumerate(ligne):
+            # Si la case est occupée par un jeton du player
+            if element == player:
+                neighbors = hexa.hex_neighbor(i, j, directions)
+                for neighbor in neighbors:
+                    # Ajouter un voisin si
+                    r = neighbor[0]
+                    q = neighbor[1]
+                    if 0 <= r < len(grid) and 0 <= q < len(grid[0]):
+                        if grid[neighbor[0]][neighbor[1]] == 0:
+                            actions.add(((i, j), neighbor))
+
+    return list(actions)
+
 def legals_dodo(grid: Grid, player: Player, directions: List[Tuple[int, int]]) -> List[ActionDodo]:
     actions: Set[ActionDodo] = set()
     # On parcourt l'ensemble des cases de la grille
