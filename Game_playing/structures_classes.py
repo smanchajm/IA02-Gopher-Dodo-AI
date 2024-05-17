@@ -1,7 +1,6 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
-from typing import Union, Callable, List
+from typing import Union, Callable, List, Set
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
 from Game_playing import hexagonal_board as hexa
 
 # Types de base utilisés par l'arbitre
