@@ -31,7 +31,6 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
     (-1, -1),
 ]
 
-
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
 
