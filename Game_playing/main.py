@@ -58,12 +58,23 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
         # return GameGopher(state, player, Player(2, UP_DIRECTIONS), hex_size, total_time)
     else:
         raise ValueError("Jeu non reconnu")
+    
+def stat_dodo() -> tuple[int, int]:
+    result = []
+    # boucle for
+    for i in range(10):
+        player1 = Player(1, DOWN_DIRECTIONS)
+        game = initialize("Dodo", INIT_GRID, player1, 7, 5)
+        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False))
+
+    print(result.count(1))
 
 # Fonction principale de jeu Dodo
 def main():
     player1 = Player(1, DOWN_DIRECTIONS)
     game = initialize("Dodo", INIT_GRID, player1, 7, 5)
-    print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
+    print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False))
+    # stat_dodo()
 
 if __name__ == "__main__":
     main()
