@@ -64,15 +64,11 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 def stat_dodo() -> tuple[int, int]:
     result = []
     # boucle for
-    for i in range(10):
+    for i in range(100):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         player1 = Player(1, DOWN_DIRECTIONS)
-        game = initialize("Dodo", INIT_GRID4, player1, 7, 5)
-        res = dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False)
-        print(res)
-        result.append(res)
-        iteration_time_end = time.time()  # Fin du chronomètre pour la durée de cette itération
-        print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
+        game = initialize("Dodo", INIT_GRID4, player1, 4, 5)
+        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
 
     print(result.count(1))
 
