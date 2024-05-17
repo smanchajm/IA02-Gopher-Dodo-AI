@@ -4,7 +4,6 @@ from Game_playing.grid import *
 from Dodo.strategies_dodo import strategy_random_dodo, strategy_minmax, strategy_first_legal_dodo
 import time
 
-
 # Boucle de jeu Dodo
 def dodo(
         env: GameDodo, strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False
@@ -55,13 +54,11 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
     else:
         raise ValueError("Jeu non reconnu")
 
-
 # Fonction principale de jeu Dodo
 def main():
     player1 = Player(1, DOWN_DIRECTIONS)
-    game = initialize("Dodo", INIT_GRID4, player1, 7, 5)
+    game = initialize("Dodo", INIT_GRID, player1, 7, 5)
     print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
-
 
 if __name__ == "__main__":
     main()
