@@ -4,7 +4,7 @@ import time
 from typing import Dict, List, Set, Tuple
 from Game_playing import hexagonal_board as hexa
 from Game_playing.grid import *
-from Game_playing.structures import *
+from Game_playing.structures_classes import *
 
 
 # Quelques constantes

@@ -10,7 +10,7 @@ Cell = tuple[int, int]
 ActionDodo = tuple[Cell, Cell]  # case de départ → case d'arrivée
 ActionGopher = Cell
 Action = Union[ActionGopher, ActionDodo]
-#Player = int  # 1 ou 2
+# Player = int  # 1 ou 2
 State = list[tuple[Cell, int]]  # État du jeu pour la boucle de jeu
 Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 Directions = list[tuple[int, int]]  # Liste de directions
@@ -31,6 +31,7 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
     (-1, 0),
     (-1, -1),
 ]
+
 
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 

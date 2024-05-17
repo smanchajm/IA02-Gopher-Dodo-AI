@@ -1,6 +1,6 @@
 """ Module concernant la grille hexagonale de jeu """
 from typing import List
-from structures import *
+from structures_classes import *
 
 
 # Fonctions utilitaires

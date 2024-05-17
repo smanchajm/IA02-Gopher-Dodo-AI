@@ -1,8 +1,8 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
-
 import random
-from Game_playing.classes import *
-Strategy = Callable[[Environment, Player,Grid], Action]
+from Game_playing.structures_classes import *
+
+Strategy = Callable[[Environment, Player, Grid], Action]
 
 
 def strategy_first_legal_dodo(env: Environment, player: Player, grid: Grid) -> Action:
@@ -15,7 +15,6 @@ def strategy_random_dodo(env: Environment, player: Player, grid: Grid) -> Action
 
 # Minimax Strategy (sans cache)
 def minmax_action(env: Environment, player: Player, grid: Grid, depth: int = 0) -> tuple[float, Action]:
-
     if depth == 0 or env.final_dodo(grid) != 0:
         return env.final_dodo(grid), (-1, -1)  # On retourne le score de la grille
 
@@ -38,5 +37,5 @@ def minmax_action(env: Environment, player: Player, grid: Grid, depth: int = 0) 
         return best
 
 
-def strategy_minmax(env: Environment, player: Player, grid: Grid,) -> Action:
+def strategy_minmax(env: Environment, player: Player, grid: Grid, ) -> Action:
     return minmax_action(env, player, grid, 3)[1]

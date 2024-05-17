@@ -1,10 +1,9 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
-from Dodo.dodo_implementation import EMPTY, UP_DIRECTIONS
-from structures import *
+from archives.dodo_implementation import UP_DIRECTIONS
+from structures_classes import *
 import time
-
 from Game_playing.grid import *
-from Dodo.strategies_dodo import strategy_random_dodo, strategy_minmax, strategy_first_legal_dodo
+from Dodo.strategies_dodo import strategy_random_dodo, strategy_minmax
 
 
 # Boucle de jeu Dodo
@@ -59,13 +58,10 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 
 
 def main():
-    init_grid = INIT_GRID
     player1 = Player(1, DOWN_DIRECTIONS)
-    player2 = Player(2, UP_DIRECTIONS)
     game = initialize("Dodo", INIT_GRID4, player1, 7, 5)
-    #hexa.display_grid(INIT_GRID4)
     print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
-    #print(game.legals_dodo(INIT_GRID4, player1))
+
 
 if __name__ == "__main__":
     main()
