@@ -1,24 +1,11 @@
 """ Module concernant la réalisation du jeu DoDo """
 import random
 import time
-from typing import Dict, List, Set, Callable, Union, Tuple
-import hexagonal_board as hexa
-from grid import *
+from typing import Dict, List, Set, Tuple
+from Game_playing import hexagonal_board as hexa
+from Game_playing.grid import *
+from Game_playing.structures import *
 
-# Structures de données
-Grid = hexa.Grid
-
-# Types de base utilisés par l'arbitre
-# Environment = ...  # type de l'environnement (objet, dictionnaire, autre...)
-Cell = tuple[int, int]
-ActionDodo = tuple[Cell, Cell]  # case de départ → case d'arrivée
-ActionGopher = Cell
-Action = Union[ActionGopher, ActionDodo]
-Player = int  # 1 ou 2
-State = list[tuple[Cell, Player]]  # État du jeu pour la boucle de jeu
-Score = int
-Time = int
-Strategy = Callable[[Grid, Player], Action]
 
 # Quelques constantes
 EMPTY = 0

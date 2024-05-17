@@ -1,13 +1,9 @@
 """ Module concernant la grille hexagonale de jeu """
 from typing import List
-from grid import *
+from structures import *
 
 # Structures de données
 
-# Types de base utilisés par l'arbitre
-# que votre IA puisse jouer (objet, dictionnaire, autre...)
-Player = int  # 1 ou 2
-Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 
 # Fonctions utilitaires
 
