@@ -91,6 +91,7 @@ class GameDodo:
 
     def play_dodo(self, player: Player, grid: Grid, action: ActionDodo) -> Grid:
         temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
+        # temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
         temp_grid[action[0][0]][action[0][1]] = 0
         temp_grid[action[1][0]][(action[1][1])] = player.id
         return hexa.grid_list_to_grid_tuple(temp_grid)

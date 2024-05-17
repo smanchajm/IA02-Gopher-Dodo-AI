@@ -62,10 +62,10 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 def stat_dodo() -> tuple[int, int]:
     result = []
     # boucle for
-    for i in range(10):
+    for i in range(100):
         player1 = Player(1, DOWN_DIRECTIONS)
-        game = initialize("Dodo", INIT_GRID, player1, 7, 5)
-        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False))
+        game = initialize("Dodo", INIT_GRID4, player1, 4, 5)
+        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
 
     print(result.count(1))
 
