@@ -3,12 +3,14 @@ from structures_classes import *
 from Game_playing.grid import *
 from Dodo.strategies_dodo import strategy_random_dodo, strategy_minmax, strategy_first_legal_dodo
 import time
+import matplotlib.pyplot as plt
 
 
 # Boucle de jeu Dodo
 def dodo(
         env: GameDodo, strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False
 ) -> Score:
+    time_history: list[Time] = []
     actual_grid: Grid = init_grid
     current_player: Player = env.max_player
     current_action: Action
@@ -36,10 +38,16 @@ def dodo(
         iteration_time_end = time.time()  # Fin du chronomètre pour la durée de cette itération
         if debug:
             print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
+        time_history.append(iteration_time_end - iteration_time_start)
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if debug:
         print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
+        plt.plot(time_history)
+        plt.ylabel("Temps d'itération (s)")
+        plt.xlabel("Itération")
+        plt.title("Temps d'itération en fonction de l'itération")
+        plt.show()
     return env.final_dodo(actual_grid)
 
 
@@ -64,11 +72,12 @@ def initialize(game: str, state: State, player: Player, hex_size: int, total_tim
 def stat_dodo() -> tuple[int, int]:
     result = []
     # boucle for
-    for i in range(100):
+    for i in range(10):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         player1 = Player(1, DOWN_DIRECTIONS)
-        game = initialize("Dodo", INIT_GRID4, player1, 4, 5)
-        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
+        game = initialize("Dodo", INIT_GRID, player1, 7, 5)
+        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False))
+        print(f"Partie {i + 1} terminée.")
 
     print(result.count(1))
 

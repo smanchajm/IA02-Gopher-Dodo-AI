@@ -13,10 +13,8 @@ def strategy_random_dodo(env: Environment, player: Player, grid: Grid) -> Action
     return random.choice(env.legals_dodo(grid, player))
 
 
-# Fonction d'évaluation sommaire pour le jeu Dodo
-def is_near_edge(cell: Cell, grid: Grid) -> bool:
-    return cell[0] == 0 or cell[0] == len(grid) - 1 or cell[1] == 0 or cell[1] == len(grid[0]) - 1
-
+def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
+    return cell[0] == 0 or cell[0] == grid_height - 1 or cell[1] == 0 or cell[1] == grid_width - 1
 
 def evaluate(env: Environment, grid: Grid, player: Player) -> int:
     if player == env.max_player:
@@ -44,6 +42,38 @@ def evaluate(env: Environment, grid: Grid, player: Player) -> int:
                     opponent_score -= 5  # Penalty for opponent being near edge
 
     return player_score - opponent_score
+
+def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
+    opponent = env.min_player if player == env.max_player else env.max_player
+
+    player_moves = len(env.legals_dodo(grid, player))
+    opponent_moves = len(env.legals_dodo(grid, opponent))
+
+    player_score = 0
+    opponent_score = 0
+
+    grid_height = len(grid)
+    grid_width = len(grid[0])
+
+    for i in range(grid_height):
+        for j in range(grid_width):
+            cell = grid[i][j]
+            if cell == player:
+                player_score -= 10  # Pénalité pour avoir une pièce
+                player_score -= 3 * player_moves  # Pénalité ajustée pour la mobilité
+                if is_near_edge((i, j), grid_height, grid_width):
+                    player_score += 10 - distance_to_edge((i, j), grid_height, grid_width)  # Récompense dynamique pour la proximité du bord
+            elif cell == opponent:
+                opponent_score += 10  # Récompense pour avoir une pièce
+                opponent_score += 3 * opponent_moves  # Récompense ajustée pour la mobilité
+                if is_near_edge((i, j), grid_height, grid_width):
+                    opponent_score -= 10 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
+
+    return player_score - opponent_score
+
+def distance_to_edge(cell: Cell, grid_height: int, grid_width: int) -> int:
+    # Calculer la distance minimale d'une cellule aux bords de la grille
+    return min(cell[0], grid_height - 1 - cell[0], cell[1], grid_width - 1 - cell[1])
 
 
 # Minimax Strategy (sans cache)
@@ -86,7 +116,8 @@ def minmax_action_alpha_beta_pruning(env: Environment, player: Player, grid: Gri
             memo[(grid_key, player_id, depth)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
-            score = evaluate(env, grid, player)
+            score = evaluate_dynamic(env, grid, player)
+            # score = evaluate(env, grid, player)
             memo[(grid_key, player_id, depth)] = (score, (-1, -1))
             return score, (-1, -1)
 
