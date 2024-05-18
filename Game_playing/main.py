@@ -1,12 +1,12 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 import time
+import matplotlib.pyplot as plt
 from structures_classes import *
 from Dodo.grid import *
 from Dodo.strategies_dodo import (
     strategy_random_dodo,
     strategy_minmax,
 )
-import matplotlib.pyplot as plt
 
 
 # Boucle de jeu Dodo

@@ -108,7 +108,7 @@ def display_grid(grid: Grid):
     print("")
 
 
-def convert(q: int, r: int, n) -> (int, int):
+def convert(q: int, r: int, n) -> Tuple[int, int]:
     """
     Fonction permettant de convertir des coordonnées allant de 0 à 2n
     à des coordonnées allant de -n à n

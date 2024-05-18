@@ -46,7 +46,7 @@ def evaluate(env: Environment, grid: Grid, player: Player) -> int:
                 player_score -= 5 * len(
                     env.legals_dodo(grid, player)
                 )  # Penalty for mobility
-                if is_near_edge((i, j), grid):
+                if is_near_edge((i, j), len(grid), len(grid)):
                     player_score += (
                         5  # Reward for being near edge (easier to block oneself)
                     )
@@ -55,7 +55,7 @@ def evaluate(env: Environment, grid: Grid, player: Player) -> int:
                 opponent_score += 5 * len(
                     env.legals_dodo(grid, opponent)
                 )  # Reward for mobility
-                if is_near_edge((i, j), grid):
+                if is_near_edge((i, j), len(grid), len(grid)):
                     opponent_score -= 5  # Penalty for opponent being near edge
 
     return player_score - opponent_score
@@ -98,7 +98,7 @@ def distance_to_edge(cell: Cell, grid_height: int, grid_width: int) -> int:
 # Minimax Strategy (sans cache)
 def minmax_action(
         env: Environment, player: Player, grid: Grid, depth: int = 0
-) -> tuple[float, Action]:
+) -> tuple[int, Action]:
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax pour le jeu Dodo
     """
@@ -106,21 +106,21 @@ def minmax_action(
         return env.final_dodo(grid), (-1, -1)  # On retourne le score de la grille
 
     if player == env.max_player:  # maximizing player
-        best = (float("-inf"), (-1, -1))
+        best = (int("-inf"), (-1, -1))
         for item in env.legals_dodo(grid, player):
             tmp = env.play_dodo(player, grid, item)
-            returned_values = minmax_action(env, env.min_player, tmp, depth - 1)
+            returned_values: tuple[int, Action] = minmax_action(env, env.min_player, tmp, depth - 1)
             if max(best[0], returned_values[0]) == returned_values[0]:
                 best = (returned_values[0], item)
         return best
 
     if player == env.min_player:  # minimizing player
-        best = (float("inf"), (-1, -1))
+        best = (int("inf"), (-1, -1))
         for item in env.legals_dodo(grid, player):
             tmp = env.play_dodo(player, grid, item)
             returned_values = minmax_action(env, env.max_player, tmp, depth - 1)
             if min(best[0], returned_values[0]) == returned_values[0]:
-                best = (returned_values[0], item)
+                best: tuple[int, Action] = (returned_values[0], item)
         return best
     return 0, (-1, -1)
 
@@ -167,7 +167,7 @@ def minmax_action_alpha_beta_pruning(
                     env, env.min_player, tmp, depth - 1, alpha, beta
                 )
                 if max(best[0], returned_values[0]) == returned_values[0]:
-                    best = (returned_values[0], item)
+                    best: tuple[float, Action] = (returned_values[0], item)
                 alpha = max(alpha, best[0])
                 if beta <= alpha:
                     break
@@ -182,7 +182,7 @@ def minmax_action_alpha_beta_pruning(
                     env, env.max_player, tmp, depth - 1, alpha, beta
                 )
                 if min(best[0], returned_values[0]) == returned_values[0]:
-                    best = (returned_values[0], item)
+                    best: tuple[float, Action] = (returned_values[0], item)
                 beta = min(beta, best[0])
                 if beta <= alpha:
                     break
