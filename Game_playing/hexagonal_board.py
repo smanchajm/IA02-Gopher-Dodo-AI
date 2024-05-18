@@ -1,30 +1,31 @@
 """ Module concernant la grille hexagonale de jeu """
+
 from typing import List
+
 Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 # Grid = tuple[tuple[int]]  # Array de Array en diagonal
 Directions = list[tuple[int, int]]  # Liste de directions
-# Fonctions utilitaires
-
-
-# Fonctions de coloration de texte
-def coloration_red(text: str) -> str:
-    return "\033[31m" + text + "\033[0m"
-
-
-def coloration_blue(text: str) -> str:
-    return "\033[34m" + text + "\033[0m"
 
 
 # Fonctions de création de grille
 def grid_tuple_to_grid_list(grid: Grid) -> list[list[int]]:
+    """
+    Fonction de conversion d'une grille en tuple en grille en liste
+    """
     return [list(i) for i in grid]
 
 
 def grid_list_to_grid_tuple(grid: list[list[int]]) -> Grid:
+    """
+    Fonction de conversion d'une grille en liste en grille en tuple
+    """
     return tuple(tuple(i) for i in grid)
 
 
 def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, int]]):
+    """
+    Fonction d'affichage des voisins d'une case
+    """
     neighbors: List[tuple[int, int]] = hex_neighbor(q, r, directions)
 
     for i, row in enumerate(grid):
@@ -50,6 +51,9 @@ def display_neighbors(grid: Grid, q: int, r: int, directions: List[tuple[int, in
 
 
 def grid_generation(n: int) -> Grid:
+    """
+    Fonction permettant de générer une grille hexagonale de taille n
+    """
     # Création d'un tableau 2(n-1) * 2(n-1)
     m = n - 1
     grid = [[-1] * (2 * m) for _ in range(2 * m)]
@@ -72,6 +76,9 @@ def grid_generation(n: int) -> Grid:
 
 
 def display_grid(grid: Grid):
+    """
+    Fonction permettant d'afficher une grille hexagonale
+    """
     # Affichage de l'indice de la colonne
     print(str("").rjust(5), end=" ")
     for j, cell in enumerate(grid[0]):
@@ -101,8 +108,11 @@ def display_grid(grid: Grid):
     print("")
 
 
-# Conversion de coordonnées allant de 0 à 2n à des coordonnées allant de -n à n.
 def convert(q: int, r: int, n) -> (int, int):
+    """
+    Fonction permettant de convertir des coordonnées allant de 0 à 2n
+    à des coordonnées allant de -n à n
+    """
     return -q + n - 1, -n + r + 1
 
 
@@ -118,6 +128,7 @@ directions_case_neighbors: List[tuple[int, int]] = [
 
 # Voisins d'une case selon certaines directions
 def hex_neighbor(q: int, r: int, directions: Directions) -> List[tuple[int, int]]:
-
+    """
+    Fonction permettant de retourner les voisins d'une case
+    """
     return [(q - dq, r + dr) for dq, dr in directions]
-

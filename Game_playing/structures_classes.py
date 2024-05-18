@@ -1,7 +1,8 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
+
 from typing import Union, Callable, List, Set
 from dataclasses import dataclass
-from Game_playing import hexagonal_board as hexa
+import Game_playing.hexagonal_board as hexa
 
 # Types de base utilisés par l'arbitre
 
@@ -37,7 +38,8 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
 # DataClass Player
 @dataclass
 class Player:
-    """ Classe représentant un joueur """
+    """Classe représentant un joueur"""
+
     id: int
     directions: Directions
 
@@ -45,7 +47,8 @@ class Player:
 # DataClass Game Dodo
 @dataclass
 class GameDodo:
-    """ Classe représentant le jeu Dodo """
+    """Classe représentant le jeu Dodo"""
+
     state: State
     # grid: Grid
     max_player: Player
@@ -57,7 +60,12 @@ class GameDodo:
 
     # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
     def legals_dodo(self, grid: Grid, player: Player) -> list[ActionDodo]:
-        actions: Set[ActionDodo] = set()  # On utilise un ensemble pour garantir l'unicité
+        """
+        Fonction retournant les actions possibles d'un joueur pour un état donné
+        """
+        actions: Set[ActionDodo] = (
+            set()
+        )  # On utilise un ensemble pour garantir l'unicité
 
         # On parcourt l'ensemble des cases de la grille
         for i, ligne in enumerate(grid):
@@ -77,18 +85,23 @@ class GameDodo:
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
     def final_dodo(self, grid: Grid, debug: bool = False) -> int:
+        """
+         Fonction retournant le score si nous sommes dans un état final (fin de partie)
+         """
         if not self.legals_dodo(grid, self.max_player):
             if debug:
                 print(self.legals_dodo(grid, self.max_player))
             return 1
-        elif not self.legals_dodo(grid, self.min_player):
+        if not self.legals_dodo(grid, self.min_player):
             if debug:
                 print(self.legals_dodo(grid, self.min_player))
             return -1
-        else:
-            return 0
+        return 0
 
     def play_dodo(self, player: Player, grid: Grid, action: ActionDodo) -> Grid:
+        """
+        Fonction jouant un coup pour un joueur donné
+        """
         temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
         # temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
         temp_grid[action[0][0]][action[0][1]] = 0
@@ -98,6 +111,7 @@ class GameDodo:
 
 @dataclass
 class GameGopher:
+    """Classe représentant le jeu Gopher"""
     pass
 
 
