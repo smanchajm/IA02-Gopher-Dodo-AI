@@ -16,6 +16,7 @@ def strategy_random_dodo(env: Environment, player: Player, grid: Grid) -> Action
 def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
     return cell[0] == 0 or cell[0] == grid_height - 1 or cell[1] == 0 or cell[1] == grid_width - 1
 
+
 def evaluate(env: Environment, grid: Grid, player: Player) -> int:
     if player == env.max_player:
         opponent = env.min_player
@@ -42,6 +43,7 @@ def evaluate(env: Environment, grid: Grid, player: Player) -> int:
                     opponent_score -= 5  # Penalty for opponent being near edge
 
     return player_score - opponent_score
+
 
 def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
     opponent = env.min_player if player == env.max_player else env.max_player
@@ -70,6 +72,7 @@ def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
                     opponent_score -= 10 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
 
     return player_score - opponent_score
+
 
 def distance_to_edge(cell: Cell, grid_height: int, grid_width: int) -> int:
     # Calculer la distance minimale d'une cellule aux bords de la grille
