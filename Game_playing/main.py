@@ -76,9 +76,9 @@ def stat_dodo() -> tuple[int, int]:
 # Fonction principale de jeu Dodo
 def main():
     player1 = Player(1, DOWN_DIRECTIONS)
-    game = initialize("Dodo", INIT_GRID4, player1, 7, 5)
-    #print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, True))
-    stat_dodo()
+    game = initialize("Dodo", INIT_GRID, player1, 7, 5)
+    print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, True))
+    # stat_dodo()
 
 
 if __name__ == "__main__":

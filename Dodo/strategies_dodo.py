@@ -121,4 +121,4 @@ def minmax_action_alpha_beta_pruning(env: Environment, player: Player, grid: Gri
 
 def strategy_minmax(env: Environment, player: Player, grid: Grid) -> Action:
     # return minmax_action(env, player, grid, 4)[1]
-    return minmax_action_alpha_beta_pruning(env, player, grid, 8)[1]
+    return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
