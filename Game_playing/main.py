@@ -6,6 +6,7 @@ from Dodo.strategies_dodo import (
     strategy_random_dodo,
     strategy_minmax,
 )
+import matplotlib.pyplot as plt
 
 
 # Boucle de jeu Dodo
@@ -19,6 +20,7 @@ def dodo(
     """
     Fonction représentant la boucle de jeu de Dodo
     """
+    time_history: list[Time] = []
     actual_grid: Grid = init_grid
     current_player: Player = env.max_player
     current_action: Action
@@ -50,10 +52,17 @@ def dodo(
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes")
+            print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
+        time_history.append(iteration_time_end - iteration_time_start)
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if debug:
         print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
+        plt.plot(time_history)
+        plt.ylabel("Temps d'itération (s)")
+        plt.xlabel("Itération")
+        plt.title("Temps d'itération en fonction de l'itération")
+        plt.show()
     return env.final_dodo(actual_grid)
 
 
@@ -98,14 +107,13 @@ def stat_dodo() -> None:
     Fonction permettant de calculer des statistiques sur le jeu Dodo en fonction de la stratégie
     """
     result = []
-    for i in range(100):
-        print(f"Iteration \033[36m {i}\033[0m.")
-        # iteration_time_start = time.time()  # Chronomètre une itération de jeu
+    # boucle for
+    for i in range(10):
+        iteration_time_start = time.time()  # Chronomètre une itération de jeu
         player1 = Player(1, DOWN_DIRECTIONS)
-        game = initialize("Dodo", INIT_GRID4, player1, 4, 5)
-        result.append(
-            dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, False)
-        )
+        game = initialize("Dodo", INIT_GRID, player1, 7, 5)
+        result.append(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False))
+        print(f"Partie {i + 1} terminée.")
 
     print(result.count(1))
 
@@ -116,9 +124,9 @@ def main():
     Fonction principale de jeu Dodo
     """
     player1 = Player(1, DOWN_DIRECTIONS)
-    # game = initialize("Dodo", INIT_GRID4, player1, 7, 5)
-    # print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, True))
-    stat_dodo()
+    game = initialize("Dodo", INIT_GRID, player1, 4, 5)
+    print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, True))
+    # stat_dodo()
 
 
 if __name__ == "__main__":
