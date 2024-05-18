@@ -1,9 +1,8 @@
 """ Module concernant la réalisation du jeu DoDo """
 import random
 import time
-from typing import Dict, List, Set, Tuple
-from Game_playing import hexagonal_board as hexa
-from Game_playing.grid import *
+from typing import Dict, Tuple
+from Dodo.grid import *
 from Game_playing.structures_classes import *
 
 
