@@ -212,7 +212,8 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
 
     # find is the hash key is in the library
     if hash(grid) in list(starting_library.keys()):
-        print("Hash found in library")
+        # write in green
+        print("\033[32mHash found in library\033[0m")
         action = starting_library[hash(grid)]['action']
         # test if the action is in the legal actions
         if action not in env.legals_dodo(grid, player):

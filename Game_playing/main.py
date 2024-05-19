@@ -57,7 +57,7 @@ def dodo(
         if current_player.id == 1:
             current_action = strategy_1(env, current_player, actual_grid, starting_library)
             if building_library:
-                if hash(actual_grid) not in starting_library.keys():
+                if hash(actual_grid) not in starting_library.keys() and nb_iterations < 200:
                     # print(f"Adding {hash(actual_grid)} to the library")
                     starting_library[hash(actual_grid)] = {'action': current_action[0]}
         else:
@@ -140,7 +140,7 @@ def main():
     Fonction principale de jeu Dodo
     """
     player1 = Player(1, DOWN_DIRECTIONS)
-    game = initialize("Dodo", INIT_GRID, player1, 4, 5)
+    game = initialize("Dodo", INIT_GRID, player1, 7, 5)
     print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False, building_library=True))
     starting_library = load_library('starting_library.pkl')
     print(len(starting_library))
