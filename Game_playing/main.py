@@ -31,7 +31,8 @@ def dodo(
     init_grid: Grid,
     debug: bool = False,
     starting_library: dict = {},
-    building_library: bool = False
+    building_library: bool = False,
+    graphics: bool = False,
 ) -> Score:
     """
     Fonction représentant la boucle de jeu de Dodo
@@ -81,7 +82,7 @@ def dodo(
         time_history.append(iteration_time_end - iteration_time_start)
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
-    if debug:
+    if graphics:
         print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
         plt.plot(time_history)
         plt.ylabel("Temps d'itération (s)")
@@ -134,16 +135,23 @@ def initialize(
         )
 
 
+def launch_multi_game(game_number: int = 1):
+    """
+    Fonction permettant de lancer plusieurs parties de jeu
+    """
+    player1 = Player(1, DOWN_DIRECTIONS)
+    for i in range(game_number):
+        game = initialize("Dodo", INIT_GRID, player1, 7, 5)
+        print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False, building_library=True, graphics=False))
+    starting_library = load_library('starting_library.pkl')
+    print(len(starting_library))
+
 # Fonction principale de jeu Dodo
 def main():
     """
     Fonction principale de jeu Dodo
     """
-    player1 = Player(1, DOWN_DIRECTIONS)
-    game = initialize("Dodo", INIT_GRID, player1, 7, 5)
-    print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False, building_library=True))
-    starting_library = load_library('starting_library.pkl')
-    print(len(starting_library))
+    launch_multi_game(10)
 
 if __name__ == "__main__":
     main()
