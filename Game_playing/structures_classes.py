@@ -116,4 +116,4 @@ class GameGopher:
 
 
 Environment = GameDodo
-Strategy = Callable[[Environment, Player, Grid], Action]
+Strategy = Callable[[Environment, Player, Grid, dict], Action]

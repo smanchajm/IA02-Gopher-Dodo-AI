@@ -77,15 +77,15 @@ def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
         for j in range(grid_width):
             cell = grid[i][j]
             if cell == player:
-                player_score -= 10  # Pénalité pour avoir une pièce
-                player_score -= 3 * player_moves  # Pénalité ajustée pour la mobilité
+                player_score -= 20  # Pénalité pour avoir une pièce
+                player_score -= 5 * player_moves  # Pénalité ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    player_score += 10 - distance_to_edge((i, j), grid_height, grid_width)  # Récompense dynamique pour la proximité du bord
+                    player_score += 20 - distance_to_edge((i, j), grid_height, grid_width)  # Récompense dynamique pour la proximité du bord
             elif cell == opponent:
-                opponent_score += 10  # Récompense pour avoir une pièce
-                opponent_score += 3 * opponent_moves  # Récompense ajustée pour la mobilité
+                opponent_score += 20  # Récompense pour avoir une pièce
+                opponent_score += 5 * opponent_moves  # Récompense ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    opponent_score -= 10 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
+                    opponent_score -= 20 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
 
     return player_score - opponent_score
 
@@ -195,9 +195,31 @@ def minmax_action_alpha_beta_pruning(
     )
 
 
-def strategy_minmax(env: Environment, player: Player, grid: Grid) -> Action:
+def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_library: dict = None) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
     # return minmax_action(env, player, grid, 4)[1]
-    return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+    # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+    """
+    Strategy that returns the action calculated by the Minimax algorithm.
+    """
+    if starting_library is None:
+        # print("No library provided")
+        return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+    # max_depth_in_library = min(100, len(starting_library))  # Assuming library covers first 100 iterations
+    action = None
+
+    # find is the hash key is in the library
+    if hash(grid) in list(starting_library.keys()):
+        print("Hash found in library")
+        action = starting_library[hash(grid)]['action']
+        # test if the action is in the legal actions
+        if action not in env.legals_dodo(grid, player):
+            action = None
+
+    if action is None:
+        # If no action is found in the library, perform the minimax search as usual
+        action = minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+
+    return action
