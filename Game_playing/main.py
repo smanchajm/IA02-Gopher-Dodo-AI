@@ -52,7 +52,6 @@ def dodo(
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes")
-            print(f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start} secondes")
         time_history.append(iteration_time_end - iteration_time_start)
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie

@@ -1,6 +1,6 @@
 """ Module concernant la grille hexagonale de jeu """
 
-from typing import List
+from typing import List, Tuple
 
 Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 # Grid = tuple[tuple[int]]  # Array de Array en diagonal
