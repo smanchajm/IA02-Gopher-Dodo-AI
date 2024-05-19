@@ -77,15 +77,15 @@ def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
         for j in range(grid_width):
             cell = grid[i][j]
             if cell == player:
-                player_score -= 20  # Pénalité pour avoir une pièce
-                player_score -= 5 * player_moves  # Pénalité ajustée pour la mobilité
+                player_score -= 400  # Pénalité pour avoir une pièce
+                player_score -= 1000 * player_moves  # Pénalité ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    player_score += 20 - distance_to_edge((i, j), grid_height, grid_width)  # Récompense dynamique pour la proximité du bord
+                    player_score += 400 - distance_to_edge((i, j), grid_height, grid_width)  # Récompense dynamique pour la proximité du bord
             elif cell == opponent:
-                opponent_score += 20  # Récompense pour avoir une pièce
-                opponent_score += 5 * opponent_moves  # Récompense ajustée pour la mobilité
+                opponent_score += 400  # Récompense pour avoir une pièce
+                opponent_score += 1000 * opponent_moves  # Récompense ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    opponent_score -= 20 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
+                    opponent_score -= 400 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
 
     return player_score - opponent_score
 
