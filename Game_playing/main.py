@@ -142,7 +142,7 @@ def launch_multi_game(game_number: int = 1):
     player1 = Player(1, DOWN_DIRECTIONS)
     for i in range(game_number):
         game = initialize("Dodo", INIT_GRID, player1, 7, 5)
-        print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, False, building_library=True, graphics=False))
+        print(dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID, True, building_library=True, graphics=True))
     starting_library = load_library('starting_library.pkl')
     print(len(starting_library))
 
@@ -151,7 +151,7 @@ def main():
     """
     Fonction principale de jeu Dodo
     """
-    launch_multi_game(10)
+    launch_multi_game(1)
 
 if __name__ == "__main__":
     main()
