@@ -86,8 +86,8 @@ def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
                 opponent_score += 400  # Récompense pour avoir une pièce
                 opponent_score += 800 * opponent_moves  # Récompense ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    opponent_score -= 400 - distance_to_edge((i, j), grid_height,
-                                                             grid_width)  # Pénalité dynamique pour l'adversaire près du bord
+                    # Pénalité dynamique pour l'adversaire près du bord
+                    opponent_score -= 400 - distance_to_edge((i, j), grid_height, grid_width)
 
     return player_score - opponent_score
 
@@ -108,7 +108,7 @@ def minmax_action(
         return env.final_dodo(grid), (-1, -1)  # On retourne le score de la grille
 
     if player == env.max_player:  # maximizing player
-        best = (int("-inf"), (-1, -1))
+        best = (int("-inf"), ((-1, -1), (-1, -1)))
         for item in env.legals_dodo(grid, player):
             tmp = env.play_dodo(player, grid, item)
             returned_values: tuple[int, Action] = minmax_action(env, env.min_player, tmp, depth - 1)
@@ -138,7 +138,7 @@ def minmax_action_alpha_beta_pruning(
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
     et memoïsation pour le jeu Dodo
     """
-    memo: Dict[MemoKey, Tuple[int, Action]] = {}  # Dictionary to store the memoized results
+    memo: Dict[MemoKey, Tuple[float, Action]] = {}  # Dictionary to store the memoized results
 
     def minmax_alpha_beta_pruning(
             env: Environment,
@@ -148,7 +148,7 @@ def minmax_action_alpha_beta_pruning(
             alpha: float,
             beta: float,
     ) -> tuple[float, Action]:
-        # Convert grid to a tuple so it can be used as a key in the dictionary
+        # Convert grid to a tuple, so it can be used as a key in the dictionary
         grid_key = grid
         player_id = player.id  # Use a unique identifier for the player
 
@@ -166,34 +166,34 @@ def minmax_action_alpha_beta_pruning(
             return score, (-1, -1)
 
         if player == env.max_player:  # Maximizing player
-            best = (float("-inf"), (-1, -1))
-            for item in env.legals_dodo(grid, player):
-                tmp = env.play_dodo(player, grid, item)
+            best_max: tuple[float, Action] = (float("-inf"), (-1, -1))
+            for action in env.legals_dodo(grid, player):
+                tmp = env.play_dodo(player, grid, action)
                 returned_values = minmax_alpha_beta_pruning(
                     env, env.min_player, tmp, depth - 1, alpha, beta
                 )
-                if max(best[0], returned_values[0]) == returned_values[0]:
-                    best: tuple[float, Action] = (returned_values[0], item)
-                alpha = max(alpha, best[0])
+                if returned_values[0] > best_max[0]:
+                    best_max = (returned_values[0], action)
+                alpha = max(alpha, best_max[0])
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id)] = best
-            return best
+            memo[(grid_key, player_id)] = best_max
+            return best_max
 
         if player == env.min_player:  # Minimizing player
-            best = (float("inf"), (-1, -1))
+            best_min: tuple[float, Action] = (float("inf"), (-1, -1))
             for item in env.legals_dodo(grid, player):
                 tmp = env.play_dodo(player, grid, item)
                 returned_values = minmax_alpha_beta_pruning(
                     env, env.max_player, tmp, depth - 1, alpha, beta
                 )
-                if min(best[0], returned_values[0]) == returned_values[0]:
-                    best: tuple[float, Action] = (returned_values[0], item)
-                beta = min(beta, best[0])
+                if returned_values[0] < best_min[0]:
+                    best_min = (returned_values[0], item)
+                beta = min(beta, best_min[0])
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id)] = best
-            return best
+            memo[(grid_key, player_id)] = best_min
+            return best_min
         return 0, (-1, -1)
 
     return minmax_alpha_beta_pruning(
@@ -210,7 +210,7 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
 
     if starting_library is None:
         # print("No library provided")
-        return minmax_action_alpha_beta_pruning(env, player, grid, 6)[1]
+        return minmax_action_alpha_beta_pruning(env, player, grid, 8)[1]
     # max_depth_in_library = min(100, len(starting_library))  # Assuming library covers first 100 iterations
     action = None
 
@@ -225,6 +225,6 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
 
     if action is None:
         # If no action is found in the library, perform the minimax search as usual
-        action = minmax_action_alpha_beta_pruning(env, player, grid, 6)[1]
+        action = minmax_action_alpha_beta_pruning(env, player, grid, 8)[1]
 
     return action

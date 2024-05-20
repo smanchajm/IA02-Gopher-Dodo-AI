@@ -1,6 +1,6 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
 
-from typing import Union, Callable, List, Set, Dict
+from typing import Union, Callable, List, Set
 from dataclasses import dataclass
 import Game_playing.hexagonal_board as hexa
 
@@ -102,7 +102,7 @@ class GameDodo:
         """
         Fonction jouant un coup pour un joueur donné
         """
-        temp_grid: List[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
+        temp_grid: List[list[int]] = hexa.grid_tuple_to_grid_list(grid)
         # temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
         temp_grid[action[0][0]][action[0][1]] = 0
         temp_grid[action[1][0]][(action[1][1])] = player.id
