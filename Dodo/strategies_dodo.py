@@ -1,6 +1,6 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
 import random
-from typing import Callable
+from typing import Callable, Dict, Tuple
 from Game_playing.structures_classes import Environment, Player, Grid, Action, Cell
 
 Strategy = Callable[[Environment, Player, Grid], Action]
@@ -13,7 +13,7 @@ def strategy_first_legal_dodo(env: Environment, player: Player, grid: Grid) -> A
     return env.legals_dodo(grid, player)[0]
 
 
-def strategy_random_dodo(env: Environment, player: Player, grid: Grid) -> Action:
+def strategy_random_dodo(env: Environment, player: Player, grid: Grid, starting_library: dict = None) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
     """
@@ -80,12 +80,14 @@ def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
                 player_score -= 400  # Pénalité pour avoir une pièce
                 player_score -= 800 * player_moves  # Pénalité ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    player_score += 400 - distance_to_edge((i, j), grid_height, grid_width)  # Récompense dynamique pour la proximité du bord
+                    player_score += 400 - distance_to_edge((i, j), grid_height,
+                                                           grid_width)  # Récompense dynamique pour la proximité du bord
             elif cell == opponent:
                 opponent_score += 400  # Récompense pour avoir une pièce
                 opponent_score += 800 * opponent_moves  # Récompense ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    opponent_score -= 400 - distance_to_edge((i, j), grid_height, grid_width)  # Pénalité dynamique pour l'adversaire près du bord
+                    opponent_score -= 400 - distance_to_edge((i, j), grid_height,
+                                                             grid_width)  # Pénalité dynamique pour l'adversaire près du bord
 
     return player_score - opponent_score
 
@@ -125,6 +127,10 @@ def minmax_action(
     return 0, (-1, -1)
 
 
+# Define a type alias for the memoization key
+MemoKey = tuple[Grid, int]
+
+
 def minmax_action_alpha_beta_pruning(
         env: Environment, player: Player, grid: Grid, depth: int = 0
 ) -> tuple[float, Action]:
@@ -132,7 +138,7 @@ def minmax_action_alpha_beta_pruning(
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
     et memoïsation pour le jeu Dodo
     """
-    memo = {}  # Dictionary to store the memoized results
+    memo: Dict[MemoKey, Tuple[int, Action]] = {}  # Dictionary to store the memoized results
 
     def minmax_alpha_beta_pruning(
             env: Environment,
@@ -143,20 +149,20 @@ def minmax_action_alpha_beta_pruning(
             beta: float,
     ) -> tuple[float, Action]:
         # Convert grid to a tuple so it can be used as a key in the dictionary
-        grid_key = tuple(map(tuple, grid))
+        grid_key = grid
         player_id = player.id  # Use a unique identifier for the player
 
-        if (grid_key, player_id, depth) in memo:
-            return memo[(grid_key, player_id, depth)]
+        if (grid_key, player_id) in memo:
+            return memo[(grid_key, player_id)]
 
         if env.final_dodo(grid) != 0:
             score = env.final_dodo(grid)
-            memo[(grid_key, player_id, depth)] = (score, (-1, -1))
+            memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
             score = evaluate_dynamic(env, grid, player)
             # score = evaluate(env, grid, player)
-            memo[(grid_key, player_id, depth)] = (score, (-1, -1))
+            memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
 
         if player == env.max_player:  # Maximizing player
@@ -171,7 +177,7 @@ def minmax_action_alpha_beta_pruning(
                 alpha = max(alpha, best[0])
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id, depth)] = best
+            memo[(grid_key, player_id)] = best
             return best
 
         if player == env.min_player:  # Minimizing player
@@ -186,7 +192,7 @@ def minmax_action_alpha_beta_pruning(
                 beta = min(beta, best[0])
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id, depth)] = best
+            memo[(grid_key, player_id)] = best
             return best
         return 0, (-1, -1)
 
@@ -201,12 +207,10 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
     """
     # return minmax_action(env, player, grid, 4)[1]
     # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
-    """
-    Strategy that returns the action calculated by the Minimax algorithm.
-    """
+
     if starting_library is None:
         # print("No library provided")
-        return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+        return minmax_action_alpha_beta_pruning(env, player, grid, 6)[1]
     # max_depth_in_library = min(100, len(starting_library))  # Assuming library covers first 100 iterations
     action = None
 
@@ -221,6 +225,6 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
 
     if action is None:
         # If no action is found in the library, perform the minimax search as usual
-        action = minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+        action = minmax_action_alpha_beta_pruning(env, player, grid, 6)[1]
 
     return action
