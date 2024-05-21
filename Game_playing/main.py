@@ -162,45 +162,64 @@ def initialize(
 
 
 def append_to_csv(dataframe: pd.DataFrame, filename: str):
+    path_file = f"./benchmarks/{filename}.csv"
     file_exists = os.path.isfile(filename)
     with open(filename, 'a', newline='') as f:
         if not file_exists:
-            dataframe.to_csv(f, header=True, index=False)
+            # dataframe.to_csv(f, header=True, index=False)
+            pass
         else:
             dataframe.to_csv(f, header=False, index=False)
+
+
+def add_to_benchmark(list_results, filename: str, game_number: int, strategy_1: str, strategy_2: str,
+                     grid: int, depth: int, starting_library: bool):
+    win_number = sum([res["winner"] == 1 for res in list_results])
+    loss_number = game_number - win_number
+    new_benchmark = {
+        "strategy_1": strategy_1,
+        "strategy_2": strategy_2,
+        "Grid": grid,
+        "depth": depth,
+        "game_number": game_number,
+        "starting_library": starting_library,
+        "win_rate": sum([res["winner"] == 1 for res in list_results]) / game_number,
+        "average_turns": sum([res["total_turns"] for res in list_results]) / game_number,
+        "min_turns": min([res["total_turns"] for res in list_results]),
+        "max_turns": max([res["total_turns"] for res in list_results]),
+        "average_iteration_time": sum([res["average_iteration_time"] for res in list_results]) / game_number,
+        "average_total_time": sum([res["total_time"] for res in list_results]) / game_number,
+        "average_turns_win": (sum(res["total_turns"] for res in list_results if res["winner"] == 1) / win_number) if win_number > 0 else 0,
+        "average_turns_loss": (sum(res["total_turns"] for res in list_results if res["winner"] == -1) / loss_number) if loss_number > 0 else 0
+
+    }
+
+    # Créer un DataFrame avec une seule ligne
+    df_results = pd.DataFrame([new_benchmark])
+    print(df_results)
+    append_to_csv(df_results, f'{filename}.csv')
 
 
 def launch_multi_game(game_number: int = 1):
     """
     Fonction permettant de lancer plusieurs parties de jeu
     """
+    # Liste pour stocker les résultats des parties
     list_results = []
-    player1 = Player(1, DOWN_DIRECTIONS)
+    player1: Player = Player(1, DOWN_DIRECTIONS)
+    size_init_grid = 4
+    init_grid = INIT_GRID4
+
     for i in range(game_number):
-        game = initialize("Dodo", INIT_GRID4, player1, 7, 5)
-        res = (dodo(game, strategy_minmax, strategy_random_dodo, INIT_GRID4, debug=False, building_library=False,
+        game = initialize("Dodo", init_grid, player1, 7, 5)
+        res = (dodo(game, strategy_minmax, strategy_random_dodo, init_grid, debug=False, building_library=False,
                     graphics=False))
         list_results.append(res)
         print(f"Partie {i + 1}: {res}")
-    print(list_results)
-    starting_library = load_library('starting_library.pkl')
-    print(len(starting_library))
 
-    new_benchmark = {
-        "strategy_1": "strategy_minmax_alpha_beta",
-        "depth": 8,
-        "strategy_2": "strategy_random_dodo",
-        "game_number": game_number,
-        "starting_library": "No",
-        "results": list_results,
-        "win_rate": sum([res["winner"] for res in list_results]) / game_number,
-        "average_turns": sum([res["total_turns"] for res in list_results]) / game_number,
-        "average_iteration_time": sum([res["average_iteration_time"] for res in list_results]) / game_number,
-        "average_total_time": sum([res["total_time"] for res in list_results]) / game_number
-    }
-    df_results = pd.DataFrame(new_benchmark)
-    print(df_results)
-    append_to_csv(df_results, 'benchmark.csv')
+    # Ajout des stat à un fichier CSV
+    add_to_benchmark(list_results, "benchmark", game_number, "strategy_minmax", "strategy_random_dodo",
+                     size_init_grid, 5, False)
 
 
 # Fonction principale de jeu Dodo
@@ -208,7 +227,7 @@ def main():
     """
     Fonction principale de jeu Dodo
     """
-    launch_multi_game(2)
+    launch_multi_game(3)
 
 
 if __name__ == "__main__":

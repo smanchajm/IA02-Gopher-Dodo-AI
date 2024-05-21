@@ -14,6 +14,8 @@
 * les pondérations des critères pour la fonction d'évaluations peuvent êtres ajustés avec du reinforcement learning
 * possible d'implémenter des méthode mixtes : en utilisant Alpha-Bêta pour les premiers coups lorsque le facteur de branchement est élevé, puis en passant à MCTS pour des recherches plus profondes lorsque le temps le permet
 * Gestion des symétries
+* Gestion des rotations
+* adapter les profondeurs de recherche en fonction des coups possibles
 * Gestion du câche (mémoïsation)
 * Calculer le nb de coup minimum pour gagner --> pas nécessaire de faire final avant 
 

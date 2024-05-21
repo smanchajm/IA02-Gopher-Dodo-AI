@@ -49,8 +49,8 @@ class Player:
 class GameDodo:
     """Classe représentant le jeu Dodo"""
 
-    state: State
-    # grid: Grid
+    # state: State
+    grid: Grid
     max_player: Player
     min_player: Player
     hex_size: int
