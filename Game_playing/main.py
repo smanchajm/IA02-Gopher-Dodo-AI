@@ -15,6 +15,7 @@ from Dodo.strategies_dodo import (
     strategy_random_dodo,
     strategy_minmax,
 )
+from hexagonal_board import display_grid
 
 
 # Function to save the library to a file
@@ -71,13 +72,13 @@ def dodo(
     else:
         starting_library = None
 
-    while not (env.final_dodo(actual_grid) == 1 or env.final_dodo(actual_grid) == -1):
-        tour += 1
+    res = env.final_dodo(actual_grid)
+    while not (res == 1 or res == -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and current_player.id == 1:
-            tour += 1
             print(f"Tour \033[36m {tour}\033[0m.")
         if current_player.id == 1:
+            tour += 1
             current_action = strategy_1(env, current_player, actual_grid, starting_library)
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
@@ -104,6 +105,8 @@ def dodo(
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes")
+
+        res = env.final_dodo(actual_grid)
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -162,12 +165,19 @@ def initialize(
 
 
 def append_to_csv(dataframe: pd.DataFrame, filename: str):
-    path_file = f"./benchmarks/{filename}.csv"
-    file_exists = os.path.isfile(filename)
-    with open(filename, 'a', newline='') as f:
+    parent_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+    path_file = os.path.join(parent_dir, "Benchmarks", filename)
+
+    # Vérifier si le fichier existe
+    file_exists = os.path.isfile(path_file)
+
+    # Créer le dossier Benchmarks s'il n'existe pas déjà
+    os.makedirs(os.path.dirname(path_file), exist_ok=True)
+
+    # Écrire dans le fichier
+    with open(path_file, 'a', newline='', encoding='utf-8') as f:
         if not file_exists:
-            # dataframe.to_csv(f, header=True, index=False)
-            pass
+            dataframe.to_csv(f, header=True, index=False)
         else:
             dataframe.to_csv(f, header=False, index=False)
 
@@ -207,13 +217,13 @@ def launch_multi_game(game_number: int = 1):
     # Liste pour stocker les résultats des parties
     list_results = []
     player1: Player = Player(1, DOWN_DIRECTIONS)
-    size_init_grid = 4
-    init_grid = INIT_GRID4
+    size_init_grid = 7
+    init_grid = INIT_GRID
 
     for i in range(game_number):
         game = initialize("Dodo", init_grid, player1, 7, 5)
-        res = (dodo(game, strategy_minmax, strategy_random_dodo, init_grid, debug=False, building_library=False,
-                    graphics=False))
+        res = (dodo(game, strategy_minmax, strategy_random_dodo, init_grid, debug=True, building_library=False,
+                    graphics=False, library=False))
         list_results.append(res)
         print(f"Partie {i + 1}: {res}")
 
@@ -227,7 +237,8 @@ def main():
     """
     Fonction principale de jeu Dodo
     """
-    launch_multi_game(3)
+
+    launch_multi_game(10)
 
 
 if __name__ == "__main__":

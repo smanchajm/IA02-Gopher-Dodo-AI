@@ -1,6 +1,6 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
 
-from typing import Union, Callable, List, Set
+from typing import Union, Callable, List, Set, Dict, Any
 from dataclasses import dataclass
 import Game_playing.hexagonal_board as hexa
 
@@ -63,9 +63,7 @@ class GameDodo:
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
-        actions: Set[ActionDodo] = (
-            set()
-        )  # On utilise un ensemble pour garantir l'unicité
+        actions: Dict[ActionDodo, Any] = {}  # On utilise un ensemble pour garantir l'unicité
 
         # On parcourt l'ensemble des cases de la grille
         for i, ligne in enumerate(grid):
@@ -79,9 +77,10 @@ class GameDodo:
                         q = neighbor[1]
                         if 0 <= r < len(grid) and 0 <= q < len(grid[0]):
                             if grid[neighbor[0]][neighbor[1]] == 0:
-                                actions.add(((i, j), neighbor))
+                                if ((i, j), neighbor) not in actions:
+                                    actions[((i, j), neighbor)] = None
 
-        return list(actions)
+        return list(actions.keys())
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
     def final_dodo(self, grid: Grid, debug: bool = False) -> int:
@@ -103,7 +102,6 @@ class GameDodo:
         Fonction jouant un coup pour un joueur donné
         """
         temp_grid: List[list[int]] = hexa.grid_tuple_to_grid_list(grid)
-        # temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
         temp_grid[action[0][0]][action[0][1]] = 0
         temp_grid[action[1][0]][(action[1][1])] = player.id
         return hexa.grid_list_to_grid_tuple(temp_grid)

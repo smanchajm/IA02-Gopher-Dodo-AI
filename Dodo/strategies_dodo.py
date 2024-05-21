@@ -60,7 +60,7 @@ def evaluate(env: Environment, grid: Grid, player: Player) -> int:
 
     return player_score - opponent_score
 
-
+# nombre de coups pour ganger ?
 def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
     opponent = env.min_player if player == env.max_player else env.max_player
 
@@ -155,13 +155,18 @@ def minmax_action_alpha_beta_pruning(
         if (grid_key, player_id) in memo:
             return memo[(grid_key, player_id)]
 
-        if env.final_dodo(grid) != 0:
-            score = env.final_dodo(grid)
+        # Si la profondeur est nulle ou si la partie est terminée
+        res = env.final_dodo(grid)
+        if res != 0:
+            if res == 1:
+                score = 10000000
+            else:
+                score = -10000000
+            # score = env.final_dodo(grid)
             memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
             score = evaluate_dynamic(env, grid, player)
-            # score = evaluate(env, grid, player)
             memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
 
