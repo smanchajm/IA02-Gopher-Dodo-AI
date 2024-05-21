@@ -212,10 +212,12 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
     """
     # return minmax_action(env, player, grid, 4)[1]
     # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
+    depth_factor = 13 / len(env.legals_dodo(grid, player))
+    depth = min(5 * max(1, round(depth_factor)), 10)
 
     if starting_library is None:
         # print("No library provided")
-        return minmax_action_alpha_beta_pruning(env, player, grid, 5)[1]
+        return minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
     # max_depth_in_library = min(100, len(starting_library))  # Assuming library covers first 100 iterations
     action = None
 
@@ -230,6 +232,6 @@ def strategy_minmax(env: Environment, player: Player, grid: Grid, starting_libra
 
     if action is None:
         # If no action is found in the library, perform the minimax search as usual
-        action = minmax_action_alpha_beta_pruning(env, player, grid, 5)[1]
+        action = minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
 
     return action

@@ -217,11 +217,11 @@ def launch_multi_game(game_number: int = 1):
     # Liste pour stocker les résultats des parties
     list_results = []
     player1: Player = Player(1, DOWN_DIRECTIONS)
-    size_init_grid = 7
-    init_grid = INIT_GRID
-
+    size_init_grid = 4
+    init_grid = INIT_GRID4
     for i in range(game_number):
-        game = initialize("Dodo", init_grid, player1, 7, 5)
+        game = initialize("Dodo", init_grid, player1, 4, 5)
+        print(len(game.legals_dodo(init_grid, player1)))
         res = (dodo(game, strategy_minmax, strategy_random_dodo, init_grid, debug=True, building_library=False,
                     graphics=False, library=False))
         list_results.append(res)
