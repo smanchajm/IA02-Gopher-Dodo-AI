@@ -1,6 +1,6 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
 
-from typing import Union, Callable, List, Set, Dict, Any
+from typing import Union, Callable, List, Dict, Any
 from dataclasses import dataclass
 import Game_playing.hexagonal_board as hexa
 
@@ -63,7 +63,9 @@ class GameDodo:
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
-        actions: Dict[ActionDodo, Any] = {}  # On utilise un ensemble pour garantir l'unicité
+        actions: Dict[ActionDodo, Any] = (
+            {}
+        )  # On utilise un ensemble pour garantir l'unicité
 
         # On parcourt l'ensemble des cases de la grille
         for i, ligne in enumerate(grid):
@@ -85,8 +87,8 @@ class GameDodo:
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
     def final_dodo(self, grid: Grid, debug: bool = False) -> int:
         """
-         Fonction retournant le score si nous sommes dans un état final (fin de partie)
-         """
+        Fonction retournant le score si nous sommes dans un état final (fin de partie)
+        """
         if not self.legals_dodo(grid, self.max_player):
             if debug:
                 print(self.legals_dodo(grid, self.max_player))
@@ -110,6 +112,7 @@ class GameDodo:
 @dataclass
 class GameGopher:
     """Classe représentant le jeu Gopher"""
+
     pass
 
 

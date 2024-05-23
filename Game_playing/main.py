@@ -1,38 +1,37 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
+
 import os
 import time
 import pickle
-from typing import Dict, Any
 
 import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd
+import pandas as pd  # type: ignore
 
-matplotlib.use('TkAgg')
+matplotlib.use("TkAgg")
 from structures_classes import *
 from Dodo.grid import *
 from Dodo.strategies_dodo import (
     strategy_random_dodo,
     strategy_minmax,
 )
-from hexagonal_board import display_grid
 
 
 # Function to save the library to a file
 def save_library(library, filename):
-    with open(filename, 'wb') as file:
+    with open(filename, "wb") as file:
         pickle.dump(library, file)
 
 
 # Function to load the library from a file
 def load_library(filename):
-    with open(filename, 'rb') as file:
+    with open(filename, "rb") as file:
         library = pickle.load(file)
     return library
 
 
 def read_plk(filename):
-    with open(filename, 'rb') as file:
+    with open(filename, "rb") as file:
         return pickle.load(file)
 
 
@@ -66,7 +65,7 @@ def dodo(
     if library:
         if starting_library == {}:
             try:  # On essaie de charger la librairie de coups de départ
-                starting_library = load_library('starting_library.pkl')
+                starting_library = load_library("starting_library.pkl")
             except FileNotFoundError:
                 starting_library = {}
     else:
@@ -79,17 +78,23 @@ def dodo(
             print(f"Tour \033[36m {tour}\033[0m.")
         if current_player.id == 1:
             tour += 1
-            current_action = strategy_1(env, current_player, actual_grid, starting_library)
+            current_action = strategy_1(
+                env, current_player, actual_grid, starting_library
+            )
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
                     # print(f"Adding {hash(actual_grid)} to the library")
-                    starting_library[hash(actual_grid)] = {'action': current_action[0]}
+                    starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
-            current_action = strategy_2(env, current_player, actual_grid, starting_library)
+            current_action = strategy_2(
+                env, current_player, actual_grid, starting_library
+            )
 
         actual_grid = env.play_dodo(current_player, actual_grid, current_action)
 
-        iteration_time_end = (time.time())  # Fin du chronomètre pour la durée de cette itération
+        iteration_time_end = (
+            time.time()
+        )  # Fin du chronomètre pour la durée de cette itération
         if current_player.id == 1:
             time_history.append(iteration_time_end - iteration_time_start)
 
@@ -104,7 +109,8 @@ def dodo(
         if debug:
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
-                f" secondes")
+                f" secondes"
+            )
 
         res = env.final_dodo(actual_grid)
 
@@ -117,14 +123,16 @@ def dodo(
         plt.title("Temps d'itération en fonction de l'itération")
         plt.show()
     if building_library:
-        save_library(starting_library, 'starting_library.pkl')
+        save_library(starting_library, "starting_library.pkl")
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
-        "average_iteration_time": sum(time_history) / len(time_history) if time_history else 0,
+        "average_iteration_time": (
+            sum(time_history) / len(time_history) if time_history else 0
+        ),
         "total_turns": tour,
         "total_time": total_time_end - total_time_start,
-        "winner": env.final_dodo(actual_grid)
+        "winner": env.final_dodo(actual_grid),
     }
 
 
@@ -154,17 +162,14 @@ def initialize(
         )
     if game == "Gopher":
         return GameDodo(
-            state,
-            player,
-            Player(2, UP_DIRECTIONS),
-            hex_size,
-            total_time,
-            [],
-            []
+            state, player, Player(2, UP_DIRECTIONS), hex_size, total_time, [], []
         )
 
 
 def append_to_csv(dataframe: pd.DataFrame, filename: str):
+    """
+    Fonction permettant d'ajouter une ligne à un fichier CSV
+    """
     parent_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     path_file = os.path.join(parent_dir, "Benchmarks", filename)
 
@@ -175,16 +180,27 @@ def append_to_csv(dataframe: pd.DataFrame, filename: str):
     os.makedirs(os.path.dirname(path_file), exist_ok=True)
 
     # Écrire dans le fichier
-    with open(path_file, 'a', newline='', encoding='utf-8') as f:
+    with open(path_file, "a", newline="", encoding="utf-8") as f:
         if not file_exists:
             dataframe.to_csv(f, header=True, index=False)
         else:
             dataframe.to_csv(f, header=False, index=False)
 
 
-def add_to_benchmark(list_results, filename: str, game_number: int, strategy_1: str, strategy_2: str,
-                     grid: int, depth: int, starting_library: bool):
-    win_number = sum([res["winner"] == 1 for res in list_results])
+def add_to_benchmark(
+        list_results,
+        filename: str,
+        game_number: int,
+        strategy_1: str,
+        strategy_2: str,
+        grid: int,
+        depth: int,
+        starting_library: bool,
+):
+    """
+    Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
+    """
+    win_number = sum(res['winner'] == 1 for res in list_results)
     loss_number = game_number - win_number
     new_benchmark = {
         "strategy_1": strategy_1,
@@ -193,21 +209,36 @@ def add_to_benchmark(list_results, filename: str, game_number: int, strategy_1: 
         "depth": depth,
         "game_number": game_number,
         "starting_library": starting_library,
-        "win_rate": sum([res["winner"] == 1 for res in list_results]) / game_number,
-        "average_turns": sum([res["total_turns"] for res in list_results]) / game_number,
-        "min_turns": min([res["total_turns"] for res in list_results]),
-        "max_turns": max([res["total_turns"] for res in list_results]),
-        "average_iteration_time": sum([res["average_iteration_time"] for res in list_results]) / game_number,
-        "average_total_time": sum([res["total_time"] for res in list_results]) / game_number,
-        "average_turns_win": (sum(res["total_turns"] for res in list_results if res["winner"] == 1) / win_number) if win_number > 0 else 0,
-        "average_turns_loss": (sum(res["total_turns"] for res in list_results if res["winner"] == -1) / loss_number) if loss_number > 0 else 0
-
+        "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
+        "average_turns": sum(res["total_turns"] for res in list_results)
+                         / game_number,
+        "min_turns": min(res["total_turns"] for res in list_results),
+        "max_turns": max(res["total_turns"] for res in list_results),
+        "average_iteration_time": sum(
+            res["average_iteration_time"] for res in list_results)
+                                  / game_number,
+        "average_total_time": sum(res["total_time"] for res in list_results)
+                              / game_number,
+        "average_turns_win": (
+            (sum(res["total_turns"] for res in list_results if res["winner"] == 1)
+             / win_number)
+            if win_number > 0
+            else 0
+        ),
+        "average_turns_loss": (
+            (
+                    sum(res["total_turns"] for res in list_results if res["winner"] == -1)
+                    / loss_number
+            )
+            if loss_number > 0
+            else 0
+        ),
     }
 
     # Créer un DataFrame avec une seule ligne
     df_results = pd.DataFrame([new_benchmark])
     print(df_results)
-    append_to_csv(df_results, f'{filename}.csv')
+    append_to_csv(df_results, f"{filename}.csv")
 
 
 def launch_multi_game(game_number: int = 1):
@@ -222,14 +253,30 @@ def launch_multi_game(game_number: int = 1):
     for i in range(game_number):
         game = initialize("Dodo", init_grid, player1, 4, 5)
         print(len(game.legals_dodo(init_grid, player1)))
-        res = (dodo(game, strategy_minmax, strategy_random_dodo, init_grid, debug=True, building_library=False,
-                    graphics=False, library=False))
+        res = dodo(
+            game,
+            strategy_minmax,
+            strategy_random_dodo,
+            init_grid,
+            debug=False,
+            building_library=False,
+            graphics=False,
+            library=False,
+        )
         list_results.append(res)
         print(f"Partie {i + 1}: {res}")
 
     # Ajout des stat à un fichier CSV
-    add_to_benchmark(list_results, "benchmark", game_number, "strategy_minmax", "strategy_random_dodo",
-                     size_init_grid, 5, False)
+    add_to_benchmark(
+        list_results,
+        "benchmark",
+        game_number,
+        "strategy_minmax",
+        "strategy_random_dodo",
+        size_init_grid,
+        5,
+        False,
+    )
 
 
 # Fonction principale de jeu Dodo
@@ -238,7 +285,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(10)
+    launch_multi_game(100)
 
 
 if __name__ == "__main__":
