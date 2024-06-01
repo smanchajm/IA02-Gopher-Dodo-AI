@@ -153,18 +153,19 @@ class GameGopher:
         for position in opponent_positions.keys():
             neighbors = hexa.hex_neighbor(position[0], position[1], player.directions)
             for neighbor in neighbors:
-                if 0 <= neighbor[0] < self.hex_size and 0 <= neighbor[1] < self.hex_size:
+                if -self.hex_size <= neighbor[0] < self.hex_size and -self.hex_size <= neighbor[1] < self.hex_size:
                     if neighbor in min_neighbors:
-                        min_neighbors.remove(neighbor)
+                        result.remove(neighbor)
                     else:
-                        min_neighbors.append(neighbor)
+                        result.append(neighbor)
 
         for position in player_positions.keys():
             neighbors = hexa.hex_neighbor(position[0], position[1], player.directions)
             for neighbor in neighbors:
-                if 0 <= neighbor[0] < self.hex_size and 0 <= neighbor[1] < self.hex_size:
-                    if neighbor not in min_neighbors and neighbor not in opponent_positions.keys():
-                        result.append(neighbor)
+                if -self.hex_size <= neighbor[0] < self.hex_size and -self.hex_size <= neighbor[1] < self.hex_size:
+                    if neighbor in result and neighbor not in opponent_positions.keys():
+                        result.remove(neighbor)
+
 
         return result
 
@@ -194,3 +195,26 @@ class GameGopher:
 
 Environment = GameDodo | GameGopher
 Strategy = Callable[[Environment, Player, Grid, dict], Action]
+
+
+def new_gopher(h: int) -> Grid2:
+    h = h - 1  # pour avoir un plateau de taille h
+    res: Grid2 = {}
+    for r in range(h, -h - 1, -1):
+        qmin = max(-h, r - h)
+        qmax = min(h, r + h)
+        for q in range(qmin, qmax + 1):
+            res[(q, r)] = EMPTY
+    return res
+
+
+state = new_gopher(7)
+player = Player(1, ALL_DIRECTIONS)
+test_gopher = GameGopher(state, player, Player(2, ALL_DIRECTIONS), player, 7, 8, {}, {})
+print(test_gopher.legals_gopher(state, player))
+
+test_gopher.play_gopher((0, 0))
+print(test_gopher.grid)
+print(test_gopher.max_positions)
+print(test_gopher.legals_gopher(state, test_gopher.min_player))
+
