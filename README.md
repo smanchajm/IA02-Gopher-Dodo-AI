@@ -11,26 +11,34 @@ These two games were created by Mark Steere.
   - [x] Grille
   - [x] Dodo rules
   - [ ] Gopher rules
-  - [ ] Envireonnement 
+  - [ ] Environnement
+  - [ ] Création des stratégies de jeu 
 - [ ] différentes stratégies
   - [x] minmax simple
-  - [ ] alpha-beta simple
-  - [ ] fonction d'évaluation
+  - [x] alpha-beta simple
+  - [x] fonction d'évaluation
+  - [ ] Monte Carlo ?
+  - [ ] stratégie copie joueur adverse / librairie first moves
 - [ ] optimisations
   - [ ] multithreading
   - [ ] symétries
-  - [ ] cache    
+  - [x] cache
+  - [ ] profondeur adaptative
+  - [ ] voir si optimisation des structures (dico ?)
+
+
+**Cleaning, cleaning, cleaning** : black, pylint, mypy, isort, etc.
   
 
 
 ## Rules 
 Both games are played on a hexagonal board. The implementation is freely inspired by *Red Blob Games [Implementation of hex Grid](https://www.redblobgames.com/grids/hexagons/).
 
-* **[Dodo Rules](https://www.redblobgames.com/grids/hexagons/)***.
+* **[Dodo Rules](https://www.redblobgames.com/grids/hexagons/)**.
 * **[Gopher Rules](https://www.marksteeregames.com/Dodo_rules.pdf)**.
 
 ## Contributors
-* Paul Clément
+* Paul Clément 
 * Samuel Manchajm
 
 ## License

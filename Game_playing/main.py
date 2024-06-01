@@ -258,7 +258,7 @@ def launch_multi_game(game_number: int = 1):
             strategy_minmax,
             strategy_random_dodo,
             init_grid,
-            debug=False,
+            debug=True,
             building_library=False,
             graphics=False,
             library=False,
