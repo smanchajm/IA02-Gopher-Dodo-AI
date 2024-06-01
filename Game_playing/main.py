@@ -1,8 +1,8 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
 import os
-import time
 import pickle
+import time
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -10,11 +10,9 @@ import pandas as pd  # type: ignore
 
 matplotlib.use("TkAgg")
 from structures_classes import *
-from Dodo.grid import *
-from Dodo.strategies_dodo import (
-    strategy_random_dodo,
-    strategy_minmax,
-)
+
+from Dodo.grid import INIT_GRID4, INIT_GRID
+from Dodo.strategies_dodo import strategy_minmax, strategy_random_dodo
 
 
 # Function to save the library to a file
@@ -136,6 +134,108 @@ def dodo(
     }
 
 
+# Boucle de jeu Gopher
+def gopher(
+        env: GameGopher,
+        strategy_1: Strategy,
+        strategy_2: Strategy,
+        init_grid: Grid2,
+        debug: bool = False,
+        starting_library: Dict = None,
+        building_library: bool = False,
+        graphics: bool = False,
+        library: bool = False,
+) -> dict[str, int | float | Any]:
+    """
+    Fonction représentant la boucle de jeu de Gopher
+    """
+    time_history: List[float] = []
+    actual_grid: Grid2 = init_grid
+    current_player: Player = env.current_player
+    current_action: Action
+    tour: int = 0
+    total_time_start = time.time()  # Chronomètre
+
+    # Permet d'éviter d'avoir une valeur par défaut mutable
+    if starting_library is None:
+        starting_library = {}
+
+    # Permet de tester nos stratégies sans la librairie
+    if library:
+        if starting_library == {}:
+            try:  # On essaie de charger la librairie de coups de départ
+                starting_library = load_library("starting_library.pkl")
+            except FileNotFoundError:
+                starting_library = {}
+    else:
+        starting_library = None
+
+    res = env.final_gopher(actual_grid)
+    while not (res == 1 or res == -1):
+        iteration_time_start = time.time()  # Chronomètre une itération de jeu
+        if debug and current_player.id == 1:
+            print(f"Tour \033[36m {tour}\033[0m.")
+        if current_player == env.max_player:
+            tour += 1
+            current_action = strategy_1(
+                env, current_player, actual_grid, starting_library
+            )
+            if building_library:
+                if hash(actual_grid) not in starting_library.keys() and tour < 100:
+                    # print(f"Adding {hash(actual_grid)} to the library")
+                    starting_library[hash(actual_grid)] = {"action": current_action[0]}
+        else:
+            current_action = strategy_2(
+                env, current_player, actual_grid, starting_library
+            )
+
+        actual_grid = env.play_gopher(current_action)
+
+        iteration_time_end = (
+            time.time()
+        )  # Fin du chronomètre pour la durée de cette itération
+
+        if current_player == env.max_player:
+            time_history.append(iteration_time_end - iteration_time_start)
+
+        if env.current_player == env.max_player:
+            current_player = env.min_player
+        else:
+            current_player = env.max_player
+
+        if debug:
+            hexa.display_grid(actual_grid)
+
+        if debug:
+            print(
+                f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
+                f" secondes"
+            )
+
+        res = env.final_gopher(actual_grid)
+
+    total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
+    if graphics:
+        print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
+        plt.plot(time_history)
+        plt.ylabel("Temps d'itération (s)")
+        plt.xlabel("Itération")
+        plt.title("Temps d'itération en fonction de l'itération")
+        plt.show()
+    if building_library:
+        save_library(starting_library, "starting_library.pkl")
+
+    # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
+    return {
+        "average_iteration_time": (
+            sum(time_history) / len(time_history) if time_history else 0
+        ),
+        "total_turns": tour,
+        "total_time": total_time_end - total_time_start,
+        "winner": env.final_gopher(actual_grid),
+    }
+
+
 # Initialisation de l'environnement
 def initialize(
         game: str, state: State, player: Player, hex_size: int, total_time: Time
@@ -161,8 +261,8 @@ def initialize(
             min_positions,
         )
     if game == "Gopher":
-        return GameDodo(
-            state, player, Player(2, UP_DIRECTIONS), hex_size, total_time, [], []
+        return GameGopher(
+            state, player, Player(2, ALL_DIRECTIONS), player, hex_size, total_time, {}, {}
         )
 
 

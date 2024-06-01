@@ -10,7 +10,7 @@ Cell = tuple[int, int]
 ActionDodo = tuple[Cell, Cell]  # case de départ → case d'arrivée
 ActionGopher = Cell
 Action = Union[ActionGopher, ActionDodo]
-# Player = int  # 1 ou 2
+Player2 = int  # 1 ou 2
 State = list[tuple[Cell, int]]  # État du jeu pour la boucle de jeu
 Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 Directions = list[tuple[int, int]]  # Liste de directions
@@ -32,6 +32,15 @@ DOWN_DIRECTIONS: List[tuple[int, int]] = [
     (-1, -1),
 ]
 
+ALL_DIRECTIONS: List[tuple[int, int]] = [
+    (0, -1),
+    (-1, 0),
+    (-1, -1),
+    (1, 0),
+    (1, 1),
+    (0, 1),
+]
+
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
 
@@ -42,6 +51,9 @@ class Player:
 
     id: int
     directions: Directions
+
+
+Grid2 = dict[Cell, Player]
 
 
 # DataClass Game Dodo
@@ -112,9 +124,73 @@ class GameDodo:
 @dataclass
 class GameGopher:
     """Classe représentant le jeu Gopher"""
+    grid: Grid2
+    max_player: Player
+    min_player: Player
+    current_player: Player
+    hex_size: int
+    total_time: Time
+    max_positions: Grid2
+    min_positions: Grid2
 
-    pass
+    def legals_gopher(self, grid: Grid2, player: Player) -> list[ActionGopher]:
+        """
+        Fonction retournant les actions possibles d'un joueur pour un état donné
+        """
+        result: List[ActionGopher] = []
+        min_neighbors: List[Cell] = []
+
+        # Premier coup
+        if len(self.max_positions) == 0 and len(self.min_positions) == 0:
+            for position in grid:
+                result.append(position)
+            return result
+
+        opponent = self.min_player if player == self.max_player else self.max_player
+        player_positions = self.max_positions if player == self.max_player else self.min_positions
+        opponent_positions = self.min_positions if player == self.max_player else self.max_positions
+
+        for position in opponent_positions.keys():
+            neighbors = hexa.hex_neighbor(position[0], position[1], player.directions)
+            for neighbor in neighbors:
+                if 0 <= neighbor[0] < self.hex_size and 0 <= neighbor[1] < self.hex_size:
+                    if neighbor in min_neighbors:
+                        min_neighbors.remove(neighbor)
+                    else:
+                        min_neighbors.append(neighbor)
+
+        for position in player_positions.keys():
+            neighbors = hexa.hex_neighbor(position[0], position[1], player.directions)
+            for neighbor in neighbors:
+                if 0 <= neighbor[0] < self.hex_size and 0 <= neighbor[1] < self.hex_size:
+                    if neighbor not in min_neighbors and neighbor not in opponent_positions.keys():
+                        result.append(neighbor)
+
+        return result
+
+    def final_gopher(self, grid: Grid2, debug: bool = False) -> int:
+        """
+        Fonction retournant le score si nous sommes dans un état final (fin de partie)
+        """
+        if not self.legals_gopher(grid, self.max_player):
+            if debug:
+                print(self.legals_gopher(grid, self.max_player))
+            return 1
+        if not self.legals_gopher(grid, self.min_player):
+            if debug:
+                print(self.legals_gopher(grid, self.min_player))
+            return -1
+        return 0
+
+    def play_gopher(self, action: ActionGopher):
+        self.grid[action] = self.current_player
+
+        # Mise à jour des positions des joueurs
+        if self.current_player.id == self.max_player.id:
+            self.max_positions[action] = self.current_player
+        else:
+            self.min_positions[action] = self.current_player
 
 
-Environment = GameDodo
+Environment = GameDodo | GameGopher
 Strategy = Callable[[Environment, Player, Grid, dict], Action]
