@@ -12,7 +12,7 @@ matplotlib.use("TkAgg")
 from structures_classes import *
 
 from Dodo.grid import INIT_GRID4, INIT_GRID
-from Dodo.strategies_dodo import strategy_minmax, strategy_random_dodo
+from Dodo.strategies_dodo import strategy_minmax, strategy_random_dodo, strategy_first_legal_gopher, strategy_random_gopher
 
 
 # Function to save the library to a file
@@ -137,8 +137,8 @@ def dodo(
 # Boucle de jeu Gopher
 def gopher(
         env: GameGopher,
-        strategy_1: Strategy,
-        strategy_2: Strategy,
+        strategy_1: Strategy_Gopher,
+        strategy_2: Strategy_Gopher,
         init_grid: Grid2,
         debug: bool = False,
         starting_library: Dict = None,
@@ -150,7 +150,7 @@ def gopher(
     Fonction représentant la boucle de jeu de Gopher
     """
     time_history: List[float] = []
-    actual_grid: Grid2 = init_grid
+    actual_grid: Grid2 = env.grid
     current_player: Player = env.current_player
     current_action: Action
     tour: int = 0
@@ -189,30 +189,31 @@ def gopher(
                 env, current_player, actual_grid, starting_library
             )
 
-        actual_grid = env.play_gopher(current_action)
+        print(f"current_action {current_action}")
+        env.play_gopher(current_action)
+        actual_grid = env.grid
 
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
-
+        print(f"current_player {current_player}")
         if current_player == env.max_player:
             time_history.append(iteration_time_end - iteration_time_start)
 
         if env.current_player == env.max_player:
             current_player = env.min_player
+            env.current_player = env.min_player
         else:
             current_player = env.max_player
-
-        if debug:
-            hexa.display_grid(actual_grid)
+            env.current_player = env.max_player
 
         if debug:
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
             )
-
         res = env.final_gopher(actual_grid)
+        print(f"res fin iter {res}")
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -238,7 +239,7 @@ def gopher(
 
 # Initialisation de l'environnement
 def initialize(
-        game: str, state: State, player: Player, hex_size: int, total_time: Time
+        game: str, state: State | Grid2, player: Player, hex_size: int, total_time: Time
 ) -> Environment:
     """
     Fonction permettant d'initialiser l'environnement de jeu
@@ -261,8 +262,9 @@ def initialize(
             min_positions,
         )
     if game == "Gopher":
+        grid = new_gopher(hex_size)
         return GameGopher(
-            state, player, Player(2, ALL_DIRECTIONS), player, hex_size, total_time, {}, {}
+            grid, player, Player(2, ALL_DIRECTIONS), player, hex_size, total_time, {}, {}
         )
 
 
@@ -341,38 +343,57 @@ def add_to_benchmark(
     append_to_csv(df_results, f"{filename}.csv")
 
 
-def launch_multi_game(game_number: int = 1):
+def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     Fonction permettant de lancer plusieurs parties de jeu
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    player1: Player = Player(1, DOWN_DIRECTIONS)
-    size_init_grid = 4
-    init_grid = INIT_GRID4
-    for i in range(game_number):
-        game = initialize("Dodo", init_grid, player1, 4, 5)
-        print(len(game.legals_dodo(init_grid, player1)))
-        res = dodo(
-            game,
-            strategy_minmax,
-            strategy_random_dodo,
-            init_grid,
-            debug=True,
-            building_library=False,
-            graphics=False,
-            library=False,
-        )
-        list_results.append(res)
-        print(f"Partie {i + 1}: {res}")
+    size_init_grid = 7
+    if name == "Dodo":
+        player1: Player = Player(1, DOWN_DIRECTIONS)
+        init_grid = INIT_GRID4
+        for i in range(game_number):
+            game = initialize("Dodo", init_grid, player1, 4, 5)
+            print(len(game.legals_dodo(init_grid, player1)))
+            res = dodo(
+                game,
+                strategy_minmax,
+                strategy_random_dodo,
+                init_grid,
+                debug=True,
+                building_library=False,
+                graphics=False,
+                library=False,
+            )
+            list_results.append(res)
+            print(f"Partie {i + 1}: {res}")
+
+    else:
+        player1: Player = Player(1, ALL_DIRECTIONS)
+        init_grid = new_gopher(7)
+        for i in range(game_number):
+            game = initialize("Gopher", init_grid, player1, 7, 5)
+            res = gopher(
+                game,
+                strategy_random_gopher,
+                strategy_random_gopher,
+                init_grid,
+                debug=True,
+                building_library=False,
+                graphics=False,
+                library=False,
+            )
+            list_results.append(res)
+            print(f"Partie {i + 1}: {res}")
 
     # Ajout des stat à un fichier CSV
     add_to_benchmark(
         list_results,
         "benchmark",
         game_number,
-        "strategy_minmax",
-        "strategy_random_dodo",
+        "strategy_first_legal_gopher",
+        "strategy_first_legal_gopher",
         size_init_grid,
         5,
         False,
@@ -385,7 +406,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100)
+    launch_multi_game(2, "Gopher")
 
 
 if __name__ == "__main__":

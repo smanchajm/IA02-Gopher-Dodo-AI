@@ -2,7 +2,7 @@
 
 import random
 from typing import Callable, Dict, Tuple, Any
-from Game_playing.structures_classes import Environment, Player, Grid, Action, Cell
+from Game_playing.structures_classes import Environment, Player, Grid, Action, Cell, Grid2
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
@@ -12,6 +12,20 @@ def strategy_first_legal_dodo(env: Environment, player: Player, grid: Grid) -> A
     Stratégie qui retourne la première action légale calculée
     """
     return env.legals_dodo(grid, player)[0]
+
+
+def strategy_first_legal_gopher(env: Environment, player: Player, grid: Grid2, starting_library: dict = Dict[Any, Any]) -> Action:
+    """
+    Stratégie qui retourne la première action légale calculée
+    """
+    return env.legals_gopher(grid, player)[0]
+
+
+def strategy_random_gopher(env: Environment, player: Player, grid: Grid2, starting_library: dict = Dict[Any, Any]) -> Action:
+    """
+    Stratégie qui retourne une action légale aléatoire
+    """
+    return random.choice(env.legals_gopher(grid, player))
 
 
 def strategy_random_dodo(

@@ -25,6 +25,7 @@ These two games were created by Mark Steere.
   - [x] cache
   - [ ] profondeur adaptative
   - [ ] voir si optimisation des structures (dico ?)
+- [ ] mémoisation qui store l'action optimale pour une grille donnée 
 
 
 **Cleaning, cleaning, cleaning** : black, pylint, mypy, isort, etc.

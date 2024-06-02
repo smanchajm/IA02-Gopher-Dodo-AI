@@ -132,3 +132,10 @@ def hex_neighbor(q: int, r: int, directions: Directions) -> List[tuple[int, int]
     Fonction permettant de retourner les voisins d'une case
     """
     return [(q - dq, r + dr) for dq, dr in directions]
+
+
+def neighbor_gopher(q: int, r: int, directions: Directions) -> List[tuple[int, int]]:
+    """
+    Fonction permettant de retourner les voisins d'une case
+    """
+    return [(q + dq, r + dr) for dq, dr in directions]
