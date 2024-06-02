@@ -11,7 +11,7 @@ import pandas as pd  # type: ignore
 matplotlib.use("TkAgg")
 from structures_classes import *
 
-from Dodo.grid import INIT_GRID4, INIT_GRID
+from Dodo.grid import INIT_GRID4, INIT_GRID, GRID1, GRID2
 from Dodo.strategies_dodo import strategy_minmax, strategy_random_dodo, strategy_first_legal_gopher, strategy_random_gopher
 
 
@@ -208,6 +208,7 @@ def gopher(
             env.current_player = env.max_player
 
         if debug:
+            print_gopher(env, GRID2)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -343,6 +344,18 @@ def add_to_benchmark(
     append_to_csv(df_results, f"{filename}.csv")
 
 
+def print_gopher(env: GameGopher, empty_grid: Grid):
+    temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
+    for position, value in env.max_positions.items():
+        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
+        temp_grid[conv_pos[0]][conv_pos[1]] = 1
+    for position, value in env.min_positions.items():
+        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
+        temp_grid[conv_pos[0]][conv_pos[1]] = 2
+
+    hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
+
+
 def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     Fonction permettant de lancer plusieurs parties de jeu
@@ -411,3 +424,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
