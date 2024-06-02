@@ -121,7 +121,7 @@ def reverse_convert(q: int, r: int, n) -> Tuple[int, int]:
     Fonction permettant de convertir des coordonnées allant de -n à n
     à des coordonnées allant de 0 à 2n
     """
-    return -q + n - 2, r + n - 2
+    return n - q - 1, r + n - 1
 
 
 directions_case_neighbors: List[tuple[int, int]] = [
@@ -149,3 +149,4 @@ def neighbor_gopher(q: int, r: int, directions: Directions) -> List[tuple[int, i
     return [(q + dq, r + dr) for dq, dr in directions]
 
 
+print(reverse_convert(6, 4, 7))

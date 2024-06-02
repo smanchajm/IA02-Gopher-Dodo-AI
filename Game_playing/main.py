@@ -11,39 +11,53 @@ import pandas as pd  # type: ignore
 matplotlib.use("TkAgg")
 from structures_classes import *
 
-from Dodo.grid import INIT_GRID4, INIT_GRID, GRID1, GRID2
-from Dodo.strategies_dodo import strategy_minmax, strategy_random_dodo, strategy_first_legal_gopher, strategy_random_gopher
+from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4
+from Dodo.strategies_dodo import (
+    strategy_first_legal_gopher,
+    strategy_minmax,
+    strategy_random_dodo,
+    strategy_random_gopher,
+)
 
 
 # Function to save the library to a file
 def save_library(library, filename):
+    """
+    Fonction permettant de sauvegarder la librairie dans un fichier
+    """
     with open(filename, "wb") as file:
         pickle.dump(library, file)
 
 
 # Function to load the library from a file
 def load_library(filename):
+    """
+    Fonction permettant de charger la librairie depuis un fichier
+    """
     with open(filename, "rb") as file:
         library = pickle.load(file)
     return library
 
 
 def read_plk(filename):
+    """
+    Fonction permettant de charger un fichier .plk
+    """
     with open(filename, "rb") as file:
         return pickle.load(file)
 
 
 # Boucle de jeu Dodo
 def dodo(
-        env: GameDodo,
-        strategy_1: Strategy,
-        strategy_2: Strategy,
-        init_grid: Grid,
-        debug: bool = False,
-        starting_library: Dict = None,
-        building_library: bool = False,
-        graphics: bool = False,
-        library: bool = False,
+    env: GameDodo,
+    strategy_1: Strategy,
+    strategy_2: Strategy,
+    init_grid: Grid,
+    debug: bool = False,
+    starting_library: Dict = None,
+    building_library: bool = False,
+    graphics: bool = False,
+    library: bool = False,
 ) -> dict[str, int | float | Any]:
     """
     Fonction représentant la boucle de jeu de Dodo
@@ -70,7 +84,7 @@ def dodo(
         starting_library = None
 
     res = env.final_dodo(actual_grid)
-    while not (res == 1 or res == -1):
+    while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and current_player.id == 1:
             print(f"Tour \033[36m {tour}\033[0m.")
@@ -136,21 +150,21 @@ def dodo(
 
 # Boucle de jeu Gopher
 def gopher(
-        env: GameGopher,
-        strategy_1: Strategy_Gopher,
-        strategy_2: Strategy_Gopher,
-        init_grid: Grid2,
-        debug: bool = False,
-        starting_library: Dict = None,
-        building_library: bool = False,
-        graphics: bool = False,
-        library: bool = False,
+    env: GameGopher,
+    strategy_1: StrategyGopher,
+    strategy_2: StrategyGopher,
+    init_grid: GridDict,
+    debug: bool = False,
+    starting_library: Dict = None,
+    building_library: bool = False,
+    graphics: bool = False,
+    library: bool = False,
 ) -> dict[str, int | float | Any]:
     """
     Fonction représentant la boucle de jeu de Gopher
     """
     time_history: List[float] = []
-    actual_grid: Grid2 = env.grid
+    actual_grid: GridDict = env.grid
     current_player: Player = env.current_player
     current_action: Action
     tour: int = 0
@@ -171,12 +185,13 @@ def gopher(
         starting_library = None
 
     res = env.final_gopher(actual_grid)
-    while not (res == 1 or res == -1):
+    while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and current_player.id == 1:
             print(f"Tour \033[36m {tour}\033[0m.")
         if current_player == env.max_player:
             tour += 1
+            print(f"legal {env.legals_gopher(env.grid, current_player)}")
             current_action = strategy_1(
                 env, current_player, actual_grid, starting_library
             )
@@ -185,11 +200,15 @@ def gopher(
                     # print(f"Adding {hash(actual_grid)} to the library")
                     starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
+            print(f"legal {env.legals_gopher(env.grid, current_player)}")
             current_action = strategy_2(
                 env, current_player, actual_grid, starting_library
             )
 
         print(f"current_action {current_action}")
+        print(
+            f"conversion {hexa.reverse_convert(current_action[0], current_action[1], env.hex_size)}"
+        )
         env.play_gopher(current_action)
         actual_grid = env.grid
 
@@ -240,7 +259,7 @@ def gopher(
 
 # Initialisation de l'environnement
 def initialize(
-        game: str, state: State | Grid2, player: Player, hex_size: int, total_time: Time
+    game: str, state: State | GridDict, player: Player, hex_size: int, total_time: Time
 ) -> Environment:
     """
     Fonction permettant d'initialiser l'environnement de jeu
@@ -262,10 +281,17 @@ def initialize(
             max_positions,
             min_positions,
         )
-    if game == "Gopher":
+    else:
         grid = new_gopher(hex_size)
         return GameGopher(
-            grid, player, Player(2, ALL_DIRECTIONS), player, hex_size, total_time, {}, {}
+            grid,
+            player,
+            Player(2, ALL_DIRECTIONS),
+            player,
+            hex_size,
+            total_time,
+            {},
+            {},
         )
 
 
@@ -291,19 +317,19 @@ def append_to_csv(dataframe: pd.DataFrame, filename: str):
 
 
 def add_to_benchmark(
-        list_results,
-        filename: str,
-        game_number: int,
-        strategy_1: str,
-        strategy_2: str,
-        grid: int,
-        depth: int,
-        starting_library: bool,
+    list_results,
+    filename: str,
+    game_number: int,
+    strategy_1: str,
+    strategy_2: str,
+    grid: int,
+    depth: int,
+    starting_library: bool,
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
     """
-    win_number = sum(res['winner'] == 1 for res in list_results)
+    win_number = sum(res["winner"] == 1 for res in list_results)
     loss_number = game_number - win_number
     new_benchmark = {
         "strategy_1": strategy_1,
@@ -313,25 +339,27 @@ def add_to_benchmark(
         "game_number": game_number,
         "starting_library": starting_library,
         "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
-        "average_turns": sum(res["total_turns"] for res in list_results)
-                         / game_number,
+        "average_turns": sum(res["total_turns"] for res in list_results) / game_number,
         "min_turns": min(res["total_turns"] for res in list_results),
         "max_turns": max(res["total_turns"] for res in list_results),
         "average_iteration_time": sum(
-            res["average_iteration_time"] for res in list_results)
-                                  / game_number,
+            res["average_iteration_time"] for res in list_results
+        )
+        / game_number,
         "average_total_time": sum(res["total_time"] for res in list_results)
-                              / game_number,
+        / game_number,
         "average_turns_win": (
-            (sum(res["total_turns"] for res in list_results if res["winner"] == 1)
-             / win_number)
+            (
+                sum(res["total_turns"] for res in list_results if res["winner"] == 1)
+                / win_number
+            )
             if win_number > 0
             else 0
         ),
         "average_turns_loss": (
             (
-                    sum(res["total_turns"] for res in list_results if res["winner"] == -1)
-                    / loss_number
+                sum(res["total_turns"] for res in list_results if res["winner"] == -1)
+                / loss_number
             )
             if loss_number > 0
             else 0
@@ -345,11 +373,14 @@ def add_to_benchmark(
 
 
 def print_gopher(env: GameGopher, empty_grid: Grid):
+    """
+    Fonction permettant d'afficher une grille de jeu Gopher
+    """
     temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
-    for position, value in env.max_positions.items():
+    for position, _ in env.max_positions.items():
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 1
-    for position, value in env.min_positions.items():
+    for position, _ in env.min_positions.items():
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 2
 
@@ -389,10 +420,10 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             game = initialize("Gopher", init_grid, player1, 7, 5)
             res = gopher(
                 game,
-                strategy_random_gopher,
+                strategy_first_legal_gopher,
                 strategy_random_gopher,
                 init_grid,
-                debug=True,
+                debug=False,
                 building_library=False,
                 graphics=False,
                 library=False,
@@ -406,7 +437,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         "benchmark",
         game_number,
         "strategy_first_legal_gopher",
-        "strategy_first_legal_gopher",
+        "strategy_random_gopher",
         size_init_grid,
         5,
         False,
@@ -419,11 +450,8 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(2, "Gopher")
+    launch_multi_game(100, "Gopher")
 
 
 if __name__ == "__main__":
     main()
-
-
-

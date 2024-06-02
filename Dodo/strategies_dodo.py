@@ -1,8 +1,10 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
 
 import random
-from typing import Callable, Dict, Tuple, Any
-from Game_playing.structures_classes import Environment, Player, Grid, Action, Cell, Grid2
+from typing import Any, Callable, Dict, Tuple
+
+from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
+                                             GridDict, Player)
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
@@ -14,14 +16,24 @@ def strategy_first_legal_dodo(env: Environment, player: Player, grid: Grid) -> A
     return env.legals_dodo(grid, player)[0]
 
 
-def strategy_first_legal_gopher(env: Environment, player: Player, grid: Grid2, starting_library: dict = Dict[Any, Any]) -> Action:
+def strategy_first_legal_gopher(
+    env: Environment,
+    player: Player,
+    grid: GridDict,
+    starting_library: dict = Dict[Any, Any],
+) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
     """
     return env.legals_gopher(grid, player)[0]
 
 
-def strategy_random_gopher(env: Environment, player: Player, grid: Grid2, starting_library: dict = Dict[Any, Any]) -> Action:
+def strategy_random_gopher(
+    env: Environment,
+    player: Player,
+    grid: GridDict,
+    starting_library: dict = Dict[Any, Any],
+) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
     """
@@ -42,6 +54,9 @@ def strategy_random_dodo(
 
 # Fonctions d'évaluation
 def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
+    """
+    Déterminer si une cellule est proche du bord de la grille
+    """
     return (
         cell[0] == 0
         or cell[0] == grid_height - 1
