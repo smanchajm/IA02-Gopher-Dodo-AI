@@ -17,6 +17,7 @@ from Dodo.strategies_dodo import (
     strategy_minmax,
     strategy_random_dodo,
     strategy_random_gopher,
+    strategy_botte_secrete,
 )
 
 
@@ -280,6 +281,8 @@ def initialize(
             total_time,
             max_positions,
             min_positions,
+            None,
+            nb_moves=0,
         )
     else:
         grid = new_gopher(hex_size)
@@ -396,18 +399,19 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     size_init_grid = 7
     if name == "Dodo":
         player1: Player = Player(1, DOWN_DIRECTIONS)
-        init_grid = INIT_GRID4
+        init_grid = INIT_GRID
         for i in range(game_number):
-            game = initialize("Dodo", init_grid, player1, 4, 5)
-            print(len(game.legals_dodo(init_grid, player1)))
+            game = initialize("Dodo", init_grid, player1, 7, 5)
+            # print(len(game.legals_dodo(init_grid, player1)))
             res = dodo(
                 game,
-                strategy_minmax,
+                # strategy_minmax,
+                strategy_botte_secrete,
                 strategy_random_dodo,
                 init_grid,
                 debug=True,
                 building_library=False,
-                graphics=False,
+                graphics=True,
                 library=False,
             )
             list_results.append(res)
@@ -450,7 +454,8 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Gopher")
+    # launch_multi_game(100, "Gopher")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 import random
 from typing import Any, Callable, Dict, Tuple
 
+from Dodo.grid import INIT_GRID
 from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
                                              GridDict, Player)
 
@@ -270,7 +271,7 @@ def strategy_minmax(
     # return minmax_action(env, player, grid, 4)[1]
     # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
     depth_factor = 13 / len(env.legals_dodo(grid, player))
-    depth = min(5 * max(1, round(depth_factor)), 9)
+    depth = min(5 * max(1, round(depth_factor)), 5)
     # depth = 5
 
     if starting_library is None:
@@ -293,3 +294,24 @@ def strategy_minmax(
         action = minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
 
     return action
+
+
+def is_first_move(env: Environment, grid: Grid) -> bool:
+    """
+    Déterminer si le premier coup a été joué
+    """
+    return env.nb_moves == 0
+
+
+def strategy_botte_secrete(
+   env: Environment, player: Player, grid: Grid, starting_library: dict = None) -> Action:
+    """
+    Stratégie qui copie les mouvements de l'adversaire pour les 100 premiers coups et joue ensuite avec l'algorithme Minmax
+    """
+    if is_first_move(env, grid):
+        return strategy_minmax(env, player, grid)
+    if env.nb_moves < 200:
+        action = env.precedent_action
+        action = ((len(grid) - 1 - action[0][0], len(grid[0]) - 1 - action[0][1]), (len(grid) - 1 - action[1][0], len(grid[0]) - 1 - action[1][1]))
+        return action
+    return strategy_minmax(env, player, grid)
