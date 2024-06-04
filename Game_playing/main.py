@@ -7,6 +7,10 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd  # type: ignore
+from collections import namedtuple
+
+
+from Game_playing.hexagonal_board import display_grid
 
 matplotlib.use("TkAgg")
 from structures_classes import *
@@ -63,8 +67,8 @@ def dodo(
     Fonction représentant la boucle de jeu de Dodo
     """
     time_history: List[float] = []
-    actual_grid: Grid = init_grid
-    current_player: Player = env.max_player
+    actual_grid: GridDict = env.grid
+    current_player: Player = env.current_player
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
@@ -83,7 +87,7 @@ def dodo(
     else:
         starting_library = None
 
-    res = env.final_dodo(actual_grid)
+    res = env.final_dodo()
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and current_player.id == 1:
@@ -91,7 +95,7 @@ def dodo(
         if current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-                env, current_player, actual_grid, starting_library
+                env, current_player, env.grid, starting_library
             )
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
@@ -99,10 +103,10 @@ def dodo(
                     starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
             current_action = strategy_2(
-                env, current_player, actual_grid, starting_library
+                env, current_player, env.grid, starting_library
             )
 
-        actual_grid = env.play_dodo(current_player, actual_grid, current_action)
+        env.play_dodo(current_action)
 
         iteration_time_end = (
             time.time()
@@ -124,7 +128,8 @@ def dodo(
                 f" secondes"
             )
 
-        res = env.final_dodo(actual_grid)
+        res = env.final_dodo()
+        env.current_player = env.max_positions.player if env.current_player == env.min_positions.player else env.min_positions.player
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -144,7 +149,7 @@ def dodo(
         ),
         "total_turns": tour,
         "total_time": total_time_end - total_time_start,
-        "winner": env.final_dodo(actual_grid),
+        "winner": env.final_dodo(),
     }
 
 
@@ -259,27 +264,30 @@ def gopher(
 
 # Initialisation de l'environnement
 def initialize(
-    game: str, state: State | GridDict, player: Player, hex_size: int, total_time: Time
+    game: str, grid: GridDict, player: Player, hex_size: int, total_time: Time
 ) -> Environment:
     """
     Fonction permettant d'initialiser l'environnement de jeu
     """
     if game == "Dodo":
-        max_positions: State = []
-        min_positions: State = []
-        for cell in state:
+        max_positions_cr = namedtuple("max_position", ["player", "positions"])
+        min_positions_cr = namedtuple("min_position", ["player", "positions"])
+        max_positions = max_positions_cr(player, {})
+        min_positions = min_positions_cr(Player(2, UP_DIRECTIONS), {})
+        for cell in grid:
             if cell[1] == player.id:
-                max_positions.append((cell[0], player.id))
-            else:
-                min_positions.append((cell[0], player.id))
+                max_positions.positions[cell] = player.id
+            elif cell[1] == 2:
+                min_positions.positions[cell] = player.id
         return GameDodo(
-            state,
+            grid,
             player,
             Player(2, UP_DIRECTIONS),
+            player,
             hex_size,
             total_time,
             max_positions,
-            min_positions,
+            min_positions
         )
     else:
         grid = new_gopher(hex_size)
@@ -399,7 +407,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         init_grid = INIT_GRID4
         for i in range(game_number):
             game = initialize("Dodo", init_grid, player1, 4, 5)
-            print(len(game.legals_dodo(init_grid, player1)))
             res = dodo(
                 game,
                 strategy_minmax,
@@ -454,4 +461,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    display_grid(INIT_GRID)

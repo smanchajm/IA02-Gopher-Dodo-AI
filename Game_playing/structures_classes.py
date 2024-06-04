@@ -1,9 +1,11 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, NamedTuple
+from collections import namedtuple
 
 import Game_playing.hexagonal_board as hexa
+from Dodo.grid import GRID2
 
 # Types de base utilisés par l'arbitre
 
@@ -28,9 +30,9 @@ UP_DIRECTIONS: List[tuple[int, int]] = [
 ]
 
 DOWN_DIRECTIONS: List[tuple[int, int]] = [
-    (0, -1),
     (-1, 0),
     (-1, -1),
+    (0, -1)
 ]
 
 ALL_DIRECTIONS: List[tuple[int, int]] = [
@@ -54,7 +56,7 @@ class Player:
     directions: Directions
 
 
-GridDict = dict[Cell, Player]
+GridDict = dict[Cell, int]
 
 
 # DataClass Game Dodo
@@ -63,63 +65,71 @@ class GameDodo:
     """Classe représentant le jeu Dodo"""
 
     # state: State
-    grid: Grid
+    grid: GridDict
     max_player: Player
     min_player: Player
+    current_player: Player
     hex_size: int
     total_time: Time
-    max_positions: State
-    min_positions: State
+    max_positions: NamedTuple
+    min_positions: NamedTuple
 
     # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
-    def legals_dodo(self, grid: Grid, player: Player) -> list[ActionDodo]:
+    def legals_dodo(self, player: Player) -> list[ActionDodo]:
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
         actions: Dict[ActionDodo, Any] = (
             {}
-        )  # On utilise un ensemble pour garantir l'unicité
+        )
 
-        # On parcourt l'ensemble des cases de la grille
-        for i, ligne in enumerate(grid):
-            for j, element in enumerate(ligne):
-                # Si la case est occupée par un jeton du player
-                if element == player.id:
-                    neighbors = hexa.hex_neighbor(i, j, player.directions)
-                    for neighbor in neighbors:
-                        # Ajouter un voisin si
-                        r = neighbor[0]
-                        q = neighbor[1]
-                        if 0 <= r < len(grid) and 0 <= q < len(grid[0]):
-                            if grid[neighbor[0]][neighbor[1]] == 0:
-                                if ((i, j), neighbor) not in actions:
-                                    actions[((i, j), neighbor)] = None
+        positions = (
+            self.max_positions.positions if (
+                        self.current_player == self.max_positions.player) else self.min_positions.positions
+        )
+
+        for position in positions:
+            neighbors = hexa.neighbor_gopher(position[0], position[1], player.directions)
+            for neighbor in neighbors:
+                r = neighbor[0]
+                q = neighbor[1]
+                if -self.hex_size <= r <= self.hex_size and -self.hex_size <= q <= self.hex_size:
+                    if self.grid[neighbor] == EMPTY:
+                        if (position, neighbor) not in actions:
+                            actions[(position, neighbor)] = None
 
         return list(actions.keys())
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
-    def final_dodo(self, grid: Grid, debug: bool = False) -> int:
+    def final_dodo(self, debug: bool = False) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
-        if not self.legals_dodo(grid, self.max_player):
+        if not self.legals_dodo(self.max_positions.player):
             if debug:
-                print(self.legals_dodo(grid, self.max_player))
+                print(self.legals_dodo(self.max_positions.player))
             return 1
-        if not self.legals_dodo(grid, self.min_player):
+        if not self.legals_dodo(self.min_positions.player):
             if debug:
-                print(self.legals_dodo(grid, self.min_player))
+                print(self.legals_dodo(self.min_positions.player))
             return -1
         return 0
 
-    def play_dodo(self, player: Player, grid: Grid, action: ActionDodo) -> Grid:
+    def play_dodo(self, action: ActionDodo) -> None:
         """
         Fonction jouant un coup pour un joueur donné
         """
-        temp_grid: List[list[int]] = hexa.grid_tuple_to_grid_list(grid)
-        temp_grid[action[0][0]][action[0][1]] = 0
-        temp_grid[action[1][0]][(action[1][1])] = player.id
-        return hexa.grid_list_to_grid_tuple(temp_grid)
+        self.grid[action[1]] = self.current_player.id
+        self.grid[action[0]] = 0
+
+        # Mise à jour des positions des joueurs
+        if self.current_player.id == self.max_positions.player.id:
+            self.max_positions.positions.pop(action[0])
+            self.max_positions.positions[action[1]] = self.current_player.id
+        else:
+            self.min_positions.positions.pop(action[0])
+            self.min_positions.positions[action[1]] = self.current_player.id
+
 
 
 @dataclass
@@ -182,13 +192,13 @@ class GameGopher:
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
         if self.current_player == self.max_player and not self.legals_gopher(
-            grid, self.current_player
+                grid, self.current_player
         ):
             if debug:
                 print(self.legals_gopher(grid, self.max_player))
             return 1
         if self.current_player == self.min_player and not self.legals_gopher(
-            grid, self.current_player
+                grid, self.current_player
         ):
             if debug:
                 print(self.legals_gopher(grid, self.min_player))
@@ -201,13 +211,13 @@ class GameGopher:
         :param action:
         :return:
         """
-        self.grid[action] = self.current_player
+        self.grid[action] = self.current_player.id
 
         # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_player.id:
-            self.max_positions[action] = self.current_player
+            self.max_positions[action] = self.current_player.id
         else:
-            self.min_positions[action] = self.current_player
+            self.min_positions[action] = self.current_player.id
 
 
 Environment = GameDodo | GameGopher
@@ -228,3 +238,33 @@ def new_gopher(h: int) -> GridDict:
         for q in range(qmin, qmax + 1):
             res[(q, r)] = EMPTY
     return res
+
+
+def print_dodo(env: GameDodo, empty_grid: Grid):
+    """
+    Fonction permettant d'afficher une grille de jeu Gopher
+    """
+    temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
+    for position in env.max_positions.positions:
+        print(position)
+        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
+        temp_grid[conv_pos[0]][conv_pos[1]] = 1
+    for position, _ in env.max_positions.positions.items():
+        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
+        temp_grid[conv_pos[0]][conv_pos[1]] = 2
+
+    hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
+
+
+player1 = Player(1, DOWN_DIRECTIONS)
+grid = new_gopher(7)
+# grid[(0, 0)] = player1
+test = GameDodo(grid, player1, Player(2, UP_DIRECTIONS), player1, 7, 0)
+test.max_positions = test.max_positions(player1, {(0, 0): player1})
+#print(hexa.neighbor_gopher(0, 0, player1.directions))
+print(test.legals_dodo(player1))
+print_dodo(test, GRID2)
+test.play_dodo(((0, 0), (0, -1)))
+print(test.grid)
+print(test.max_positions)
+print_dodo(test, GRID2)
