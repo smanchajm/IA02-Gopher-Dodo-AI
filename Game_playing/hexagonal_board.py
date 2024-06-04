@@ -149,4 +149,4 @@ def neighbor_gopher(q: int, r: int, directions: Directions) -> List[tuple[int, i
     return [(q + dq, r + dr) for dq, dr in directions]
 
 
-print(reverse_convert(6, 4, 7))
+# print(reverse_convert(6, 4, 7))

@@ -69,9 +69,9 @@ INIT_GRID3 = (
 )
 
 
-taille = 0
-for i in range(0, len(INIT_GRID)):
-    for j in range(0, len(INIT_GRID[i])):
-        if INIT_GRID[i][j] != -1:
-            taille += 1
-print(taille)
+# taille = 0
+# for i in range(0, len(INIT_GRID)):
+#     for j in range(0, len(INIT_GRID[i])):
+#         if INIT_GRID[i][j] != -1:
+#             taille += 1
+# print(taille)
