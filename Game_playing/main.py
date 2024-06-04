@@ -56,7 +56,7 @@ def dodo(
     env: GameDodo,
     strategy_1: Strategy,
     strategy_2: Strategy,
-    init_grid: Grid,
+    init_grid: GridDict,
     debug: bool = False,
     starting_library: Dict = None,
     building_library: bool = False,
@@ -120,7 +120,8 @@ def dodo(
             current_player = env.max_player
 
         if debug:
-            hexa.display_grid(actual_grid)
+            print_dodo(env, INIT_GRID)
+
 
         if debug:
             print(
@@ -270,24 +271,13 @@ def initialize(
     Fonction permettant d'initialiser l'environnement de jeu
     """
     if game == "Dodo":
-        max_positions_cr = namedtuple("max_position", ["player", "positions"])
-        min_positions_cr = namedtuple("min_position", ["player", "positions"])
-        max_positions = max_positions_cr(player, {})
-        min_positions = min_positions_cr(Player(2, UP_DIRECTIONS), {})
-        for cell in grid:
-            if cell[1] == player.id:
-                max_positions.positions[cell] = player.id
-            elif cell[1] == 2:
-                min_positions.positions[cell] = player.id
         return GameDodo(
             grid,
             player,
             Player(2, UP_DIRECTIONS),
             player,
             hex_size,
-            total_time,
-            max_positions,
-            min_positions
+            total_time
         )
     else:
         grid = new_gopher(hex_size)
@@ -404,12 +394,13 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     size_init_grid = 7
     if name == "Dodo":
         player1: Player = Player(1, DOWN_DIRECTIONS)
-        init_grid = INIT_GRID4
+        init_grid = INIT_GRID
+        init_grid = convert_grid(init_grid, size_init_grid)
         for i in range(game_number):
             game = initialize("Dodo", init_grid, player1, 4, 5)
             res = dodo(
                 game,
-                strategy_minmax,
+                strategy_random_dodo,
                 strategy_random_dodo,
                 init_grid,
                 debug=True,
@@ -457,9 +448,8 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Gopher")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":
-    #main()
-    display_grid(INIT_GRID)
+    main()

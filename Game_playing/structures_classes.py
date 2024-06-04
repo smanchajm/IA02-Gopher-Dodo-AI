@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Union, NamedTuple
 from collections import namedtuple
 
 import Game_playing.hexagonal_board as hexa
-from Dodo.grid import GRID2
+from Dodo.grid import GRID2, INIT_GRID, INIT_GRID4
 
 # Types de base utilisés par l'arbitre
 
@@ -57,6 +57,8 @@ class Player:
 
 
 GridDict = dict[Cell, int]
+max_positions_cr = namedtuple("max_position", ["player", "positions"])
+min_positions_cr = namedtuple("min_position", ["player", "positions"])
 
 
 # DataClass Game Dodo
@@ -71,8 +73,24 @@ class GameDodo:
     current_player: Player
     hex_size: int
     total_time: Time
-    max_positions: NamedTuple
-    min_positions: NamedTuple
+    max_positions = max_positions_cr(
+        player=Player(1, DOWN_DIRECTIONS),
+        positions={}
+    )
+    min_positions = min_positions_cr(
+        player=Player(2, UP_DIRECTIONS),
+        positions={}
+    )
+
+    # Initialisation des positions des joueurs
+    def __post_init__(self):
+        for cell in self.grid:
+            if self.grid[cell] == self.max_player.id:
+                self.max_positions.positions[cell] = self.max_player.id
+            elif self.grid[cell] == self.min_player.id:
+                self.min_positions.positions[cell] = self.min_player.id
+        #self.max_positions.player = self.max_player
+        #self.min_positions.player = self.min_player
 
     # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
     def legals_dodo(self, player: Player) -> list[ActionDodo]:
@@ -83,10 +101,10 @@ class GameDodo:
             {}
         )
 
-        positions = (
-            self.max_positions.positions if (
-                        self.current_player == self.max_positions.player) else self.min_positions.positions
-        )
+        if player.id == self.max_positions.player.id:
+            positions = self.max_positions.positions
+        else:
+            positions = self.min_positions.positions
 
         for position in positions:
             neighbors = hexa.neighbor_gopher(position[0], position[1], player.directions)
@@ -94,10 +112,9 @@ class GameDodo:
                 r = neighbor[0]
                 q = neighbor[1]
                 if -self.hex_size <= r <= self.hex_size and -self.hex_size <= q <= self.hex_size:
-                    if self.grid[neighbor] == EMPTY:
+                    if self.grid[neighbor] == EMPTY:  # problème ici
                         if (position, neighbor) not in actions:
                             actions[(position, neighbor)] = None
-
         return list(actions.keys())
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
@@ -221,7 +238,7 @@ class GameGopher:
 
 
 Environment = GameDodo | GameGopher
-Strategy = Callable[[Environment, Player, Grid, dict], Action]
+Strategy = Callable[[Environment, Player, GridDict, dict], Action]
 
 StrategyGopher = Callable[[Environment, Player, GridDict, dict], Action]
 
@@ -242,7 +259,7 @@ def new_gopher(h: int) -> GridDict:
 
 def print_dodo(env: GameDodo, empty_grid: Grid):
     """
-    Fonction permettant d'afficher une grille de jeu Gopher
+    Fonction permettant d'afficher une grille de jeu Dodo
     """
     temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
     for position in env.max_positions.positions:
@@ -256,15 +273,13 @@ def print_dodo(env: GameDodo, empty_grid: Grid):
     hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
 
 
-player1 = Player(1, DOWN_DIRECTIONS)
-grid = new_gopher(7)
-# grid[(0, 0)] = player1
-test = GameDodo(grid, player1, Player(2, UP_DIRECTIONS), player1, 7, 0)
-test.max_positions = test.max_positions(player1, {(0, 0): player1})
-#print(hexa.neighbor_gopher(0, 0, player1.directions))
-print(test.legals_dodo(player1))
-print_dodo(test, GRID2)
-test.play_dodo(((0, 0), (0, -1)))
-print(test.grid)
-print(test.max_positions)
-print_dodo(test, GRID2)
+def convert_grid(grid: Grid, hex_size: int) -> GridDict:
+    new_gopher(hex_size)
+    res: GridDict = {}
+    for i in range(0, len(grid)):
+        for j in range(0, len(grid[i])):
+            if grid[i][j] != -1:
+                coord = hexa.convert(i, j, hex_size)
+                res[coord] = grid[i][j]
+    return res
+

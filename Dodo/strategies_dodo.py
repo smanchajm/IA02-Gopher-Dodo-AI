@@ -9,7 +9,7 @@ from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
 Strategy = Callable[[Environment, Player, Grid], Action]
 
 
-def strategy_first_legal_dodo(env: Environment, player: Player, grid: Grid) -> Action:
+def strategy_first_legal_dodo(env: Environment, player: Player, grid: GridDict) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
     """
@@ -43,13 +43,13 @@ def strategy_random_gopher(
 def strategy_random_dodo(
     env: Environment,
     player: Player,
-    grid: Grid,
+    grid: GridDict,
     starting_library: dict = Dict[Any, Any],
 ) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
     """
-    return random.choice(env.legals_dodo(grid, player))
+    return random.choice(env.legals_dodo(player))
 
 
 # Fonctions d'évaluation
