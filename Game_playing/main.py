@@ -15,12 +15,12 @@ from Game_playing.hexagonal_board import display_grid
 matplotlib.use("TkAgg")
 from structures_classes import *
 
-from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4
+from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
 from Dodo.strategies_dodo import (
     strategy_first_legal_gopher,
     strategy_minmax,
     strategy_random_dodo,
-    strategy_random_gopher,
+    strategy_random_gopher, strategy_first_legal_dodo,
 )
 
 
@@ -68,7 +68,6 @@ def dodo(
     """
     time_history: List[float] = []
     actual_grid: GridDict = env.grid
-    current_player: Player = env.current_player
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
@@ -89,13 +88,14 @@ def dodo(
 
     res = env.final_dodo()
     while res not in (1, -1):
+        print(f"current_player {env.current_player.id}")
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
-        if debug and current_player.id == 1:
+        if debug and env.current_player.id == 1:
             print(f"Tour \033[36m {tour}\033[0m.")
-        if current_player.id == 1:
+        if env.current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-                env, current_player, env.grid, starting_library
+                env, env.current_player, env.grid, starting_library
             )
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
@@ -103,24 +103,26 @@ def dodo(
                     starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
             current_action = strategy_2(
-                env, current_player, env.grid, starting_library
+                env, env.current_player, env.grid, starting_library
             )
 
         env.play_dodo(current_action)
+        print(f"current player after{env.current_player.id}")
 
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
+        """
         if current_player.id == 1:
             time_history.append(iteration_time_end - iteration_time_start)
 
         if current_player.id == 1:
             current_player = env.min_player
         else:
-            current_player = env.max_player
-
+            current_player = env.max_player 
+        """
         if debug:
-            print_dodo(env, INIT_GRID)
+            print_dodo(env, GRID4)
 
 
         if debug:
@@ -130,7 +132,6 @@ def dodo(
             )
 
         res = env.final_dodo()
-        env.current_player = env.max_positions.player if env.current_player == env.min_positions.player else env.min_positions.player
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -233,7 +234,7 @@ def gopher(
             env.current_player = env.max_player
 
         if debug:
-            print_gopher(env, GRID2)
+            print_gopher(env, GRID4)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -391,19 +392,19 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 7
+    size_init_grid = 4
     if name == "Dodo":
         player1: Player = Player(1, DOWN_DIRECTIONS)
-        init_grid = INIT_GRID
-        init_grid = convert_grid(init_grid, size_init_grid)
         for i in range(game_number):
-            game = initialize("Dodo", init_grid, player1, 4, 5)
+            init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            print(init_grid)
+            game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
-                strategy_random_dodo,
+                strategy_minmax,
                 strategy_random_dodo,
                 init_grid,
-                debug=True,
+                debug=False,
                 building_library=False,
                 graphics=False,
                 library=False,
@@ -448,7 +449,10 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(100, "Dodo")
+
+
+
 
 
 if __name__ == "__main__":

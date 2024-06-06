@@ -121,7 +121,7 @@ def reverse_convert(q: int, r: int, n) -> Tuple[int, int]:
     Fonction permettant de convertir des coordonnées allant de -n à n
     à des coordonnées allant de 0 à 2n
     """
-    return n - q - 1, r + n - 1
+    return -r + n - 1, n + q - 1
 
 
 directions_case_neighbors: List[tuple[int, int]] = [

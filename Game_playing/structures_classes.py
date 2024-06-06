@@ -111,7 +111,7 @@ class GameDodo:
             for neighbor in neighbors:
                 r = neighbor[0]
                 q = neighbor[1]
-                if -self.hex_size <= r <= self.hex_size and -self.hex_size <= q <= self.hex_size:
+                if (r, q) in self.grid:
                     if self.grid[neighbor] == EMPTY:  # problème ici
                         if (position, neighbor) not in actions:
                             actions[(position, neighbor)] = None
@@ -124,11 +124,11 @@ class GameDodo:
         """
         if not self.legals_dodo(self.max_positions.player):
             if debug:
-                print(self.legals_dodo(self.max_positions.player))
+                print(f"test:{self.legals_dodo(self.max_positions.player)}")
             return 1
         if not self.legals_dodo(self.min_positions.player):
             if debug:
-                print(self.legals_dodo(self.min_positions.player))
+                print(f"test:{self.legals_dodo(self.min_positions.player)}")
             return -1
         return 0
 
@@ -136,6 +136,7 @@ class GameDodo:
         """
         Fonction jouant un coup pour un joueur donné
         """
+
         self.grid[action[1]] = self.current_player.id
         self.grid[action[0]] = 0
 
@@ -146,6 +147,26 @@ class GameDodo:
         else:
             self.min_positions.positions.pop(action[0])
             self.min_positions.positions[action[1]] = self.current_player.id
+
+        self.current_player = self.min_player if self.current_player == self.max_player else self.max_player
+
+    def undo(self, action: ActionDodo):
+
+        # update party state
+        self.grid[action[0]] = self.current_player.id
+        self.grid[action[1]] = EMPTY
+
+        # update pawns
+        if self.current_player.id == self.max_positions.player.id:
+            self.min_positions.positions.pop(action[1])
+            self.min_positions.positions[action[0]] = self.min_positions.player.id
+        else:
+            self.max_positions.positions.pop(action[1])
+            self.max_positions.positions[action[0]] = self.max_positions.player.id
+
+        self.current_player = self.min_player if self.current_player == self.max_player else self.max_player
+
+
 
 
 
@@ -263,15 +284,15 @@ def print_dodo(env: GameDodo, empty_grid: Grid):
     """
     temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
     for position in env.max_positions.positions:
-        print(position)
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 1
-    for position, _ in env.max_positions.positions.items():
+    for position in env.min_positions.positions:
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 2
-
     hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
 
+
+print(hexa.reverse_convert(3, 6, 7))
 
 def convert_grid(grid: Grid, hex_size: int) -> GridDict:
     new_gopher(hex_size)
