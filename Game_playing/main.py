@@ -17,10 +17,9 @@ from structures_classes import *
 
 from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
 from Dodo.strategies_dodo import (
-    strategy_first_legal_gopher,
+    strategy_first_legal,
     strategy_minmax,
-    strategy_random_dodo,
-    strategy_random_gopher, strategy_first_legal_dodo,
+    strategy_random,
 )
 
 
@@ -85,7 +84,7 @@ def dodo(
     else:
         starting_library = None
 
-    res = env.final_dodo()
+    res = env.final()
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
@@ -104,20 +103,12 @@ def dodo(
                 env, env.current_player, env.grid, starting_library
             )
 
-        env.play_dodo(current_action)
+        env.play(current_action)
 
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
-        """
-        if current_player.id == 1:
-            time_history.append(iteration_time_end - iteration_time_start)
 
-        if current_player.id == 1:
-            current_player = env.min_player
-        else:
-            current_player = env.max_player 
-        """
         if debug:
             print_dodo(env, GRID2)
 
@@ -128,7 +119,7 @@ def dodo(
                 f" secondes"
             )
 
-        res = env.final_dodo()
+        res = env.final()
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -148,15 +139,15 @@ def dodo(
         ),
         "total_turns": tour,
         "total_time": total_time_end - total_time_start,
-        "winner": env.final_dodo(),
+        "winner": env.final(),
     }
 
 
 # Boucle de jeu Gopher
 def gopher(
     env: GameGopher,
-    strategy_1: StrategyGopher,
-    strategy_2: StrategyGopher,
+    strategy_1: Strategy,
+    strategy_2: Strategy,
     init_grid: GridDict,
     debug: bool = False,
     starting_library: Dict = None,
@@ -169,7 +160,6 @@ def gopher(
     """
     time_history: List[float] = []
     actual_grid: GridDict = env.grid
-    current_player: Player = env.current_player
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
@@ -188,49 +178,51 @@ def gopher(
     else:
         starting_library = None
 
-    res = env.final_gopher(actual_grid)
+    res = env.final()
+
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
-        if debug and current_player.id == 1:
+        if debug and env.current_player.id == 1:
             print(f"Tour \033[36m {tour}\033[0m.")
-        if current_player == env.max_player:
+        if env.current_player.id == env.max_player.id:
             tour += 1
             current_action = strategy_1(
-                env, current_player, actual_grid, starting_library
+                env, env.current_player, actual_grid, starting_library
             )
+            print(f"Action minmax {current_action}")
+            env.play(current_action)
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
                     # print(f"Adding {hash(actual_grid)} to the library")
                     starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
             current_action = strategy_2(
-                env, current_player, actual_grid, starting_library
+                env, env.current_player, actual_grid, starting_library
             )
+            env.play(current_action)
 
-
-        env.play_gopher(current_action)
         actual_grid = env.grid
 
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
-        if current_player == env.max_player:
+        if env.current_player == env.max_player:
             time_history.append(iteration_time_end - iteration_time_start)
 
-        if env.current_player == env.max_player:
-            current_player = env.min_player
-            env.current_player = env.min_player
-        else:
-            current_player = env.max_player
-            env.current_player = env.max_player
 
         if debug:
-            print_gopher(env, GRID4)
+            print_gopher(env, GRID2)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
             )
-        res = env.final_gopher(actual_grid)
+
+        if tour > 1:
+            res = env.final()
+            print(f"Winner: {res}")
+        print(f"max {env.legals(env.max_player)}")
+        print(f"min {env.legals(env.min_player)}")
+
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -250,14 +242,14 @@ def gopher(
         ),
         "total_turns": tour,
         "total_time": total_time_end - total_time_start,
-        "winner": env.final_gopher(actual_grid),
+        "winner": env.final(),
     }
 
 
 # Initialisation de l'environnement
 def initialize(
     game: str, grid: GridDict, player: Player, hex_size: int, total_time: Time
-) -> Environment:
+) -> GameDodo | GameGopher:
     """
     Fonction permettant d'initialiser l'environnement de jeu
     """
@@ -279,8 +271,6 @@ def initialize(
             player,
             hex_size,
             total_time,
-            {},
-            {},
         )
 
 
@@ -366,10 +356,10 @@ def print_gopher(env: GameGopher, empty_grid: Grid):
     Fonction permettant d'afficher une grille de jeu Gopher
     """
     temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
-    for position, _ in env.max_positions.items():
+    for position, _ in env.max_positions.positions.items():
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 1
-    for position, _ in env.min_positions.items():
+    for position, _ in env.min_positions.positions.items():
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 2
 
@@ -391,7 +381,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             res = dodo(
                 game,
                 strategy_minmax,
-                strategy_random_dodo,
+                strategy_random,
                 init_grid,
                 debug=False,
                 building_library=False,
@@ -410,8 +400,8 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             game = initialize("Gopher", init_grid, player1, 7, 5)
             res = gopher(
                 game,
-                strategy_first_legal_gopher,
-                strategy_random_gopher,
+                strategy_minmax,
+                strategy_random,
                 init_grid,
                 debug=True,
                 building_library=False,
@@ -426,8 +416,8 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         list_results,
         "benchmark",
         game_number,
-        "strategy_alpha_beta",
-        "strategy_random_gopher",
+        "strategy_minmax",
+        "strategy_random",
         size_init_grid,
         5,
         False,
@@ -440,7 +430,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(50, "Dodo")
+    launch_multi_game(10, "Gopher")
 
 
 

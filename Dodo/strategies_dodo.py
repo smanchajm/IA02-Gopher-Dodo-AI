@@ -9,29 +9,17 @@ from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
 Strategy = Callable[[Environment, Player, Grid], Action]
 
 
-def strategy_first_legal_dodo(env: Environment,
+def strategy_first_legal(env: Environment,
     player: Player,
     grid: GridDict,
     starting_library: dict = Dict[Any, Any],) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
     """
-    return env.legals_dodo(player)[0]
+    return env.legals(player)[0]
 
 
-def strategy_first_legal_gopher(
-    env: Environment,
-    player: Player,
-    grid: GridDict,
-    starting_library: dict = Dict[Any, Any],
-) -> Action:
-    """
-    Stratégie qui retourne la première action légale calculée
-    """
-    return env.legals_gopher(grid, player)[0]
-
-
-def strategy_random_gopher(
+def strategy_random(
     env: Environment,
     player: Player,
     grid: GridDict,
@@ -40,19 +28,9 @@ def strategy_random_gopher(
     """
     Stratégie qui retourne une action légale aléatoire
     """
-    return random.choice(env.legals_gopher(grid, player))
-
-
-def strategy_random_dodo(
-    env: Environment,
-    player: Player,
-    grid: GridDict,
-    starting_library: dict = Dict[Any, Any],
-) -> Action:
-    """
-    Stratégie qui retourne une action légale aléatoire
-    """
-    return random.choice(env.legals_dodo(player))
+    print(f"Player random {player.id}")
+    print(f"random {env.legals(player)}")
+    return random.choice(env.legals(player))
 
 
 # Fonctions d'évaluation
@@ -86,13 +64,13 @@ def evaluate(env: Environment, grid: GridDict, player: Player) -> int:
                 10  # Penalty for having a piece, to encourage blocking oneself
             )
             player_score -= 5 * len(
-                env.legals_dodo(player)
+                env.legals(player)
             )  # Penalty for mobility
 
         elif grid[cell] == opponent:
             opponent_score += 10  # Reward for having a piece
             opponent_score += 5 * len(
-                env.legals_dodo(grid, opponent)
+                env.legals(opponent)
             )  # Reward for mobility
 
     return player_score - opponent_score
@@ -105,8 +83,8 @@ def evaluate_dynamic(env: Environment, grid: GridDict, player: Player) -> int:
     """
     opponent = env.min_player if player == env.max_player else env.max_player
 
-    player_moves = len(env.legals_dodo(player))
-    opponent_moves = len(env.legals_dodo(opponent))
+    player_moves = len(env.legals(player))
+    opponent_moves = len(env.legals(opponent))
 
     player_score = 0
     opponent_score = 0
@@ -152,27 +130,27 @@ def minmax_action(
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax pour le jeu Dodo
     """
-    if depth == 0 or env.final_dodo(env.grid) != 0:
-        return env.final_dodo(env.grid), (-1, -1)  # On retourne le score de la grille
+    if depth == 0 or env.final() != 0:
+        return env.final(), (-1, -1)  # On retourne le score de la grille
 
     if player == env.max_player:  # maximizing player
         best = (int("-inf"), ((-1, -1), (-1, -1)))
-        for item in env.legals_dodo(player):
-            env.play_dodo(item)
+        for item in env.legals(player):
+            env.play(item)
             returned_values: tuple[int, Action] = minmax_action(
                 env, env.min_player, depth - 1
             )
-            env.undo(item)
+            env.reverse_action(item)
             if max(best[0], returned_values[0]) == returned_values[0]:
                 best = (returned_values[0], item)
         return best
 
     if player == env.min_player:  # minimizing player
         best = (int("inf"), (-1, -1))
-        for item in env.legals_dodo(player):
-            env.play_dodo(item)
+        for item in env.legals(player):
+            env.play(item)
             returned_values = minmax_action(env, env.max_player, depth - 1)
-            env.undo(item)
+            env.reverse_action(item)
             if min(best[0], returned_values[0]) == returned_values[0]:
                 best: tuple[int, Action] = (returned_values[0], item)
         return best
@@ -193,7 +171,7 @@ def minmax_action_alpha_beta_pruning(
     memo: Dict[MemoKey, Tuple[float, Action]] = (
         {}
     )  # Dictionary to store the memoized results
-
+    print(f"Player minmax {player.id}")
     def minmax_alpha_beta_pruning(
         env: Environment,
         player: Player,
@@ -208,13 +186,12 @@ def minmax_action_alpha_beta_pruning(
             return memo[(grid_key, player_id)]
 
         # Si la profondeur est nulle ou si la partie est terminée
-        res = env.final_dodo(env.grid)
+        res = env.final()
         if res != 0:
             if res == 1:
                 score = 10000000
             else:
                 score = -10000000
-            # score = env.final_dodo(grid)
             memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
@@ -224,13 +201,13 @@ def minmax_action_alpha_beta_pruning(
 
         if player == env.max_player:  # Maximizing player
             best_max: tuple[float, Action] = (float("-inf"), (-1, -1))
-            for action in env.legals_dodo(player):
+            for action in env.legals(player):
 
-                env.play_dodo(action)
+                env.play(action)
                 returned_values = minmax_alpha_beta_pruning(
                     env, env.min_player, depth - 1, alpha, beta
                 )
-                env.undo(action)
+                env.reverse_action(action)
                 if returned_values[0] > best_max[0]:
                     best_max = (returned_values[0], action)
                 alpha = max(alpha, best_max[0])
@@ -241,12 +218,12 @@ def minmax_action_alpha_beta_pruning(
 
         if player == env.min_player:  # Minimizing player
             best_min: tuple[float, Action] = (float("inf"), (-1, -1))
-            for item in env.legals_dodo(player):
-                env.play_dodo(item)
+            for item in env.legals(player):
+                env.play(item)
                 returned_values = minmax_alpha_beta_pruning(
                     env, env.max_player, depth - 1, alpha, beta
                 )
-                env.undo(item)
+                env.reverse_action(item)
                 if returned_values[0] < best_min[0]:
                     best_min = (returned_values[0], item)
                 beta = min(beta, best_min[0])
@@ -270,7 +247,7 @@ def strategy_minmax(
     """
     # return minmax_action(env, player, grid, 4)[1]
     # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
-    depth_factor = 13 / len(env.legals_dodo(player))
+    depth_factor = 13 / len(env.legals(player))
     depth = min(5 * max(1, round(depth_factor)), 9)
     # depth = 5
 
@@ -286,7 +263,7 @@ def strategy_minmax(
         print("\033[32mHash found in library\033[0m")
         action = starting_library[hash(grid)]["action"]
         # test if the action is in the legal actions
-        if action not in env.legals_dodo(player):
+        if action not in env.legals(player):
             action = None
 
     if action is None:
