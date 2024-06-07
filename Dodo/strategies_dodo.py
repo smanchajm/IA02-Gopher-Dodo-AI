@@ -88,17 +88,12 @@ def evaluate(env: Environment, grid: GridDict, player: Player) -> int:
             player_score -= 5 * len(
                 env.legals_dodo(player)
             )  # Penalty for mobility
-            if is_near_edge(cell, env.hex_size, env.hex_size):
-                player_score += (
-                    5  # Reward for being near edge (easier to block oneself)
-                )
+
         elif grid[cell] == opponent:
             opponent_score += 10  # Reward for having a piece
             opponent_score += 5 * len(
                 env.legals_dodo(grid, opponent)
             )  # Reward for mobility
-            if is_near_edge(cell, env.hex_size, env.hex_size):
-                opponent_score -= 5  # Penalty for opponent being near edge
 
     return player_score - opponent_score
 
@@ -123,20 +118,22 @@ def evaluate_dynamic(env: Environment, grid: GridDict, player: Player) -> int:
         if grid[cell] == player:
             player_score -= 400  # Pénalité pour avoir une pièce
             player_score -= 800 * player_moves  # Pénalité ajustée pour la mobilité
+            """
             if is_near_edge(cell, grid_height, grid_width):
                 player_score += 400 - distance_to_edge(
                     cell, grid_height, grid_width
-                )  # Récompense dynamique pour la proximité du bord
+                )  # Récompense dynamique pour la proximité du bord """
         elif cell == opponent:
             opponent_score += 400  # Récompense pour avoir une pièce
             opponent_score += (
                     800 * opponent_moves
             )  # Récompense ajustée pour la mobilité
+            """
             if is_near_edge(cell, grid_height, grid_width):
                 # Pénalité dynamique pour l'adversaire près du bord
                 opponent_score -= 400 - distance_to_edge(
                     cell, grid_height, grid_width
-                )
+                )"""
 
     return player_score - opponent_score
 
@@ -204,11 +201,9 @@ def minmax_action_alpha_beta_pruning(
         alpha: float,
         beta: float,
     ) -> tuple[float, Action]:
-        grid = env.grid
         # Convert grid to a tuple, so it can be used as a key in the dictionary
-        grid_key = tuple(map(tuple, grid))
+        grid_key = tuple(map(tuple, env.grid))
         player_id = player.id  # Use a unique identifier for the player
-
         if (grid_key, player_id) in memo:
             return memo[(grid_key, player_id)]
 
@@ -229,8 +224,8 @@ def minmax_action_alpha_beta_pruning(
 
         if player == env.max_player:  # Maximizing player
             best_max: tuple[float, Action] = (float("-inf"), (-1, -1))
-            print(env.legals_dodo(player))
             for action in env.legals_dodo(player):
+
                 env.play_dodo(action)
                 returned_values = minmax_alpha_beta_pruning(
                     env, env.min_player, depth - 1, alpha, beta
@@ -252,10 +247,10 @@ def minmax_action_alpha_beta_pruning(
                     env, env.max_player, depth - 1, alpha, beta
                 )
                 env.undo(item)
-
                 if returned_values[0] < best_min[0]:
                     best_min = (returned_values[0], item)
                 beta = min(beta, best_min[0])
+
                 if beta <= alpha:
                     break
             memo[(grid_key, player_id)] = best_min

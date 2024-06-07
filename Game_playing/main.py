@@ -71,7 +71,6 @@ def dodo(
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
-
     # Permet d'éviter d'avoir une valeur par défaut mutable
     if starting_library is None:
         starting_library = {}
@@ -88,7 +87,6 @@ def dodo(
 
     res = env.final_dodo()
     while res not in (1, -1):
-        print(f"current_player {env.current_player.id}")
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
             print(f"Tour \033[36m {tour}\033[0m.")
@@ -107,7 +105,6 @@ def dodo(
             )
 
         env.play_dodo(current_action)
-        print(f"current player after{env.current_player.id}")
 
         iteration_time_end = (
             time.time()
@@ -122,7 +119,7 @@ def dodo(
             current_player = env.max_player 
         """
         if debug:
-            print_dodo(env, GRID4)
+            print_dodo(env, GRID2)
 
 
         if debug:
@@ -198,7 +195,6 @@ def gopher(
             print(f"Tour \033[36m {tour}\033[0m.")
         if current_player == env.max_player:
             tour += 1
-            print(f"legal {env.legals_gopher(env.grid, current_player)}")
             current_action = strategy_1(
                 env, current_player, actual_grid, starting_library
             )
@@ -207,22 +203,17 @@ def gopher(
                     # print(f"Adding {hash(actual_grid)} to the library")
                     starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
-            print(f"legal {env.legals_gopher(env.grid, current_player)}")
             current_action = strategy_2(
                 env, current_player, actual_grid, starting_library
             )
 
-        print(f"current_action {current_action}")
-        print(
-            f"conversion {hexa.reverse_convert(current_action[0], current_action[1], env.hex_size)}"
-        )
+
         env.play_gopher(current_action)
         actual_grid = env.grid
 
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
-        print(f"current_player {current_player}")
         if current_player == env.max_player:
             time_history.append(iteration_time_end - iteration_time_start)
 
@@ -240,7 +231,6 @@ def gopher(
                 f" secondes"
             )
         res = env.final_gopher(actual_grid)
-        print(f"res fin iter {res}")
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -392,12 +382,11 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 4
+    size_init_grid = 7
     if name == "Dodo":
-        player1: Player = Player(1, DOWN_DIRECTIONS)
         for i in range(game_number):
-            init_grid = convert_grid(INIT_GRID4, size_init_grid)
-            print(init_grid)
+            player1: Player = Player(1, DOWN_DIRECTIONS)
+            init_grid = convert_grid(INIT_GRID, size_init_grid)
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
@@ -411,6 +400,8 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
+            del game
+            del player1
 
     else:
         player1: Player = Player(1, ALL_DIRECTIONS)
@@ -422,7 +413,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 strategy_first_legal_gopher,
                 strategy_random_gopher,
                 init_grid,
-                debug=False,
+                debug=True,
                 building_library=False,
                 graphics=False,
                 library=False,
@@ -435,7 +426,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         list_results,
         "benchmark",
         game_number,
-        "strategy_first_legal_gopher",
+        "strategy_alpha_beta",
         "strategy_random_gopher",
         size_init_grid,
         5,
@@ -449,7 +440,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Dodo")
+    launch_multi_game(50, "Dodo")
 
 
 
