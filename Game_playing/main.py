@@ -7,10 +7,6 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd  # type: ignore
-from collections import namedtuple
-
-
-from Game_playing.hexagonal_board import display_grid
 
 matplotlib.use("TkAgg")
 from structures_classes import *
@@ -55,7 +51,6 @@ def dodo(
     env: GameDodo,
     strategy_1: Strategy,
     strategy_2: Strategy,
-    init_grid: GridDict,
     debug: bool = False,
     starting_library: Dict = None,
     building_library: bool = False,
@@ -112,7 +107,6 @@ def dodo(
         if debug:
             print_dodo(env, GRID2)
 
-
         if debug:
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
@@ -148,7 +142,6 @@ def gopher(
     env: GameGopher,
     strategy_1: Strategy,
     strategy_2: Strategy,
-    init_grid: GridDict,
     debug: bool = False,
     starting_library: Dict = None,
     building_library: bool = False,
@@ -209,7 +202,6 @@ def gopher(
         if env.current_player == env.max_player:
             time_history.append(iteration_time_end - iteration_time_start)
 
-
         if debug:
             print_gopher(env, GRID2)
             print(
@@ -222,7 +214,6 @@ def gopher(
             print(f"Winner: {res}")
         print(f"max {env.legals(env.max_player)}")
         print(f"min {env.legals(env.min_player)}")
-
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
     if graphics:
@@ -253,25 +244,22 @@ def initialize(
     """
     Fonction permettant d'initialiser l'environnement de jeu
     """
+    # Initialisation de l'environnement du jeu Dodo
     if game == "Dodo":
         return GameDodo(
-            grid,
-            player,
-            Player(2, UP_DIRECTIONS),
-            player,
-            hex_size,
-            total_time
+            grid, player, Player(2, UP_DIRECTIONS), player, hex_size, total_time
         )
-    else:
-        grid = new_gopher(hex_size)
-        return GameGopher(
-            grid,
-            player,
-            Player(2, ALL_DIRECTIONS),
-            player,
-            hex_size,
-            total_time,
-        )
+
+    # Initialisation de l'environnement du jeu Gopher
+    grid = new_gopher(hex_size)
+    return GameGopher(
+        grid,
+        player,
+        Player(2, ALL_DIRECTIONS),
+        player,
+        hex_size,
+        total_time,
+    )
 
 
 def append_to_csv(dataframe: pd.DataFrame, filename: str):
@@ -382,7 +370,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                init_grid,
                 debug=False,
                 building_library=False,
                 graphics=False,
@@ -390,8 +377,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
-            del game
-            del player1
 
     else:
         player1: Player = Player(1, ALL_DIRECTIONS)
@@ -402,7 +387,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                init_grid,
                 debug=True,
                 building_library=False,
                 graphics=False,
@@ -431,9 +415,6 @@ def main():
     """
 
     launch_multi_game(10, "Gopher")
-
-
-
 
 
 if __name__ == "__main__":

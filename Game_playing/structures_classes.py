@@ -1,12 +1,11 @@
 """ Module regroupant l'ensemble des structures de données utilisées """
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Union, NamedTuple
+from typing import Any, Callable, Dict, List, Union
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
 import Game_playing.hexagonal_board as hexa
-from Dodo.grid import GRID2, INIT_GRID, INIT_GRID4
 
 # Types de base utilisés par l'arbitre
 
@@ -30,11 +29,7 @@ UP_DIRECTIONS: List[tuple[int, int]] = [
     (0, 1),
 ]
 
-DOWN_DIRECTIONS: List[tuple[int, int]] = [
-    (-1, 0),
-    (-1, -1),
-    (0, -1)
-]
+DOWN_DIRECTIONS: List[tuple[int, int]] = [(-1, 0), (-1, -1), (0, -1)]
 
 ALL_DIRECTIONS: List[tuple[int, int]] = [
     (0, -1),
@@ -44,8 +39,6 @@ ALL_DIRECTIONS: List[tuple[int, int]] = [
     (1, 1),
     (0, 1),
 ]
-
-""" Module concernant l'environnement du jeu Gopher-Dodo """
 
 
 # DataClass Player
@@ -57,9 +50,11 @@ class Player:
     directions: Directions
 
 
+# Initialisation des struct de données
 GridDict = dict[Cell, int]
-max_positions_cr = namedtuple("max_position", ["player", "positions"])
-min_positions_cr = namedtuple("min_position", ["player", "positions"])
+MaxPositionsCr = namedtuple("max_position", ["player", "positions"])
+MinPositionsCr = namedtuple("min_position", ["player", "positions"])
+
 
 @dataclass
 class Environment(ABC):
@@ -74,19 +69,27 @@ class Environment(ABC):
 
     @abstractmethod
     def legals(self, player: Player) -> list[Action]:
-        pass
+        """
+        Fonction retournant les actions possibles d'un joueur pour un état donné
+        """
 
     @abstractmethod
     def final(self, debug: bool = False) -> int:
-        pass
+        """
+        Fonction retournant le score si nous sommes dans un état final (fin de partie)
+        """
 
     @abstractmethod
     def play(self, action: Action):
-        pass
+        """
+        Fonction jouant un coup pour un joueur donné
+        """
 
     @abstractmethod
     def reverse_action(self, action: Action):
-        pass
+        """
+        Fonction annulant un coup pour un joueur donné
+        """
 
 
 # DataClass Game Dodo
@@ -94,19 +97,19 @@ class Environment(ABC):
 class GameDodo(Environment):
     """Classe représentant le jeu Dodo"""
 
-
-    max_positions = max_positions_cr(
-        player=Player(1, DOWN_DIRECTIONS),
-        positions={}
-    )
-    min_positions = min_positions_cr(
-        player=Player(2, UP_DIRECTIONS),
-        positions={}
-    )
+    max_positions = MaxPositionsCr(player=Player(1, DOWN_DIRECTIONS), positions={})
+    min_positions = MinPositionsCr(player=Player(2, UP_DIRECTIONS), positions={})
 
     # Initialisation des positions des joueurs
     def __post_init__(self):
-        super().__init__(self.grid, self.max_player, self.min_player, self.current_player, self.hex_size, self.total_time)
+        super().__init__(
+            self.grid,
+            self.max_player,
+            self.min_player,
+            self.current_player,
+            self.hex_size,
+            self.total_time,
+        )
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
@@ -121,17 +124,18 @@ class GameDodo(Environment):
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
-        actions: Dict[ActionDodo, Any] = (
-            {}
-        )
+        actions: Dict[ActionDodo, Any] = {}
 
         if player.id == self.max_positions.player.id:
             positions = self.max_positions.positions
         else:
             positions = self.min_positions.positions
 
+        # Recherche des coups légaux
         for position in positions:
-            neighbors = hexa.neighbor_gopher(position[0], position[1], player.directions)
+            neighbors = hexa.neighbor_gopher(
+                position[0], position[1], player.directions
+            )
             for neighbor in neighbors:
                 r = neighbor[0]
                 q = neighbor[1]
@@ -157,25 +161,42 @@ class GameDodo(Environment):
         Fonction jouant un coup pour un joueur donné
         """
 
+        # Mise à jour de la grille
         self.grid[action[1]] = self.current_player.id
         self.grid[action[0]] = 0
-        if action[0] not in self.max_positions.positions and self.current_player.id == self.max_positions.player.id:
+
+        # Debug
+        if (
+            action[0] not in self.max_positions.positions
+            and self.current_player.id == self.max_positions.player.id
+        ):
             print(f" error action[0]:{action[0]}")
+
         # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
-            del(self.max_positions.positions[action[0]])
+            del self.max_positions.positions[action[0]]
             self.max_positions.positions[action[1]] = self.current_player.id
         else:
-            del(self.min_positions.positions[action[0]])
+            del self.min_positions.positions[action[0]]
             self.min_positions.positions[action[1]] = self.current_player.id
 
-        self.current_player = self.min_player if self.current_player == self.max_player else self.max_player
+        # Changement de joueur
+        self.current_player = (
+            self.min_player
+            if self.current_player == self.max_player
+            else self.max_player
+        )
 
     def reverse_action(self, action: ActionDodo):
+        """
+        Fonction annulant un coup pour un joueur donné
+        """
 
+        # Mise à jour de la grille
         self.grid[action[0]] = self.current_player.id
         self.grid[action[1]] = EMPTY
 
+        # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
             self.min_positions.positions.pop(action[1])
             self.min_positions.positions[action[0]] = self.min_positions.player.id
@@ -183,25 +204,31 @@ class GameDodo(Environment):
             self.max_positions.positions.pop(action[1])
             self.max_positions.positions[action[0]] = self.max_positions.player.id
 
-        self.current_player = self.min_player if self.current_player == self.max_player else self.max_player
+        # Changement de joueur
+        self.current_player = (
+            self.min_player
+            if self.current_player == self.max_player
+            else self.max_player
+        )
 
 
 @dataclass
 class GameGopher(Environment):
     """Classe représentant le jeu Gopher"""
 
-    max_positions = max_positions_cr(
-        player=Player(1, ALL_DIRECTIONS),
-        positions={}
-    )
-    min_positions = min_positions_cr(
-        player=Player(2, ALL_DIRECTIONS),
-        positions={}
-    )
+    max_positions = MaxPositionsCr(player=Player(1, ALL_DIRECTIONS), positions={})
+    min_positions = MinPositionsCr(player=Player(2, ALL_DIRECTIONS), positions={})
 
     # Initialisation des positions des joueurs
     def __post_init__(self):
-        super().__init__(self.grid, self.max_player, self.min_player, self.current_player, self.hex_size, self.total_time)
+        super().__init__(
+            self.grid,
+            self.max_player,
+            self.min_player,
+            self.current_player,
+            self.hex_size,
+            self.total_time,
+        )
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
@@ -218,18 +245,26 @@ class GameGopher(Environment):
         result: List[ActionGopher] = []
 
         # Premier coup
-        if len(self.max_positions.positions) == 0 and len(self.min_positions.positions) == 0:
+        if (
+            len(self.max_positions.positions) == 0
+            and len(self.min_positions.positions) == 0
+        ):
             for position in self.grid:
                 result.append(position)
             return result
 
         player_positions = (
-            self.max_positions.positions if player == self.max_player else self.min_positions.positions
+            self.max_positions.positions
+            if player == self.max_player
+            else self.min_positions.positions
         )
         opponent_positions = (
-            self.min_positions.positions if player == self.max_player else self.max_positions.positions
+            self.min_positions.positions
+            if player == self.max_player
+            else self.max_positions.positions
         )
 
+        # Recherche des coups légaux
         for position in opponent_positions.keys():
             neighbors = hexa.neighbor_gopher(
                 position[0], position[1], player.directions
@@ -277,19 +312,33 @@ class GameGopher(Environment):
         else:
             self.min_positions.positions[action] = self.current_player.id
 
-        self.current_player = self.min_player if self.current_player == self.max_player else self.max_player
+        # Changement de joueur
+        self.current_player = (
+            self.min_player
+            if self.current_player == self.max_player
+            else self.max_player
+        )
 
     def reverse_action(self, action: ActionGopher):
+        """
+        Fonction annulant un coup pour un joueur donné
+        """
 
+        # mise à jour de la grille
         self.grid[action] = EMPTY
 
-        # update pawns
+        # mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
             self.min_positions.positions.pop(action)
         else:
             self.max_positions.positions.pop(action)
 
-        self.current_player = self.min_player if self.current_player == self.max_player else self.max_player
+        # Changement de joueur
+        self.current_player = (
+            self.min_player
+            if self.current_player == self.max_player
+            else self.max_player
+        )
 
 
 Strategy = Callable[[Environment, Player, GridDict, dict], Action]
@@ -324,6 +373,11 @@ def print_dodo(env: GameDodo, empty_grid: Grid):
 
 
 def convert_grid(grid: Grid, hex_size: int) -> GridDict:
+    """
+    Fonction permettant de convertir une grille de jeu (tuple) en dictionnaire
+
+    """
+
     new_gopher(hex_size)
     res: GridDict = {}
     for i in range(0, len(grid)):
@@ -332,4 +386,3 @@ def convert_grid(grid: Grid, hex_size: int) -> GridDict:
                 coord = hexa.convert(i, j, hex_size)
                 res[coord] = grid[i][j]
     return res
-

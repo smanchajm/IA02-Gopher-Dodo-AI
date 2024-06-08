@@ -3,16 +3,24 @@
 import random
 from typing import Any, Callable, Dict, Tuple
 
-from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
-                                             GridDict, Player)
+from Game_playing.structures_classes import (
+    Action,
+    Cell,
+    Environment,
+    Grid,
+    GridDict,
+    Player,
+)
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
 
-def strategy_first_legal(env: Environment,
+def strategy_first_legal(
+    env: Environment,
     player: Player,
     grid: GridDict,
-    starting_library: dict = Dict[Any, Any],) -> Action:
+    starting_library: dict = Dict[Any, Any],
+) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
     """
@@ -63,15 +71,11 @@ def evaluate(env: Environment, grid: GridDict, player: Player) -> int:
             player_score -= (
                 10  # Penalty for having a piece, to encourage blocking oneself
             )
-            player_score -= 5 * len(
-                env.legals(player)
-            )  # Penalty for mobility
+            player_score -= 5 * len(env.legals(player))  # Penalty for mobility
 
         elif grid[cell] == opponent:
             opponent_score += 10  # Reward for having a piece
-            opponent_score += 5 * len(
-                env.legals(opponent)
-            )  # Reward for mobility
+            opponent_score += 5 * len(env.legals(opponent))  # Reward for mobility
 
     return player_score - opponent_score
 
@@ -104,7 +108,7 @@ def evaluate_dynamic(env: Environment, grid: GridDict, player: Player) -> int:
         elif cell == opponent:
             opponent_score += 400  # Récompense pour avoir une pièce
             opponent_score += (
-                    800 * opponent_moves
+                800 * opponent_moves
             )  # Récompense ajustée pour la mobilité
             """
             if is_near_edge(cell, grid_height, grid_width):
@@ -158,7 +162,7 @@ def minmax_action(
 
 
 # Define a type alias for the memoization key
-MemoKey = tuple[Grid, int]
+MemoKey = tuple[GridDict, int]
 
 
 def minmax_action_alpha_beta_pruning(
@@ -172,6 +176,7 @@ def minmax_action_alpha_beta_pruning(
         {}
     )  # Dictionary to store the memoized results
     print(f"Player minmax {player.id}")
+
     def minmax_alpha_beta_pruning(
         env: Environment,
         player: Player,
@@ -180,7 +185,7 @@ def minmax_action_alpha_beta_pruning(
         beta: float,
     ) -> tuple[float, Action]:
         # Convert grid to a tuple, so it can be used as a key in the dictionary
-        grid_key = tuple(map(tuple, env.grid))
+        grid_key = env.grid  # Use the grid as a key
         player_id = player.id  # Use a unique identifier for the player
         if (grid_key, player_id) in memo:
             return memo[(grid_key, player_id)]
@@ -234,9 +239,7 @@ def minmax_action_alpha_beta_pruning(
             return best_min
         return 0, (-1, -1)
 
-    return minmax_alpha_beta_pruning(
-        env, player, depth, float("-inf"), float("inf")
-    )
+    return minmax_alpha_beta_pruning(env, player, depth, float("-inf"), float("inf"))
 
 
 def strategy_minmax(
