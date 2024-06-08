@@ -14,4 +14,4 @@ strategy_alpha_beta,strategy_random_gopher,4,5,200,False,0.69,20.77,14,56,0.0,0.
 strategy_random,strategy_random,7,5,50,False,1.0,0.0,0,0,0.0,0.0,0.0,0
 strategy_minmax,strategy_random,7,5,100,False,1.0,1.0,1,1,0.0,0.000949547290802002,1.0,0
 strategy_minmax,strategy_random,7,5,100,False,0.87,10.39,2,34,4.8913095423213985e-05,0.02944828748703003,7.597701149425287,29.076923076923077
-strategy_minmax,strategy_random,7,5,10,False,0.8,13.6,2,32,6.907333742480478e-05,0.08010804653167725,9.5,30.0
+strategy_alpha_beta,strategy_random,4,5,100,False,0.94,21.41,11,66,0.0,26.031708092689513,20.30851063829787,38.666666666666664

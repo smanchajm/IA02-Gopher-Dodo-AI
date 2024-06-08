@@ -1,5 +1,5 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
-
+import json
 import random
 from typing import Any, Callable, Dict, Tuple
 
@@ -185,10 +185,10 @@ def minmax_action_alpha_beta_pruning(
         beta: float,
     ) -> tuple[float, Action]:
         # Convert grid to a tuple, so it can be used as a key in the dictionary
-        grid_key = env.grid  # Use the grid as a key
+       # grid_key = hash(json.dumps(env.grid, sort_keys=True))  # Use the grid as a key
         player_id = player.id  # Use a unique identifier for the player
-        if (grid_key, player_id) in memo:
-            return memo[(grid_key, player_id)]
+        #if (grid_key, player_id) in memo:
+        #    return memo[(grid_key, player_id)]
 
         # Si la profondeur est nulle ou si la partie est terminée
         res = env.final()
@@ -197,11 +197,11 @@ def minmax_action_alpha_beta_pruning(
                 score = 10000000
             else:
                 score = -10000000
-            memo[(grid_key, player_id)] = (score, (-1, -1))
+            #memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
             score = evaluate_dynamic(env, env.grid, player)
-            memo[(grid_key, player_id)] = (score, (-1, -1))
+            #memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
 
         if player == env.max_player:  # Maximizing player
@@ -218,7 +218,7 @@ def minmax_action_alpha_beta_pruning(
                 alpha = max(alpha, best_max[0])
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id)] = best_max
+            #memo[(grid_key, player_id)] = best_max
             return best_max
 
         if player == env.min_player:  # Minimizing player
@@ -235,7 +235,7 @@ def minmax_action_alpha_beta_pruning(
 
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id)] = best_min
+            #memo[(grid_key, player_id)] = best_min
             return best_min
         return 0, (-1, -1)
 

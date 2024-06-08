@@ -105,7 +105,7 @@ def dodo(
         )  # Fin du chronomètre pour la durée de cette itération
 
         if debug:
-            print_dodo(env, GRID2)
+            print_dodo(env, GRID4)
 
         if debug:
             print(
@@ -203,7 +203,7 @@ def gopher(
             time_history.append(iteration_time_end - iteration_time_start)
 
         if debug:
-            print_gopher(env, GRID2)
+            print_gopher(env, GRID4)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -360,11 +360,11 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 7
+    size_init_grid = 4
     if name == "Dodo":
         for i in range(game_number):
             player1: Player = Player(1, DOWN_DIRECTIONS)
-            init_grid = convert_grid(INIT_GRID, size_init_grid)
+            init_grid = convert_grid(INIT_GRID4, size_init_grid)
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
@@ -400,7 +400,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         list_results,
         "benchmark",
         game_number,
-        "strategy_minmax",
+        "strategy_alpha_beta",
         "strategy_random",
         size_init_grid,
         5,
@@ -414,7 +414,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(10, "Gopher")
+    launch_multi_game(100, "Dodo")
 
 
 if __name__ == "__main__":
