@@ -2,9 +2,8 @@
 
 from cmath import log
 import random
-from typing import Any, Callable, Dict, Tuple
+from typing import Callable, Tuple
 
-from Dodo.grid import INIT_GRID
 from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
                                              GridDict, Player)
 
@@ -199,12 +198,12 @@ def strategy_minmax(
     # print(f"Depth factor: {depth_factor}")
 
     depth = min(2 + round(depth_factor), 9)
-    # print(f"Depth: {depth}")
+    print(f"Depth: {depth}")
 
     return minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
 
 
-def is_first_move(env: Environment, grid: Grid) -> bool:
+def is_first_move(env: Environment) -> bool:
     """
     Déterminer si le premier coup a été joué
     """
@@ -212,7 +211,7 @@ def is_first_move(env: Environment, grid: Grid) -> bool:
 
 
 def strategy_botte_secrete(
-   env: Environment, player: Player, grid: Grid, starting_library: dict = None) -> Action:
+   env: Environment, player: Player, grid: Grid) -> Action:
     """
     Stratégie qui copie les mouvements de l'adversaire pour les 100 premiers coups et joue ensuite avec l'algorithme Minmax
     """
