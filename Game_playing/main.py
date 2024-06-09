@@ -105,6 +105,9 @@ def dodo(
 
         actual_grid = env.play_dodo(current_player, actual_grid, current_action)
 
+        env.nb_moves = env.nb_moves + 1
+        env.precedent_action = current_action
+
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
@@ -411,7 +414,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 init_grid,
                 debug=True,
                 building_library=False,
-                graphics=True,
+                graphics=False,
                 library=False,
             )
             list_results.append(res)

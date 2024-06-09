@@ -1,7 +1,7 @@
 """ Module concernant la réalisation du jeu DoDo """
 import random
 import time
-from typing import Dict, Tuple
+from typing import Dict, Set, Tuple
 from Dodo.grid import *
 from Game_playing.structures_classes import *
 
@@ -74,7 +74,7 @@ def final_dodo(grid: Grid) -> int:
 
 
 def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
-    temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
+    temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
     temp_grid[action[0][0]][action[0][1]] = 0
     temp_grid[action[1][0]][action[1][1]] = player
     return hexa.grid_list_to_grid_tuple(temp_grid)

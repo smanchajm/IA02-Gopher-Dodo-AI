@@ -20,3 +20,5 @@ strategy_first_legal_gopher,strategy_random_gopher,7,5,1,False,0.0,173.0,173,173
 strategy_first_legal_gopher,strategy_random_gopher,7,5,1,False,0.0,179.0,179,179,4.586161181913408e-05,3.597679853439331,0,179.0
 strategy_first_legal_gopher,strategy_random_gopher,7,5,1,False,1.0,195.0,195,195,4.514425228803586e-05,42.44242882728577,195.0,0
 strategy_first_legal_gopher,strategy_random_gopher,7,5,1,False,1.0,367.0,367,367,3.410035323057253e-05,50.66351675987244,367.0,0
+strategy_first_legal_gopher,strategy_random_gopher,7,5,1,False,1.0,134.0,134,134,0.1043952881400265,14.345349311828613,134.0,0
+strategy_first_legal_gopher,strategy_random_gopher,7,5,1,False,1.0,185.0,185,185,0.27774725733576594,55.0526909828186,185.0,0

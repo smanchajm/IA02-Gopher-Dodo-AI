@@ -270,9 +270,10 @@ def strategy_minmax(
     """
     # return minmax_action(env, player, grid, 4)[1]
     # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
-    depth_factor = 13 / len(env.legals_dodo(grid, player))
-    depth = min(5 * max(1, round(depth_factor)), 9)
-    # depth = 5
+    # depth_factor = 13 / len(env.legals_dodo(grid, player))
+    # print(f"Depth factor: {depth_factor}")
+    # depth = min(5 * max(1, round(depth_factor)), 9)
+    depth = 4
 
     if starting_library is None:
         # print("No library provided")
@@ -309,14 +310,13 @@ def strategy_botte_secrete(
     Stratégie qui copie les mouvements de l'adversaire pour les 100 premiers coups et joue ensuite avec l'algorithme Minmax
     """
     if is_first_move(env, grid):
-        print("First move")
+        # print("First move")
         return strategy_minmax(env, player, grid)
     if env.nb_moves < 200:
-        print("Secret move")
+        # print("Secret move")
         action = env.precedent_action
         action = ((len(grid) - 1 - action[0][0], len(grid[0]) - 1 - action[0][1]), (len(grid) - 1 - action[1][0], len(grid[0]) - 1 - action[1][1]))
         return action
-    else:
-        print(env.nb_moves)
-    print("Playing Minmax")
+    # print("Playing Minmax")
     return strategy_minmax(env, player, grid)
+
