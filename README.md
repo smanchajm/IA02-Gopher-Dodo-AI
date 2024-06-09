@@ -10,15 +10,15 @@ These two games were created by Mark Steere.
 - [ ] Implémentation du jeu 
   - [x] Grille
   - [x] Dodo rules
-  - [ ] Gopher rules
-  - [ ] Environnement
+  - [x] Gopher rules
+  - [x] Environnement
   - [ ] Création des stratégies de jeu 
 - [ ] différentes stratégies
   - [x] minmax simple
   - [x] alpha-beta simple
   - [x] fonction d'évaluation
   - [ ] Monte Carlo ?
-  - [ ] stratégie copie joueur adverse / librairie first moves
+  - [x] stratégie copie joueur adverse / librairie first moves
 - [ ] optimisations
   - [ ] multithreading
   - [ ] symétries
