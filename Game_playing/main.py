@@ -1,7 +1,6 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
 import os
-import pickle
 import time
 
 import matplotlib
@@ -20,34 +19,6 @@ from Dodo.strategies_dodo import (
     strategy_botte_secrete,
 )
 
-
-# Function to save the library to a file
-def save_library(library, filename):
-    """
-    Fonction permettant de sauvegarder la librairie dans un fichier
-    """
-    with open(filename, "wb") as file:
-        pickle.dump(library, file)
-
-
-# Function to load the library from a file
-def load_library(filename):
-    """
-    Fonction permettant de charger la librairie depuis un fichier
-    """
-    with open(filename, "rb") as file:
-        library = pickle.load(file)
-    return library
-
-
-def read_plk(filename):
-    """
-    Fonction permettant de charger un fichier .plk
-    """
-    with open(filename, "rb") as file:
-        return pickle.load(file)
-
-
 # Boucle de jeu Dodo
 def dodo(
     env: GameDodo,
@@ -55,10 +26,7 @@ def dodo(
     strategy_2: Strategy,
     init_grid: Grid,
     debug: bool = False,
-    starting_library: Dict = None,
-    building_library: bool = False,
     graphics: bool = False,
-    library: bool = False,
 ) -> dict[str, int | float | Any]:
     """
     Fonction représentant la boucle de jeu de Dodo
@@ -70,20 +38,6 @@ def dodo(
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
 
-    # Permet d'éviter d'avoir une valeur par défaut mutable
-    if starting_library is None:
-        starting_library = {}
-
-    # Permet de tester nos stratégies sans la librairie
-    if library:
-        if starting_library == {}:
-            try:  # On essaie de charger la librairie de coups de départ
-                starting_library = load_library("starting_library.pkl")
-            except FileNotFoundError:
-                starting_library = {}
-    else:
-        starting_library = None
-
     res = env.final_dodo(actual_grid)
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
@@ -92,15 +46,11 @@ def dodo(
         if current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-                env, current_player, actual_grid, starting_library
+                env, current_player, actual_grid
             )
-            if building_library:
-                if hash(actual_grid) not in starting_library.keys() and tour < 100:
-                    # print(f"Adding {hash(actual_grid)} to the library")
-                    starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
             current_action = strategy_2(
-                env, current_player, actual_grid, starting_library
+                env, current_player, actual_grid
             )
 
         actual_grid = env.play_dodo(current_player, actual_grid, current_action)
@@ -138,8 +88,6 @@ def dodo(
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
         plt.show()
-    if building_library:
-        save_library(starting_library, "starting_library.pkl")
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
@@ -157,12 +105,8 @@ def gopher(
     env: GameGopher,
     strategy_1: StrategyGopher,
     strategy_2: StrategyGopher,
-    init_grid: GridDict,
     debug: bool = False,
-    starting_library: Dict = None,
-    building_library: bool = False,
     graphics: bool = False,
-    library: bool = False,
 ) -> dict[str, int | float | Any]:
     """
     Fonction représentant la boucle de jeu de Gopher
@@ -174,20 +118,6 @@ def gopher(
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
 
-    # Permet d'éviter d'avoir une valeur par défaut mutable
-    if starting_library is None:
-        starting_library = {}
-
-    # Permet de tester nos stratégies sans la librairie
-    if library:
-        if starting_library == {}:
-            try:  # On essaie de charger la librairie de coups de départ
-                starting_library = load_library("starting_library.pkl")
-            except FileNotFoundError:
-                starting_library = {}
-    else:
-        starting_library = None
-
     res = env.final_gopher(actual_grid)
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
@@ -197,16 +127,13 @@ def gopher(
             tour += 1
             print(f"legal {env.legals_gopher(env.grid, current_player)}")
             current_action = strategy_1(
-                env, current_player, actual_grid, starting_library
+                env, current_player, actual_grid
             )
-            if building_library:
-                if hash(actual_grid) not in starting_library.keys() and tour < 100:
-                    # print(f"Adding {hash(actual_grid)} to the library")
-                    starting_library[hash(actual_grid)] = {"action": current_action[0]}
+            
         else:
             print(f"legal {env.legals_gopher(env.grid, current_player)}")
             current_action = strategy_2(
-                env, current_player, actual_grid, starting_library
+                env, current_player, actual_grid
             )
 
         print(f"current_action {current_action}")
@@ -247,8 +174,6 @@ def gopher(
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
         plt.show()
-    if building_library:
-        save_library(starting_library, "starting_library.pkl")
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
@@ -330,7 +255,6 @@ def add_to_benchmark(
     strategy_2: str,
     grid: int,
     depth: int,
-    starting_library: bool,
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
@@ -343,7 +267,6 @@ def add_to_benchmark(
         "Grid": grid,
         "depth": depth,
         "game_number": game_number,
-        "starting_library": starting_library,
         "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
         "average_turns": sum(res["total_turns"] for res in list_results) / game_number,
         "min_turns": min(res["total_turns"] for res in list_results),
@@ -408,14 +331,12 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             # print(len(game.legals_dodo(init_grid, player1)))
             res = dodo(
                 game,
-                # strategy_minmax,
-                strategy_botte_secrete,
+                strategy_minmax,
+                # strategy_botte_secrete,
                 strategy_random_dodo,
                 init_grid,
-                debug=True,
-                building_library=False,
+                debug=False,
                 graphics=False,
-                library=False,
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
@@ -431,23 +352,29 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 strategy_random_gopher,
                 init_grid,
                 debug=False,
-                building_library=False,
                 graphics=False,
-                library=False,
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
 
     # Ajout des stat à un fichier CSV
+    # add_to_benchmark(
+    #     list_results,
+    #     "benchmark",
+    #     game_number,
+    #     "strategy_first_legal_gopher",
+    #     "strategy_random_gopher",
+    #     size_init_grid,
+    #     5,
+    # )
     add_to_benchmark(
         list_results,
         "benchmark",
         game_number,
-        "strategy_first_legal_gopher",
-        "strategy_random_gopher",
+        "strategy_minmax",
+        "strategy_random_dodo",
         size_init_grid,
-        5,
-        False,
+        3,
     )
 
 
@@ -458,7 +385,7 @@ def main():
     """
 
     # launch_multi_game(100, "Gopher")
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(10, "Dodo")
 
 
 if __name__ == "__main__":

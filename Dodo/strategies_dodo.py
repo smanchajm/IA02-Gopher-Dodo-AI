@@ -1,5 +1,6 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
 
+from cmath import log
 import random
 from typing import Any, Callable, Dict, Tuple
 
@@ -8,7 +9,6 @@ from Game_playing.structures_classes import (Action, Cell, Environment, Grid,
                                              GridDict, Player)
 
 Strategy = Callable[[Environment, Player, Grid], Action]
-
 
 def strategy_first_legal_dodo(env: Environment, player: Player, grid: Grid) -> Action:
     """
@@ -21,7 +21,6 @@ def strategy_first_legal_gopher(
     env: Environment,
     player: Player,
     grid: GridDict,
-    starting_library: dict = Dict[Any, Any],
 ) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
@@ -33,7 +32,6 @@ def strategy_random_gopher(
     env: Environment,
     player: Player,
     grid: GridDict,
-    starting_library: dict = Dict[Any, Any],
 ) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
@@ -45,7 +43,6 @@ def strategy_random_dodo(
     env: Environment,
     player: Player,
     grid: Grid,
-    starting_library: dict = Dict[Any, Any],
 ) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
@@ -53,7 +50,6 @@ def strategy_random_dodo(
     return random.choice(env.legals_dodo(grid, player))
 
 
-# Fonctions d'évaluation
 def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
     """
     Déterminer si une cellule est proche du bord de la grille
@@ -66,43 +62,6 @@ def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
     )
 
 
-def evaluate(env: Environment, grid: Grid, player: Player) -> int:
-    """
-    Première fonction d'évaluation pour le jeu Dodo
-    """
-    if player == env.max_player:
-        opponent = env.min_player
-    else:
-        opponent = env.max_player
-
-    player_score = 0
-    opponent_score = 0
-
-    for i, row in enumerate(grid):
-        for j, cell in enumerate(row):
-            if cell == player:
-                player_score -= (
-                    10  # Penalty for having a piece, to encourage blocking oneself
-                )
-                player_score -= 5 * len(
-                    env.legals_dodo(grid, player)
-                )  # Penalty for mobility
-                if is_near_edge((i, j), len(grid), len(grid)):
-                    player_score += (
-                        5  # Reward for being near edge (easier to block oneself)
-                    )
-            elif cell == opponent:
-                opponent_score += 10  # Reward for having a piece
-                opponent_score += 5 * len(
-                    env.legals_dodo(grid, opponent)
-                )  # Reward for mobility
-                if is_near_edge((i, j), len(grid), len(grid)):
-                    opponent_score -= 5  # Penalty for opponent being near edge
-
-    return player_score - opponent_score
-
-
-# nombre de coups pour gagner ?
 def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
     """
     Fonction d'évaluation pour le jeu Dodo avec une récompense dynamique pour la proximité du bord
@@ -121,24 +80,24 @@ def evaluate_dynamic(env: Environment, grid: Grid, player: Player) -> int:
     for i in range(grid_height):
         for j in range(grid_width):
             cell = grid[i][j]
-            if cell == player:
-                player_score -= 400  # Pénalité pour avoir une pièce
-                player_score -= 800 * player_moves  # Pénalité ajustée pour la mobilité
+            if cell == player.id:
+                player_score -= 40  # Pénalité pour avoir une pièce
+                player_score -= 80 * player_moves  # Pénalité ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
-                    player_score += 400 - distance_to_edge(
+                    player_score += 40 - distance_to_edge(
                         (i, j), grid_height, grid_width
                     )  # Récompense dynamique pour la proximité du bord
-            elif cell == opponent:
-                opponent_score += 400  # Récompense pour avoir une pièce
+            elif cell == opponent.id:
+                opponent_score += 40  # Récompense pour avoir une pièce
                 opponent_score += (
-                    800 * opponent_moves
+                    80 * opponent_moves
                 )  # Récompense ajustée pour la mobilité
                 if is_near_edge((i, j), grid_height, grid_width):
                     # Pénalité dynamique pour l'adversaire près du bord
-                    opponent_score -= 400 - distance_to_edge(
+                    opponent_score -= 40 - distance_to_edge(
                         (i, j), grid_height, grid_width
                     )
-
+    
     return player_score - opponent_score
 
 
@@ -149,42 +108,6 @@ def distance_to_edge(cell: Cell, grid_height: int, grid_width: int) -> int:
     return min(cell[0], grid_height - 1 - cell[0], cell[1], grid_width - 1 - cell[1])
 
 
-# Minimax Strategy (sans cache)
-def minmax_action(
-    env: Environment, player: Player, grid: Grid, depth: int = 0
-) -> tuple[int, Action]:
-    """
-    Stratégie qui retourne le résultat de l'algorithme Minimax pour le jeu Dodo
-    """
-    if depth == 0 or env.final_dodo(grid) != 0:
-        return env.final_dodo(grid), (-1, -1)  # On retourne le score de la grille
-
-    if player == env.max_player:  # maximizing player
-        best = (int("-inf"), ((-1, -1), (-1, -1)))
-        for item in env.legals_dodo(grid, player):
-            tmp = env.play_dodo(player, grid, item)
-            returned_values: tuple[int, Action] = minmax_action(
-                env, env.min_player, tmp, depth - 1
-            )
-            if max(best[0], returned_values[0]) == returned_values[0]:
-                best = (returned_values[0], item)
-        return best
-
-    if player == env.min_player:  # minimizing player
-        best = (int("inf"), (-1, -1))
-        for item in env.legals_dodo(grid, player):
-            tmp = env.play_dodo(player, grid, item)
-            returned_values = minmax_action(env, env.max_player, tmp, depth - 1)
-            if min(best[0], returned_values[0]) == returned_values[0]:
-                best: tuple[int, Action] = (returned_values[0], item)
-        return best
-    return 0, (-1, -1)
-
-
-# Define a type alias for the memoization key
-MemoKey = tuple[Grid, int]
-
-
 def minmax_action_alpha_beta_pruning(
     env: Environment, player: Player, grid: Grid, depth: int = 0
 ) -> tuple[float, Action]:
@@ -192,9 +115,7 @@ def minmax_action_alpha_beta_pruning(
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
     et memoization pour le jeu Dodo
     """
-    memo: Dict[MemoKey, Tuple[float, Action]] = (
-        {}
-    )  # Dictionary to store the memoized results
+    memo = {}  # Closure
 
     def minmax_alpha_beta_pruning(
         env: Environment,
@@ -204,6 +125,7 @@ def minmax_action_alpha_beta_pruning(
         alpha: float,
         beta: float,
     ) -> tuple[float, Action]:
+        
         # Convert grid to a tuple, so it can be used as a key in the dictionary
         grid_key = grid
         player_id = player.id  # Use a unique identifier for the player
@@ -213,11 +135,12 @@ def minmax_action_alpha_beta_pruning(
 
         # Si la profondeur est nulle ou si la partie est terminée
         res = env.final_dodo(grid)
+
         if res != 0:
             if res == 1:
-                score = 100
+                score = 10000
             else:
-                score = -100
+                score = -10000
             # score = env.final_dodo(grid)
             memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
@@ -263,38 +186,22 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
-    env: Environment, player: Player, grid: Grid, starting_library: dict = None
+    env: Environment, player: Player, grid: Grid
 ) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
-    # return minmax_action(env, player, grid, 4)[1]
-    # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
-    # depth_factor = 13 / len(env.legals_dodo(grid, player))
+    try:
+        depth_factor = 1/(log(len(env.legals_dodo(grid, player)), 2) / 5) * 1.2
+    except ZeroDivisionError:
+        depth_factor = 1
+    depth_factor = depth_factor.real # convert depth factor to a float
     # print(f"Depth factor: {depth_factor}")
-    # depth = min(5 * max(1, round(depth_factor)), 9)
-    depth = 4
 
-    if starting_library is None:
-        # print("No library provided")
-        return minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
-    # max_depth_in_library = min(100, len(starting_library))  # library covers first 100 iterations
-    action = None
+    depth = min(2 + round(depth_factor), 9)
+    # print(f"Depth: {depth}")
 
-    # find is the hash key is in the library
-    if hash(grid) in list(starting_library.keys()):
-        # write in green
-        print("\033[32mHash found in library\033[0m")
-        action = starting_library[hash(grid)]["action"]
-        # test if the action is in the legal actions
-        if action not in env.legals_dodo(grid, player):
-            action = None
-
-    if action is None:
-        # If no action is found in the library, perform the minimax search as usual
-        action = minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
-
-    return action
+    return minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
 
 
 def is_first_move(env: Environment, grid: Grid) -> bool:
@@ -310,13 +217,9 @@ def strategy_botte_secrete(
     Stratégie qui copie les mouvements de l'adversaire pour les 100 premiers coups et joue ensuite avec l'algorithme Minmax
     """
     if is_first_move(env, grid):
-        # print("First move")
         return strategy_minmax(env, player, grid)
-    if env.nb_moves < 200:
-        # print("Secret move")
+    if env.nb_moves < 100:
         action = env.precedent_action
         action = ((len(grid) - 1 - action[0][0], len(grid[0]) - 1 - action[0][1]), (len(grid) - 1 - action[1][0], len(grid[0]) - 1 - action[1][1]))
         return action
-    # print("Playing Minmax")
     return strategy_minmax(env, player, grid)
-
