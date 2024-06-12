@@ -1,5 +1,4 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
-import json
 import random
 from typing import Any, Callable, Dict, Tuple
 
@@ -36,8 +35,6 @@ def strategy_random(
     """
     Stratégie qui retourne une action légale aléatoire
     """
-    print(f"Player random {player.id}")
-    print(f"random {env.legals(player)}")
     return random.choice(env.legals(player))
 
 
@@ -175,7 +172,6 @@ def minmax_action_alpha_beta_pruning(
     memo: Dict[MemoKey, Tuple[float, Action]] = (
         {}
     )  # Dictionary to store the memoized results
-    print(f"Player minmax {player.id}")
 
     def minmax_alpha_beta_pruning(
         env: Environment,

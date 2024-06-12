@@ -182,7 +182,6 @@ def gopher(
             current_action = strategy_1(
                 env, env.current_player, actual_grid, starting_library
             )
-            print(f"Action minmax {current_action}")
             env.play(current_action)
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
@@ -414,7 +413,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Dodo")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":

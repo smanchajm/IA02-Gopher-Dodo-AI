@@ -12,19 +12,20 @@ These two games were created by Mark Steere.
   - [x] Dodo rules
   - [x] Gopher rules
   - [x] Environnement
-  - [ ] Création des stratégies de jeu 
+  - [x] Création des stratégies de jeu 
+  - [ ] Serveur 
 - [ ] différentes stratégies
   - [x] minmax simple
   - [x] alpha-beta simple
   - [x] fonction d'évaluation
-  - [ ] Monte Carlo ?
+  - [ ] MCTS
   - [x] stratégie copie joueur adverse / librairie first moves
 - [ ] optimisations
   - [ ] multithreading
   - [ ] symétries
   - [x] cache
-  - [ ] profondeur adaptative
-  - [ ] voir si optimisation des structures (dico ?)
+  - [ ] profondeur adaptative ~
+  - [x] voir si optimisation des structures (dico ?)
 - [ ] mémoisation qui store l'action optimale pour une grille donnée 
 
 
