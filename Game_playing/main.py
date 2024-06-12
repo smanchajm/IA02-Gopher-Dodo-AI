@@ -19,43 +19,13 @@ from Dodo.strategies_dodo import (
 )
 
 
-# Function to save the library to a file
-def save_library(library, filename):
-    """
-    Fonction permettant de sauvegarder la librairie dans un fichier
-    """
-    with open(filename, "wb") as file:
-        pickle.dump(library, file)
-
-
-# Function to load the library from a file
-def load_library(filename):
-    """
-    Fonction permettant de charger la librairie depuis un fichier
-    """
-    with open(filename, "rb") as file:
-        library = pickle.load(file)
-    return library
-
-
-def read_plk(filename):
-    """
-    Fonction permettant de charger un fichier .plk
-    """
-    with open(filename, "rb") as file:
-        return pickle.load(file)
-
-
 # Boucle de jeu Dodo
 def dodo(
     env: GameDodo,
     strategy_1: Strategy,
     strategy_2: Strategy,
     debug: bool = False,
-    starting_library: Dict = None,
-    building_library: bool = False,
     graphics: bool = False,
-    library: bool = False,
 ) -> dict[str, int | float | Any]:
     """
     Fonction représentant la boucle de jeu de Dodo
@@ -65,19 +35,6 @@ def dodo(
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
-    # Permet d'éviter d'avoir une valeur par défaut mutable
-    if starting_library is None:
-        starting_library = {}
-
-    # Permet de tester nos stratégies sans la librairie
-    if library:
-        if starting_library == {}:
-            try:  # On essaie de charger la librairie de coups de départ
-                starting_library = load_library("starting_library.pkl")
-            except FileNotFoundError:
-                starting_library = {}
-    else:
-        starting_library = None
 
     res = env.final()
     while res not in (1, -1):
@@ -87,15 +44,11 @@ def dodo(
         if env.current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-                env, env.current_player, env.grid, starting_library
+                env, env.current_player, env.grid
             )
-            if building_library:
-                if hash(actual_grid) not in starting_library.keys() and tour < 100:
-                    # print(f"Adding {hash(actual_grid)} to the library")
-                    starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
             current_action = strategy_2(
-                env, env.current_player, env.grid, starting_library
+                env, env.current_player, env.grid
             )
 
         env.play(current_action)
@@ -123,8 +76,6 @@ def dodo(
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
         plt.show()
-    if building_library:
-        save_library(starting_library, "starting_library.pkl")
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
@@ -157,20 +108,6 @@ def gopher(
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
 
-    # Permet d'éviter d'avoir une valeur par défaut mutable
-    if starting_library is None:
-        starting_library = {}
-
-    # Permet de tester nos stratégies sans la librairie
-    if library:
-        if starting_library == {}:
-            try:  # On essaie de charger la librairie de coups de départ
-                starting_library = load_library("starting_library.pkl")
-            except FileNotFoundError:
-                starting_library = {}
-    else:
-        starting_library = None
-
     res = env.final()
 
     while res not in (1, -1):
@@ -182,6 +119,7 @@ def gopher(
             current_action = strategy_1(
                 env, env.current_player, actual_grid, starting_library
             )
+            print(f"Action minmax {current_action}")
             env.play(current_action)
             if building_library:
                 if hash(actual_grid) not in starting_library.keys() and tour < 100:
@@ -413,7 +351,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(100, "Dodo")
 
 
 if __name__ == "__main__":

@@ -77,11 +77,3 @@ INIT_GRID3 = (
     (2, 2, 2, 0, -1),
     (2, 2, 2, -1, -1),
 )
-
-
-taille = 0
-for i in range(0, len(INIT_GRID)):
-    for j in range(0, len(INIT_GRID[i])):
-        if INIT_GRID[i][j] != -1:
-            taille += 1
-print(taille)
