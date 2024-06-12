@@ -94,10 +94,7 @@ def gopher(
     strategy_1: Strategy,
     strategy_2: Strategy,
     debug: bool = False,
-    starting_library: Dict = None,
-    building_library: bool = False,
     graphics: bool = False,
-    library: bool = False,
 ) -> dict[str, int | float | Any]:
     """
     Fonction représentant la boucle de jeu de Gopher
@@ -117,17 +114,13 @@ def gopher(
         if env.current_player.id == env.max_player.id:
             tour += 1
             current_action = strategy_1(
-                env, env.current_player, actual_grid, starting_library
+                env, env.current_player, actual_grid
             )
             print(f"Action minmax {current_action}")
             env.play(current_action)
-            if building_library:
-                if hash(actual_grid) not in starting_library.keys() and tour < 100:
-                    # print(f"Adding {hash(actual_grid)} to the library")
-                    starting_library[hash(actual_grid)] = {"action": current_action[0]}
         else:
             current_action = strategy_2(
-                env, env.current_player, actual_grid, starting_library
+                env, env.current_player, actual_grid
             )
             env.play(current_action)
 
@@ -160,8 +153,6 @@ def gopher(
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
         plt.show()
-    if building_library:
-        save_library(starting_library, "starting_library.pkl")
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
@@ -241,7 +232,6 @@ def add_to_benchmark(
         "Grid": grid,
         "depth": depth,
         "game_number": game_number,
-        "starting_library": starting_library,
         "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
         "average_turns": sum(res["total_turns"] for res in list_results) / game_number,
         "min_turns": min(res["total_turns"] for res in list_results),

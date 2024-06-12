@@ -1,4 +1,6 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
+from cmath import log
+import json
 import random
 from typing import Any, Callable, Dict, Tuple
 
@@ -17,8 +19,6 @@ Strategy = Callable[[Environment, Player, Grid], Action]
 def strategy_first_legal(
     env: Environment,
     player: Player,
-    grid: GridDict,
-    starting_library: dict = Dict[Any, Any],
 ) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
@@ -29,8 +29,6 @@ def strategy_first_legal(
 def strategy_random(
     env: Environment,
     player: Player,
-    grid: GridDict,
-    starting_library: dict = Dict[Any, Any],
 ) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
@@ -51,32 +49,6 @@ def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
     )
 
 
-def evaluate(env: Environment, grid: GridDict, player: Player) -> int:
-    """
-    Première fonction d'évaluation pour le jeu Dodo
-    """
-    if player == env.max_player:
-        opponent = env.min_player
-    else:
-        opponent = env.max_player
-
-    player_score = 0
-    opponent_score = 0
-
-    for cell in grid:
-        if grid[cell] == player:
-            player_score -= (
-                10  # Penalty for having a piece, to encourage blocking oneself
-            )
-            player_score -= 5 * len(env.legals(player))  # Penalty for mobility
-
-        elif grid[cell] == opponent:
-            opponent_score += 10  # Reward for having a piece
-            opponent_score += 5 * len(env.legals(opponent))  # Reward for mobility
-
-    return player_score - opponent_score
-
-
 # nombre de coups pour gagner ?
 def evaluate_dynamic(env: Environment, grid: GridDict, player: Player) -> int:
     """
@@ -95,24 +67,24 @@ def evaluate_dynamic(env: Environment, grid: GridDict, player: Player) -> int:
 
     for cell in grid:
         if grid[cell] == player:
-            player_score -= 400  # Pénalité pour avoir une pièce
-            player_score -= 800 * player_moves  # Pénalité ajustée pour la mobilité
-            """
+            player_score -= 40  # Pénalité pour avoir une pièce
+            player_score -= 80 * player_moves  # Pénalité ajustée pour la mobilité
+
             if is_near_edge(cell, grid_height, grid_width):
-                player_score += 400 - distance_to_edge(
+                player_score += 40 - distance_to_edge(
                     cell, grid_height, grid_width
-                )  # Récompense dynamique pour la proximité du bord """
+                )  # Récompense dynamique pour la proximité du bord
         elif cell == opponent:
-            opponent_score += 400  # Récompense pour avoir une pièce
+            opponent_score += 40  # Récompense pour avoir une pièce
             opponent_score += (
-                800 * opponent_moves
+                80 * opponent_moves
             )  # Récompense ajustée pour la mobilité
-            """
+
             if is_near_edge(cell, grid_height, grid_width):
                 # Pénalité dynamique pour l'adversaire près du bord
-                opponent_score -= 400 - distance_to_edge(
+                opponent_score -= 40 - distance_to_edge(
                     cell, grid_height, grid_width
-                )"""
+                )
 
     return player_score - opponent_score
 
@@ -169,9 +141,7 @@ def minmax_action_alpha_beta_pruning(
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
     et memoization pour le jeu Dodo
     """
-    memo: Dict[MemoKey, Tuple[float, Action]] = (
-        {}
-    )  # Dictionary to store the memoized results
+    memo = {}  # Closure
 
     def minmax_alpha_beta_pruning(
         env: Environment,
@@ -181,23 +151,25 @@ def minmax_action_alpha_beta_pruning(
         beta: float,
     ) -> tuple[float, Action]:
         # Convert grid to a tuple, so it can be used as a key in the dictionary
-       # grid_key = hash(json.dumps(env.grid, sort_keys=True))  # Use the grid as a key
+       # Convert grid to a tuple, so it can be used as a key in the dictionary
+        grid_key = env.grid
         player_id = player.id  # Use a unique identifier for the player
-        #if (grid_key, player_id) in memo:
-        #    return memo[(grid_key, player_id)]
+
+        if (grid_key, player_id) in memo:
+            return memo[(grid_key, player_id)]
 
         # Si la profondeur est nulle ou si la partie est terminée
         res = env.final()
         if res != 0:
             if res == 1:
-                score = 10000000
+                score = 10000
             else:
-                score = -10000000
-            #memo[(grid_key, player_id)] = (score, (-1, -1))
+                score = -10000
+            memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
             score = evaluate_dynamic(env, env.grid, player)
-            #memo[(grid_key, player_id)] = (score, (-1, -1))
+            memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
 
         if player == env.max_player:  # Maximizing player
@@ -214,7 +186,7 @@ def minmax_action_alpha_beta_pruning(
                 alpha = max(alpha, best_max[0])
                 if beta <= alpha:
                     break
-            #memo[(grid_key, player_id)] = best_max
+            memo[(grid_key, player_id)] = best_max
             return best_max
 
         if player == env.min_player:  # Minimizing player
@@ -231,7 +203,7 @@ def minmax_action_alpha_beta_pruning(
 
                 if beta <= alpha:
                     break
-            #memo[(grid_key, player_id)] = best_min
+            memo[(grid_key, player_id)] = best_min
             return best_min
         return 0, (-1, -1)
 
@@ -244,29 +216,13 @@ def strategy_minmax(
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
-    # return minmax_action(env, player, grid, 4)[1]
-    # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
-    depth_factor = 13 / len(env.legals(player))
-    depth = min(5 * max(1, round(depth_factor)), 9)
-    # depth = 5
+    try:
+        depth_factor = 1/(log(len(env.legals(grid, player)), 2) / 5) * 1.2
+    except ZeroDivisionError:
+        depth_factor = 1
+    depth_factor = depth_factor.real # convert depth factor to a float
 
-    if starting_library is None:
-        # print("No library provided")
-        return minmax_action_alpha_beta_pruning(env, player, depth)[1]
-    # max_depth_in_library = min(100, len(starting_library))  # library covers first 100 iterations
-    action = None
+    depth = min(2 + round(depth_factor), 9)
+    print(f"Depth: {depth}")
 
-    # find is the hash key is in the library
-    if hash(grid) in list(starting_library.keys()):
-        # write in green
-        print("\033[32mHash found in library\033[0m")
-        action = starting_library[hash(grid)]["action"]
-        # test if the action is in the legal actions
-        if action not in env.legals(player):
-            action = None
-
-    if action is None:
-        # If no action is found in the library, perform the minimax search as usual
-        action = minmax_action_alpha_beta_pruning(env, player, depth)[1]
-
-    return action
+    return minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
