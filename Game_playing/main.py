@@ -308,7 +308,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=True,
+                debug=False,
                 graphics=False,
             )
             list_results.append(res)
@@ -332,7 +332,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(10, "Dodo")
 
 
 if __name__ == "__main__":

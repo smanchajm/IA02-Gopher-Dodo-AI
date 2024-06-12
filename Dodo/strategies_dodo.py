@@ -223,7 +223,7 @@ def strategy_minmax(
         depth_factor = 1
     depth_factor = depth_factor.real # convert depth factor to a float
 
-    depth = min(2 + round(depth_factor), 9)
-    print(f"Depth: {depth}")
+    depth = min(6 + round(depth_factor), 15)
+    # print(f"Depth: {depth}")
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]
