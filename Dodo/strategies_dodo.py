@@ -14,6 +14,8 @@ from Game_playing.structures_classes import (
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
+# Define a type alias for the memoization key
+MemoKey = tuple[GridDict, int]
 
 def strategy_first_legal(
     env: Environment,
@@ -161,10 +163,6 @@ def minmax_action(
     return 0, (-1, -1)
 
 
-# Define a type alias for the memoization key
-MemoKey = tuple[GridDict, int]
-
-
 def minmax_action_alpha_beta_pruning(
     env: Environment, player: Player, depth: int = 0
 ) -> tuple[float, Action]:
@@ -185,7 +183,7 @@ def minmax_action_alpha_beta_pruning(
         beta: float,
     ) -> tuple[float, Action]:
         # Convert grid to a tuple, so it can be used as a key in the dictionary
-       # grid_key = hash(json.dumps(env.grid, sort_keys=True))  # Use the grid as a key
+        # grid_key = hash(env.grid)  # Use the grid as a key
         player_id = player.id  # Use a unique identifier for the player
         #if (grid_key, player_id) in memo:
         #    return memo[(grid_key, player_id)]
@@ -243,34 +241,12 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
-    env: Environment, player: Player, grid: GridDict, starting_library: dict = None
+    env: Environment, player: Player, grid: GridDict
 ) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
-    # return minmax_action(env, player, grid, 4)[1]
-    # return minmax_action_alpha_beta_pruning(env, player, grid, 4)[1]
     depth_factor = 13 / len(env.legals(player))
     depth = min(5 * max(1, round(depth_factor)), 9)
-    # depth = 5
 
-    if starting_library is None:
-        # print("No library provided")
-        return minmax_action_alpha_beta_pruning(env, player, depth)[1]
-    # max_depth_in_library = min(100, len(starting_library))  # library covers first 100 iterations
-    action = None
-
-    # find is the hash key is in the library
-    if hash(grid) in list(starting_library.keys()):
-        # write in green
-        print("\033[32mHash found in library\033[0m")
-        action = starting_library[hash(grid)]["action"]
-        # test if the action is in the legal actions
-        if action not in env.legals(player):
-            action = None
-
-    if action is None:
-        # If no action is found in the library, perform the minimax search as usual
-        action = minmax_action_alpha_beta_pruning(env, player, depth)[1]
-
-    return action
+    return minmax_action_alpha_beta_pruning(env, player, depth)[1]
