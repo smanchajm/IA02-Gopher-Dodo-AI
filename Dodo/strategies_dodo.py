@@ -153,10 +153,11 @@ def minmax_action_alpha_beta_pruning(
         # Convert grid to a tuple, so it can be used as a key in the dictionary
        # Convert grid to a tuple, so it can be used as a key in the dictionary
         grid_key = env.grid
+        # hash a dictionary
         player_id = player.id  # Use a unique identifier for the player
 
-        if (grid_key, player_id) in memo:
-            return memo[(grid_key, player_id)]
+        # if (grid_key, player_id) in memo:
+        #     return memo[(grid_key, player_id)]
 
         # Si la profondeur est nulle ou si la partie est terminée
         res = env.final()
@@ -165,11 +166,11 @@ def minmax_action_alpha_beta_pruning(
                 score = 10000
             else:
                 score = -10000
-            memo[(grid_key, player_id)] = (score, (-1, -1))
+            # memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
             score = evaluate_dynamic(env, env.grid, player)
-            memo[(grid_key, player_id)] = (score, (-1, -1))
+            # memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
 
         if player == env.max_player:  # Maximizing player
@@ -186,7 +187,7 @@ def minmax_action_alpha_beta_pruning(
                 alpha = max(alpha, best_max[0])
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id)] = best_max
+            # memo[(grid_key, player_id)] = best_max
             return best_max
 
         if player == env.min_player:  # Minimizing player
@@ -203,7 +204,7 @@ def minmax_action_alpha_beta_pruning(
 
                 if beta <= alpha:
                     break
-            memo[(grid_key, player_id)] = best_min
+            # memo[(grid_key, player_id)] = best_min
             return best_min
         return 0, (-1, -1)
 
@@ -211,13 +212,13 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
-    env: Environment, player: Player, grid: GridDict, starting_library: dict = None
+    env: Environment, player: Player
 ) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
     try:
-        depth_factor = 1/(log(len(env.legals(grid, player)), 2) / 5) * 1.2
+        depth_factor = 1/(log(len(env.legals(player)), 2) / 5) * 1.2
     except ZeroDivisionError:
         depth_factor = 1
     depth_factor = depth_factor.real # convert depth factor to a float
@@ -225,4 +226,4 @@ def strategy_minmax(
     depth = min(2 + round(depth_factor), 9)
     print(f"Depth: {depth}")
 
-    return minmax_action_alpha_beta_pruning(env, player, grid, depth)[1]
+    return minmax_action_alpha_beta_pruning(env, player, depth)[1]

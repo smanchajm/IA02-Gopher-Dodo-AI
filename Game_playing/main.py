@@ -1,7 +1,6 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
 import os
-import pickle
 import time
 
 import matplotlib
@@ -13,7 +12,6 @@ from structures_classes import *
 
 from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
 from Dodo.strategies_dodo import (
-    strategy_first_legal,
     strategy_minmax,
     strategy_random,
 )
@@ -31,7 +29,6 @@ def dodo(
     Fonction représentant la boucle de jeu de Dodo
     """
     time_history: List[float] = []
-    actual_grid: GridDict = env.grid
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
@@ -44,11 +41,11 @@ def dodo(
         if env.current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-                env, env.current_player, env.grid
+                env, env.current_player
             )
         else:
             current_action = strategy_2(
-                env, env.current_player, env.grid
+                env, env.current_player
             )
 
         env.play(current_action)
@@ -219,7 +216,6 @@ def add_to_benchmark(
     strategy_2: str,
     grid: int,
     depth: int,
-    starting_library: bool,
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
@@ -298,9 +294,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 strategy_minmax,
                 strategy_random,
                 debug=False,
-                building_library=False,
                 graphics=False,
-                library=False,
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
@@ -315,9 +309,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 strategy_minmax,
                 strategy_random,
                 debug=True,
-                building_library=False,
                 graphics=False,
-                library=False,
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
@@ -331,7 +323,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         "strategy_random",
         size_init_grid,
         5,
-        False,
     )
 
 
@@ -341,7 +332,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Dodo")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":
