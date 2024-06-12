@@ -332,7 +332,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(10, "Dodo")
+    launch_multi_game(100, "Dodo")
 
 
 if __name__ == "__main__":
