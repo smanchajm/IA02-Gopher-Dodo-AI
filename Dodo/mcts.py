@@ -1,4 +1,4 @@
-""" Module contenant les différentes stratégies pour le jeu Dodo """
+""" Module concernant l'implémentation de l'algorithme Monte Carlo Tree Search """
 import random
 from typing import Any, Callable, Dict, Tuple
 import numpy as np
@@ -16,10 +16,13 @@ from Game_playing.structures_classes import (
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
+""" La base du code de l'algorithme MCTS est inspirée de l'article suivant: https://ai-boson.github.io/mcts/"""
 
+# voir si on change de player quand on va plus loin dans l'arbre
 class MonteCarloTreeSearchNode:
     def __init__(self, env: Environment, parent=None, parent_action=None):
         self.env = env
+        self.player = env.current_player
         self.parent = parent
         self.parent_action = parent_action
         self.children = []
@@ -32,7 +35,7 @@ class MonteCarloTreeSearchNode:
         return
 
     def untried_actions(self):
-        self._untried_actions = self.env.legals(self.env.current_player)
+        self._untried_actions = self.env.legals(self.player)
         return self._untried_actions
 
     def q(self):
@@ -50,6 +53,7 @@ class MonteCarloTreeSearchNode:
             next_state, parent=self, parent_action=action)
 
         self.children.append(child_node)
+        self.env.reverse_action(action)
         return child_node
 
     def is_terminal_node(self):
@@ -57,14 +61,16 @@ class MonteCarloTreeSearchNode:
 
     def rollout(self):
         current_rollout_state = self.env
-
+        cache = []
         while not current_rollout_state.final():
-            possible_moves = current_rollout_state.legals(self.env.current_player)
+            possible_moves = current_rollout_state.legals(self.player)
 
             action = self.rollout_policy(possible_moves)
+            cache.append(action)
             current_rollout_state = current_rollout_state.play(action)
         return current_rollout_state.final()
 
+    # a modif
     def backpropagate(self, result):
         self._number_of_visits += 1.
         self._results[result] += 1.
@@ -81,6 +87,7 @@ class MonteCarloTreeSearchNode:
     def rollout_policy(self, possible_moves):
         return possible_moves[np.random.randint(len(possible_moves))]
 
+    # a modif pour ajouter un cache
     def _tree_policy(self):
 
         current_node = self
@@ -92,6 +99,7 @@ class MonteCarloTreeSearchNode:
                 current_node = current_node.best_child()
         return current_node
 
+    # a modif pour ajouter un cache
     def best_action(self):
         simulation_no = 100
 
