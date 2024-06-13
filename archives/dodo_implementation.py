@@ -1,7 +1,7 @@
 """ Module concernant la réalisation du jeu DoDo """
 import random
 import time
-from typing import Dict, Tuple
+from typing import Dict, Set, Tuple
 from Dodo.grid import *
 from Game_playing.structures_classes import *
 
@@ -69,12 +69,12 @@ def final_dodo(grid: Grid) -> int:
         return 1
     elif not legals_dodo(grid, PLAYER2, UP_DIRECTIONS):
         return -1
-    else:
-        return 0
+
+    return 0
 
 
 def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
-    temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
+    temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
     temp_grid[action[0][0]][action[0][1]] = 0
     temp_grid[action[1][0]][action[1][1]] = player
     return hexa.grid_list_to_grid_tuple(temp_grid)
@@ -84,15 +84,15 @@ def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
 def strategy_first_legal_dodo(grid: Grid, player: Player) -> Action:
     if player == PLAYER1:
         return legals_dodo(grid, player, DOWN_DIRECTIONS)[0]
-    else:
-        return legals_dodo(grid, player, UP_DIRECTIONS)[0]
+    
+    return legals_dodo(grid, player, UP_DIRECTIONS)[0]
 
 
 def strategy_random_dodo(grid: Grid, player: Player) -> Action:
     if player == PLAYER1:
         return random.choice(legals_dodo(grid, player, DOWN_DIRECTIONS))
-    else:
-        return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
+    
+    return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
 
 
 # Minimax Strategy (sans cache)
@@ -161,7 +161,6 @@ def dodo(
 
 
 def main():
-    init_grid = INIT_GRID
     print(dodo(strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
     pass
 
