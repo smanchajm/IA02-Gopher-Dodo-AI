@@ -14,6 +14,8 @@ from Game_playing.structures_classes import (
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
+# Define a type alias for the memoization key
+MemoKey = tuple[GridDict, int]
 
 def strategy_first_legal(
     env: Environment,
@@ -129,10 +131,6 @@ def minmax_action(
     return 0, (-1, -1)
 
 
-# Define a type alias for the memoization key
-MemoKey = tuple[GridDict, int]
-
-
 def minmax_action_alpha_beta_pruning(
     env: Environment, player: Player, depth: int = 0
 ) -> tuple[float, Action]:
@@ -201,11 +199,13 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
+
     env: Environment, player: Player
 ) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
+
     try:
         depth_factor = 1/(log(len(env.legals(player)), 2) / 5) * 1.2
     except ZeroDivisionError:
@@ -213,6 +213,6 @@ def strategy_minmax(
     depth_factor = depth_factor.real # convert depth factor to a float
 
     depth = min(6 + round(depth_factor), 15)
-    # print(f"Depth: {depth}")
+
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]

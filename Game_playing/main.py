@@ -36,7 +36,6 @@ def dodo(
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
-
     res = env.final()
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
@@ -45,11 +44,13 @@ def dodo(
         if env.current_player.id == 1:
             tour += 1
             current_action = strategy_1(
+
                 env, env.current_player
             )
         else:
             current_action = strategy_2(
                 env, env.current_player
+
             )
 
         env.play(current_action)
@@ -218,7 +219,7 @@ def add_to_benchmark(
     game_number: int,
     strategy_1: str,
     strategy_2: str,
-    grid: int,
+    grid: int
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
@@ -285,11 +286,11 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 4
+    size_init_grid = 7
     if name == "Dodo":
         for i in range(game_number):
             player1: Player = Player(1, DOWN_DIRECTIONS)
-            init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            init_grid = convert_grid(INIT_GRID, size_init_grid)
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
