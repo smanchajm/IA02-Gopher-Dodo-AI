@@ -1,25 +1,24 @@
 """ Module concernant l'implémentation de l'algorithme Monte Carlo Tree Search """
-import random
-from typing import Any, Callable, Dict, Tuple
-import numpy as np
+from typing import Callable
 from collections import defaultdict
-from dataclasses import dataclass
+import numpy as np
+
 
 from Game_playing.structures_classes import (
     Action,
-    Cell,
     Environment,
     Grid,
-    GridDict,
     Player,
 )
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
-""" La base du code de l'algorithme MCTS est inspirée de l'article suivant: https://ai-boson.github.io/mcts/"""
+""" La base du code de l'algorithme MCTS est inspirée 
+de l'article suivant: https://ai-boson.github.io/mcts/"""
 
 # voir si on change de player quand on va plus loin dans l'arbre
 class MonteCarloTreeSearchNode:
+    """ Classe qui représente un noeud de l'arbre de recherche de l'algorithme MCTS"""
     def __init__(self, env: Environment, parent=None, parent_action=None):
         self.env = env
         self.player = env.current_player
@@ -32,7 +31,6 @@ class MonteCarloTreeSearchNode:
         self._results[-1] = 0
         self._untried_actions = None
         self._untried_actions = self.untried_actions()
-        return
 
     def untried_actions(self):
         self._untried_actions = self.env.legals(self.player)
@@ -91,12 +89,11 @@ class MonteCarloTreeSearchNode:
     def _tree_policy(self):
 
         current_node = self
-        while not (current_node.is_terminal_node() == (1, -1)):
+        while current_node.is_terminal_node() != (1, -1):
 
             if not current_node.is_fully_expanded():
                 return current_node.expand()
-            else:
-                current_node = current_node.best_child()
+            current_node = current_node.best_child()
         return current_node
 
     # a modif pour ajouter un cache
