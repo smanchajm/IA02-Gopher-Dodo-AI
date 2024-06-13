@@ -1,8 +1,7 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
 from cmath import log
-import json
 import random
-from typing import Any, Callable, Dict, Tuple
+from typing import Callable
 
 from Game_playing.structures_classes import (
     Action,
@@ -139,9 +138,7 @@ def minmax_action_alpha_beta_pruning(
 ) -> tuple[float, Action]:
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
-    et memoization pour le jeu Dodo
     """
-    memo = {}  # Closure
 
     def minmax_alpha_beta_pruning(
         env: Environment,
@@ -150,14 +147,6 @@ def minmax_action_alpha_beta_pruning(
         alpha: float,
         beta: float,
     ) -> tuple[float, Action]:
-        # Convert grid to a tuple, so it can be used as a key in the dictionary
-       # Convert grid to a tuple, so it can be used as a key in the dictionary
-        grid_key = env.grid
-        # hash a dictionary
-        player_id = player.id  # Use a unique identifier for the player
-
-        # if (grid_key, player_id) in memo:
-        #     return memo[(grid_key, player_id)]
 
         # Si la profondeur est nulle ou si la partie est terminée
         res = env.final()

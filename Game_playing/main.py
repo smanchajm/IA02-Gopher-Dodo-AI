@@ -5,17 +5,16 @@ import time
 
 import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd  # type: ignore
+import pandas as pd
 
-matplotlib.use("TkAgg")
-from structures_classes import *
-
-from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
+from Dodo.grid import INIT_GRID4, GRID4
 from Dodo.strategies_dodo import (
     strategy_minmax,
     strategy_random,
 )
+from structures_classes import *
 
+matplotlib.use("TkAgg")
 
 # Boucle de jeu Dodo
 def dodo(
@@ -293,7 +292,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=False,
+                debug=True,
                 graphics=False,
             )
             list_results.append(res)
@@ -308,7 +307,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=False,
+                debug=True,
                 graphics=False,
             )
             list_results.append(res)
@@ -332,7 +331,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Dodo")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":
