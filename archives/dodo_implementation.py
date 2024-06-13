@@ -1,4 +1,3 @@
-""" Module concernant la réalisation du jeu DoDo """
 import random
 import time
 from typing import Dict, List, Set, Tuple
@@ -6,28 +5,14 @@ from typing import Dict, List, Set, Tuple
 from Dodo.grid import INIT_GRID4
 import Game_playing.hexagonal_board as hexa
 from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import Action, ActionDodo, Player, Score, Strategy
-
+from Game_playing.structures_classes import DOWN_DIRECTIONS, EMPTY, UP_DIRECTIONS, Action, ActionDodo, Player, Score, Strategy
 
 # Quelques constantes
-EMPTY = 0
-
-UP_DIRECTIONS: List[tuple[int, int]] = [
-    (1, 0),
-    (1, 1),
-    (0, 1),
-]
-
-DOWN_DIRECTIONS: List[tuple[int, int]] = [
-    (0, -1),
-    (-1, 0),
-    (-1, -1),
-]
-
 PLAYER1: Player = 1  # Player bleu
 PLAYER2: Player = 2  # Player rouge
 
 minimax_cache: Dict[Tuple[Grid, int, bool, Player], Tuple[int, ActionDodo]] = {}
+
 
 # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
 def legals_dodo(grid: Grid, player: Player, directions: List[Tuple[int, int]]) -> List[ActionDodo]:
@@ -81,9 +66,9 @@ def minmax_action(grid: Grid, player: Player, depth: int = 0) -> tuple[float, Ac
     player2: Player = PLAYER2
 
     if depth == 0 or final_dodo(grid) != 0:
-        return final_dodo(grid), (-1, -1)  # On retourne le score de la grille
+        return final_dodo(grid), (-1, -1) # On retourne le score de la grille
 
-    if player == 1:  # maximazing player
+    if player == 1: # maximazing player
         best = (float("-inf"), (-1, -1))
         for item in legals_dodo(grid, player, DOWN_DIRECTIONS):
             tmp = play_dodo(grid, player, item)
