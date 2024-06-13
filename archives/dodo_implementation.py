@@ -32,7 +32,7 @@ def legals_dodo(grid: Grid, player: Player, directions: List[Tuple[int, int]]) -
 def final_dodo(grid: Grid) -> int:
     if not legals_dodo(grid, PLAYER1, DOWN_DIRECTIONS):
         return 1
-    elif not legals_dodo(grid, PLAYER2, UP_DIRECTIONS):
+    if not legals_dodo(grid, PLAYER2, UP_DIRECTIONS):
         return -1
 
     return 0
@@ -49,14 +49,12 @@ def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
 def strategy_first_legal_dodo(grid: Grid, player: Player) -> Action:
     if player == PLAYER1:
         return legals_dodo(grid, player, DOWN_DIRECTIONS)[0]
-    
     return legals_dodo(grid, player, UP_DIRECTIONS)[0]
 
 
 def strategy_random_dodo(grid: Grid, player: Player) -> Action:
     if player == PLAYER1:
         return random.choice(legals_dodo(grid, player, DOWN_DIRECTIONS))
-    
     return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
 
 
