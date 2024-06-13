@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from Dodo.grid import INIT_GRID, GRID4
+<<<<<<< HEAD
 from Dodo.strategies_dodo import (
     Strategy,
     strategy_minmax,
@@ -16,9 +17,11 @@ from Dodo.strategies_dodo import (
 )
 from Dodo.mcts3 import *
 
+=======
+from Dodo.strategies_dodo import strategy_minmax, strategy_random
+>>>>>>> 66dd792 (Try to implement client-serveur module with first)
 import Game_playing.hexagonal_board as hexa
-from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, Player, Time, convert_grid, new_gopher, print_dodo
+from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, Grid, GridDict, Player, State, Strategy, Time, convert_grid, new_gopher, print_dodo
 
 matplotlib.use("TkAgg")
 
@@ -46,13 +49,11 @@ def dodo(
         if env.current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-
-                env, env.current_player
+                env, env.current_player, env.grid
             )
         else:
             current_action = strategy_2(
-                env, env.current_player
-
+                env, env.current_player, env.grid
             )
 
         env.play(current_action)
@@ -80,7 +81,6 @@ def dodo(
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
         plt.show()
-
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
         "average_iteration_time": (
@@ -108,6 +108,7 @@ def gopher(
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
+
 
     res = env.final()
 
@@ -168,14 +169,15 @@ def gopher(
         "winner": env.final(),
     }
 
-
 # Initialisation de l'environnement
 def initialize(
-    game: str, grid: GridDict, player: Player, hex_size: int, total_time: Time
+    game: str, state: State, player: Player, hex_size: int, total_time: Time
 ) -> GameDodo | GameGopher:
     """
     Fonction permettant d'initialiser l'environnement de jeu
     """
+    grid = convert_grid(state, hex_size)
+
     # Initialisation de l'environnement du jeu Dodo
     if game == "Dodo":
         return GameDodo(
@@ -221,7 +223,7 @@ def add_to_benchmark(
     game_number: int,
     strategy_1: str,
     strategy_2: str,
-    grid: int
+    grid: int,
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
