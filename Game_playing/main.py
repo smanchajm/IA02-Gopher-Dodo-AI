@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from Dodo.grid import INIT_GRID4, GRID4
+from Dodo.grid import INIT_GRID, GRID4
 from Dodo.strategies_dodo import (
     Strategy,
     strategy_minmax,
