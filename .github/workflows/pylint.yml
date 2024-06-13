@@ -21,7 +21,7 @@ jobs:
         pip install numpy
     - name: Set PythonPath
       run: |  
-        echo "PYTHONPATH=mlprepare" >> $GITHUB_ENV
+        echo "PYTHONPATH=/" >> $GITHUB_ENV
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116 --exit-zero
