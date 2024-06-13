@@ -2,6 +2,7 @@
 
 import os
 import time
+from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -9,10 +10,14 @@ import pandas as pd
 
 from Dodo.grid import INIT_GRID4, GRID4
 from Dodo.strategies_dodo import (
+    Strategy,
     strategy_minmax,
     strategy_random,
 )
-from structures_classes import *
+
+import Game_playing.hexagonal_board as hexa
+from Game_playing.hexagonal_board import Grid
+from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, Player, Time, convert_grid, new_gopher, print_dodo
 
 matplotlib.use("TkAgg")
 
@@ -214,7 +219,6 @@ def add_to_benchmark(
     strategy_1: str,
     strategy_2: str,
     grid: int,
-    depth: int,
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
@@ -225,7 +229,6 @@ def add_to_benchmark(
         "strategy_1": strategy_1,
         "strategy_2": strategy_2,
         "Grid": grid,
-        "depth": depth,
         "game_number": game_number,
         "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
         "average_turns": sum(res["total_turns"] for res in list_results) / game_number,
@@ -321,7 +324,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         "strategy_alpha_beta",
         "strategy_random",
         size_init_grid,
-        5,
     )
 
 
