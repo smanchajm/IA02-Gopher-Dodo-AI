@@ -21,6 +21,8 @@ jobs:
         pip install numpy
     - name: Analysing the code with pylint
       run: |
-        echo "PYTHONPATH=/" >> $GITHUB_ENV
-        echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
+        echo "----PYTHONPATH------"
+        PWD=$(pwd)
+        export PYTHONPATH=$PWD/src:$PWD/tests:$PYTHONPATH
+        echo "PYTHONPATH=$PYTHONPATH"
         pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116 --exit-zero
