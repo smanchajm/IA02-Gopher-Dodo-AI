@@ -2,24 +2,17 @@
 
 import os
 import time
-from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from Dodo.grid import INIT_GRID, GRID4
-from Dodo.strategies_dodo import (
-    Strategy,
-    strategy_minmax,
-    strategy_random,
-)
-from Dodo.mcts3 import *
+from mcts3 import *
+from grid import *
+from strategies_dodo import strategy_minmax, strategy_random
 
-from Dodo.strategies_dodo import strategy_minmax, strategy_random
-
-import Game_playing.hexagonal_board as hexa
-from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, Grid, GridDict, Player, State, Strategy, Time, convert_grid, new_gopher, print_dodo
+import hexagonal_board as hexa
+from structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, Grid, GridDict, Player, State, Strategy, Time, convert_grid, new_gopher, print_dodo
 
 matplotlib.use("TkAgg")
 

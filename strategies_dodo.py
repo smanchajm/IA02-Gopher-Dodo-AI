@@ -3,7 +3,7 @@ from cmath import log
 import random
 from typing import Callable
 
-from Game_playing.structures_classes import (
+from structures_classes import (
     Action,
     Cell,
     Environment,
@@ -11,7 +11,6 @@ from Game_playing.structures_classes import (
     GridDict,
     Player,
     State,
-    Time,
 )
 
 Strategy = Callable[[Environment, Player, Grid], Action]

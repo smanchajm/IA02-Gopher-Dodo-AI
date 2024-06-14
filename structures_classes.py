@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Union
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
-import Game_playing.hexagonal_board as hexa
+import hexagonal_board as hexa
 
 # Types de base utilisés par l'arbitre
 

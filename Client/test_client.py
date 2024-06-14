@@ -3,9 +3,9 @@
 import ast
 import argparse
 from typing import Dict, Any
-from Dodo.strategies_dodo import strategy_first_legal
-from Game_playing.main import initialize
-from Game_playing.structures_classes import Player
+from strategies_dodo import strategy_first_legal
+from main import initialize
+from structures_classes import Player
 from gndclient import start, Action, Score, State, Time, DODO_STR, GOPHER_STR
 
 Environment = Dict[str, Any]
