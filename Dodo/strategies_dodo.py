@@ -1,8 +1,7 @@
 """ Module contenant les différentes stratégies pour le jeu Dodo """
 from cmath import log
-import json
 import random
-from typing import Any, Callable, Dict, Tuple
+from typing import Callable
 
 from Game_playing.structures_classes import (
     Action,
@@ -15,6 +14,8 @@ from Game_playing.structures_classes import (
 
 Strategy = Callable[[Environment, Player, Grid], Action]
 
+# Define a type alias for the memoization key
+MemoKey = tuple[GridDict, int]
 
 def strategy_first_legal(
     env: Environment,
@@ -130,18 +131,12 @@ def minmax_action(
     return 0, (-1, -1)
 
 
-# Define a type alias for the memoization key
-MemoKey = tuple[GridDict, int]
-
-
 def minmax_action_alpha_beta_pruning(
     env: Environment, player: Player, depth: int = 0
 ) -> tuple[float, Action]:
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
-    et memoization pour le jeu Dodo
     """
-    memo = {}  # Closure
 
     def minmax_alpha_beta_pruning(
         env: Environment,
@@ -150,14 +145,6 @@ def minmax_action_alpha_beta_pruning(
         alpha: float,
         beta: float,
     ) -> tuple[float, Action]:
-        # Convert grid to a tuple, so it can be used as a key in the dictionary
-       # Convert grid to a tuple, so it can be used as a key in the dictionary
-        grid_key = env.grid
-        # hash a dictionary
-        player_id = player.id  # Use a unique identifier for the player
-
-        # if (grid_key, player_id) in memo:
-        #     return memo[(grid_key, player_id)]
 
         # Si la profondeur est nulle ou si la partie est terminée
         res = env.final()
@@ -212,11 +199,13 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
+
     env: Environment, player: Player
 ) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
+
     try:
         depth_factor = 1/(log(len(env.legals(player)), 2) / 5) * 1.2
     except ZeroDivisionError:
@@ -224,6 +213,6 @@ def strategy_minmax(
     depth_factor = depth_factor.real # convert depth factor to a float
 
     depth = min(6 + round(depth_factor), 15)
-    # print(f"Depth: {depth}")
+
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]

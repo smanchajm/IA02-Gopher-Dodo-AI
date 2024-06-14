@@ -1,55 +1,20 @@
-""" Module concernant la réalisation du jeu DoDo """
 import random
 import time
-from typing import Dict, Tuple
-from Dodo.grid import *
-from Game_playing.structures_classes import *
+from typing import Dict, List, Set, Tuple
 
+from Dodo.grid import INIT_GRID4
+import Game_playing.hexagonal_board as hexa
+from Game_playing.hexagonal_board import Grid
+from Game_playing.structures_classes import DOWN_DIRECTIONS, EMPTY, UP_DIRECTIONS, Action, ActionDodo, Player, Score, Strategy
 
 # Quelques constantes
-EMPTY = 0
-
-UP_DIRECTIONS: List[tuple[int, int]] = [
-    (1, 0),
-    (1, 1),
-    (0, 1),
-]
-
-DOWN_DIRECTIONS: List[tuple[int, int]] = [
-    (0, -1),
-    (-1, 0),
-    (-1, -1),
-]
-
 PLAYER1: Player = 1  # Player bleu
 PLAYER2: Player = 2  # Player rouge
 
 minimax_cache: Dict[Tuple[Grid, int, bool, Player], Tuple[int, ActionDodo]] = {}
 
 
-# Règles du DoDo
-
-
 # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
-def legals_dodo(grid: Grid, player: Player, directions) -> list[ActionDodo]:
-    actions: Set[ActionDodo] = set()  # On utilise un ensemble pour garantir l'unicité
-
-    # On parcourt l'ensemble des cases de la grille
-    for i, ligne in enumerate(grid):
-        for j, element in enumerate(ligne):
-            # Si la case est occupée par un jeton du player
-            if element == player:
-                neighbors = hexa.hex_neighbor(i, j, directions)
-                for neighbor in neighbors:
-                    # Ajouter un voisin si
-                    r = neighbor[0]
-                    q = neighbor[1]
-                    if 0 <= r < len(grid) and 0 <= q < len(grid[0]):
-                        if grid[neighbor[0]][neighbor[1]] == 0:
-                            actions.add(((i, j), neighbor))
-
-    return list(actions)
-
 def legals_dodo(grid: Grid, player: Player, directions: List[Tuple[int, int]]) -> List[ActionDodo]:
     actions: Set[ActionDodo] = set()
     # On parcourt l'ensemble des cases de la grille
@@ -67,14 +32,14 @@ def legals_dodo(grid: Grid, player: Player, directions: List[Tuple[int, int]]) -
 def final_dodo(grid: Grid) -> int:
     if not legals_dodo(grid, PLAYER1, DOWN_DIRECTIONS):
         return 1
-    elif not legals_dodo(grid, PLAYER2, UP_DIRECTIONS):
+    if not legals_dodo(grid, PLAYER2, UP_DIRECTIONS):
         return -1
-    else:
-        return 0
+
+    return 0
 
 
 def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
-    temp_grid: list[list[int, ...], ...] = hexa.grid_tuple_to_grid_list(grid)
+    temp_grid: list[list[int]] = hexa.grid_tuple_to_grid_list(grid)
     temp_grid[action[0][0]][action[0][1]] = 0
     temp_grid[action[1][0]][action[1][1]] = player
     return hexa.grid_list_to_grid_tuple(temp_grid)
@@ -84,15 +49,13 @@ def play_dodo(grid: Grid, player: Player, action: ActionDodo) -> Grid:
 def strategy_first_legal_dodo(grid: Grid, player: Player) -> Action:
     if player == PLAYER1:
         return legals_dodo(grid, player, DOWN_DIRECTIONS)[0]
-    else:
-        return legals_dodo(grid, player, UP_DIRECTIONS)[0]
+    return legals_dodo(grid, player, UP_DIRECTIONS)[0]
 
 
 def strategy_random_dodo(grid: Grid, player: Player) -> Action:
     if player == PLAYER1:
         return random.choice(legals_dodo(grid, player, DOWN_DIRECTIONS))
-    else:
-        return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
+    return random.choice(legals_dodo(grid, player, UP_DIRECTIONS))
 
 
 # Minimax Strategy (sans cache)
@@ -101,9 +64,9 @@ def minmax_action(grid: Grid, player: Player, depth: int = 0) -> tuple[float, Ac
     player2: Player = PLAYER2
 
     if depth == 0 or final_dodo(grid) != 0:
-        return final_dodo(grid), (-1, -1)  # On retourne le score de la grille
+        return final_dodo(grid), (-1, -1) # On retourne le score de la grille
 
-    if player == 1:  # maximazing player
+    if player == 1: # maximazing player
         best = (float("-inf"), (-1, -1))
         for item in legals_dodo(grid, player, DOWN_DIRECTIONS):
             tmp = play_dodo(grid, player, item)
@@ -128,7 +91,7 @@ def strategy_minmax(grid: Grid, player: Player) -> Action:
 
 # Boucle de jeu Dodo
 def dodo(
-        strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid, debug: bool = False
+        strategy_1: Strategy, strategy_2: Strategy, init_grid: Grid
 ) -> Score:
     actual_grid: Grid = init_grid
     current_player: Player = 1
@@ -161,9 +124,7 @@ def dodo(
 
 
 def main():
-    init_grid = INIT_GRID
     print(dodo(strategy_minmax, strategy_random_dodo, INIT_GRID4, False))
-    pass
 
 
 if __name__ == "__main__":

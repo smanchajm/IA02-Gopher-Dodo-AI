@@ -2,21 +2,25 @@
 
 import os
 import time
+from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd  # type: ignore
+import pandas as pd
 
-matplotlib.use("TkAgg")
-from structures_classes import *
-
-from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
+from Dodo.grid import INIT_GRID, GRID4
 from Dodo.strategies_dodo import (
+    Strategy,
     strategy_minmax,
     strategy_random,
 )
 from Dodo.mcts3 import *
 
+import Game_playing.hexagonal_board as hexa
+from Game_playing.hexagonal_board import Grid
+from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, Player, Time, convert_grid, new_gopher, print_dodo
+
+matplotlib.use("TkAgg")
 
 # Boucle de jeu Dodo
 def dodo(
@@ -41,17 +45,17 @@ def dodo(
             print(f"Tour \033[36m {tour}\033[0m.")
         if env.current_player.id == 1:
             tour += 1
-
             current_action = strategy_1(
+
                 env, env.current_player
             )
-
         else:
             current_action = strategy_2(
                 env, env.current_player
-            )
-        env.play(current_action)
 
+            )
+
+        env.play(current_action)
 
         iteration_time_end = (
             time.time()
@@ -217,8 +221,7 @@ def add_to_benchmark(
     game_number: int,
     strategy_1: str,
     strategy_2: str,
-    grid: int,
-    depth: int,
+    grid: int
 ):
     """
     Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
@@ -229,7 +232,6 @@ def add_to_benchmark(
         "strategy_1": strategy_1,
         "strategy_2": strategy_2,
         "Grid": grid,
-        "depth": depth,
         "game_number": game_number,
         "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
         "average_turns": sum(res["total_turns"] for res in list_results) / game_number,
@@ -286,11 +288,11 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 4
+    size_init_grid = 7
     if name == "Dodo":
         for i in range(game_number):
             player1: Player = Player(1, DOWN_DIRECTIONS)
-            init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            init_grid = convert_grid(INIT_GRID, size_init_grid)
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
@@ -311,7 +313,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=False,
+                debug=True,
                 graphics=False,
             )
             list_results.append(res)
@@ -325,7 +327,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         "strategy_alpha_beta",
         "strategy_random",
         size_init_grid,
-        5,
     )
 
 
@@ -335,7 +336,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(10, "Dodo")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":
