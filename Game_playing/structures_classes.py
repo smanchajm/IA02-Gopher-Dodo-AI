@@ -230,6 +230,8 @@ class GameGopher(Environment):
             self.total_time,
         )
 
+        print(type(self.min_player))
+
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
         for cell in self.grid:
