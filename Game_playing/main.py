@@ -8,8 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from Dodo.grid import INIT_GRID, GRID4
-<<<<<<< HEAD
+from Dodo.grid import GRID4
 from Dodo.strategies_dodo import (
     Strategy,
     strategy_minmax,
@@ -17,9 +16,8 @@ from Dodo.strategies_dodo import (
 )
 from Dodo.mcts3 import *
 
-=======
 from Dodo.strategies_dodo import strategy_minmax, strategy_random
->>>>>>> 66dd792 (Try to implement client-serveur module with first)
+
 import Game_playing.hexagonal_board as hexa
 from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, Grid, GridDict, Player, State, Strategy, Time, convert_grid, new_gopher, print_dodo
 
