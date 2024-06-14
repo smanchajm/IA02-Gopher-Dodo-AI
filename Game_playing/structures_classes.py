@@ -13,7 +13,6 @@ Cell = tuple[int, int]
 ActionDodo = tuple[Cell, Cell]  # case de départ → case d'arrivée
 ActionGopher = Cell
 Action = Union[ActionGopher, ActionDodo]
-Player2 = int  # 1 ou 2
 State = list[tuple[Cell, int]]  # État du jeu pour la boucle de jeu
 Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
 Directions = list[tuple[int, int]]  # Liste de directions
@@ -40,12 +39,12 @@ ALL_DIRECTIONS: List[tuple[int, int]] = [
     (0, 1),
 ]
 
-
 # DataClass Player
 @dataclass
 class Player:
-    """Classe représentant un joueur"""
-
+    """
+    Classe représentant un joueur
+    """
     id: int
     directions: Directions
 
@@ -225,15 +224,18 @@ class GameGopher(Environment):
             self.grid,
             self.max_player,
             self.min_player,
-            self.current_player,
+            self.current_player,            
             self.hex_size,
             self.total_time,
         )
 
-        print(type(self.min_player))
+        # force max_player to be an instance of the class Player
+        self.max_player = Player(self.max_player, ALL_DIRECTIONS)
+        self.min_player = Player(self.min_player, ALL_DIRECTIONS)
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
+        
         for cell in self.grid:
             if self.grid[cell] == self.max_player.id:
                 self.max_positions.positions[cell] = self.max_player.id

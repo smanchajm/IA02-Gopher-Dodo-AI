@@ -214,5 +214,4 @@ def strategy_minmax(
 
     depth = min(6 + round(depth_factor), 15)
 
-
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]

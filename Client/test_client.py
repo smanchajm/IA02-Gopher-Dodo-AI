@@ -20,7 +20,7 @@ def initialize_for_network(
     )
 
     # Initialize the game here
-    initialize(game, state, player, hex_size, total_time)
+    return initialize(game, state, player, hex_size, total_time)
 
 
 def strategy_brain(
