@@ -153,17 +153,14 @@ def minmax_action_alpha_beta_pruning(
                 score = 10000
             else:
                 score = -10000
-            # memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
         if depth == 0:
             score = evaluate_dynamic(env, env.grid, player)
-            # memo[(grid_key, player_id)] = (score, (-1, -1))
             return score, (-1, -1)
 
-        if player == env.max_player:  # Maximizing player
+        if player == env.max_player.id:  # Maximizing player
             best_max: tuple[float, Action] = (float("-inf"), (-1, -1))
             for action in env.legals(player):
-
                 env.play(action)
                 returned_values = minmax_alpha_beta_pruning(
                     env, env.min_player, depth - 1, alpha, beta
@@ -174,10 +171,9 @@ def minmax_action_alpha_beta_pruning(
                 alpha = max(alpha, best_max[0])
                 if beta <= alpha:
                     break
-            # memo[(grid_key, player_id)] = best_max
             return best_max
 
-        if player == env.min_player:  # Minimizing player
+        if player == env.min_player.id:  # Minimizing player
             best_min: tuple[float, Action] = (float("inf"), (-1, -1))
             for item in env.legals(player):
                 env.play(item)
@@ -191,15 +187,13 @@ def minmax_action_alpha_beta_pruning(
 
                 if beta <= alpha:
                     break
-            # memo[(grid_key, player_id)] = best_min
             return best_min
-        return 0, (-1, -1)
+        return 0, (-3, -3)
 
     return minmax_alpha_beta_pruning(env, player, depth, float("-inf"), float("inf"))
 
 
 def strategy_minmax(
-
     env: Environment, player: Player
 ) -> Action:
     """

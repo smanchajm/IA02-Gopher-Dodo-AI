@@ -35,6 +35,7 @@ def strategy_brain(
     s = input()
     print()
     t = ast.literal_eval(s)
+    print(t)
     return (env, t)
 
 
@@ -49,6 +50,7 @@ def strategy_min_max_network(
     The minmax strategy with alpha-beta pruning for a network game
     """
     action = strategy_minmax(env, player)
+    print(action)
     return env, action
 
 
@@ -78,7 +80,8 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
-        strategy_min_max_network,
+        # strategy_min_max_network,
+        strategy_brain,
         final_result,
         gui=True,
     )

@@ -232,6 +232,7 @@ class GameGopher(Environment):
         # force max_player to be an instance of the class Player
         self.max_player = Player(self.max_player, ALL_DIRECTIONS)
         self.min_player = Player(self.min_player, ALL_DIRECTIONS)
+        self.current_player = self.max_player
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
@@ -308,6 +309,7 @@ class GameGopher(Environment):
         :param action:
         :return:
         """
+
         self.grid[action] = self.current_player.id
 
         # Mise à jour des positions des joueurs
