@@ -191,6 +191,29 @@ class GameDodo(Environment):
         """
         Fonction annulant un coup pour un joueur donné
         """
+        # Changement de joueur
+        self.current_player = (
+            self.min_player
+            if self.current_player == self.max_player
+            else self.max_player
+        )
+
+        # Mise à jour de la grille
+        self.grid[action[0]] = self.current_player.id
+        self.grid[action[1]] = EMPTY
+
+        # Mise à jour des positions des joueurs
+        if self.current_player.id == self.min_positions.player.id:
+            self.min_positions.positions.pop(action[1])
+            self.min_positions.positions[action[0]] = self.min_positions.player.id
+        else:
+            self.max_positions.positions.pop(action[1])
+            self.max_positions.positions[action[0]] = self.max_positions.player.id
+
+    def reverse_action_player(self, action: ActionDodo, player: Player):
+        """
+        Fonction annulant un coup pour un joueur donné
+        """
 
         # Mise à jour de la grille
         self.grid[action[0]] = self.current_player.id

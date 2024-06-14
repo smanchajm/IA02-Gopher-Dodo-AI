@@ -45,10 +45,12 @@ def dodo(
             print(f"Tour \033[36m {tour}\033[0m.")
         if env.current_player.id == 1:
             tour += 1
+
             current_action = strategy_1(
 
                 env, env.current_player
             )
+            # current_action = mcts.search(env)
         else:
             current_action = strategy_2(
                 env, env.current_player
@@ -288,17 +290,17 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 7
+    size_init_grid = 4
     if name == "Dodo":
         for i in range(game_number):
             player1: Player = Player(1, DOWN_DIRECTIONS)
-            init_grid = convert_grid(INIT_GRID, size_init_grid)
+            init_grid = convert_grid(INIT_GRID4, size_init_grid)
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=True,
+                debug=False,
                 graphics=False,
             )
             list_results.append(res)
@@ -336,7 +338,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(10, "Dodo")
 
 
 if __name__ == "__main__":
