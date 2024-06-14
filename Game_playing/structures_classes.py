@@ -224,7 +224,7 @@ class GameGopher(Environment):
             self.grid,
             self.max_player,
             self.min_player,
-            self.current_player,            
+            self.current_player,
             self.hex_size,
             self.total_time,
         )
