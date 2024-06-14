@@ -15,6 +15,7 @@ from Dodo.strategies_dodo import (
     strategy_minmax,
     strategy_random,
 )
+from Dodo.mcts3 import *
 
 
 # Boucle de jeu Dodo
@@ -32,7 +33,7 @@ def dodo(
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
-
+    mcts = MCTS()
     res = env.final()
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
@@ -40,15 +41,17 @@ def dodo(
             print(f"Tour \033[36m {tour}\033[0m.")
         if env.current_player.id == 1:
             tour += 1
+
             current_action = strategy_1(
                 env, env.current_player
             )
+
         else:
             current_action = strategy_2(
                 env, env.current_player
             )
-
         env.play(current_action)
+
 
         iteration_time_end = (
             time.time()
@@ -293,7 +296,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=False,
+                debug=True,
                 graphics=False,
             )
             list_results.append(res)
@@ -332,7 +335,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(100, "Dodo")
+    launch_multi_game(10, "Dodo")
 
 
 if __name__ == "__main__":
