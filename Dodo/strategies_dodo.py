@@ -10,6 +10,8 @@ from Game_playing.structures_classes import (
     Grid,
     GridDict,
     Player,
+    State,
+    Time,
 )
 
 Strategy = Callable[[Environment, Player, Grid], Action]
@@ -19,12 +21,14 @@ MemoKey = tuple[GridDict, int]
 
 def strategy_first_legal(
     env: Environment,
+    state: State,
     player: Player,
+    time: Time
 ) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
     """
-    return env.legals(player)[0]
+    return env,env.legals(player)[0]
 
 
 def strategy_random(
