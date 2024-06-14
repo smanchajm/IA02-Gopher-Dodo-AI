@@ -2,7 +2,7 @@
 
 import ast
 import argparse
-from Dodo.strategies_dodo import strategy_first_legal, strategy_minmax
+from Dodo.strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
 from Game_playing.main import initialize
 from Game_playing.structures_classes import Action, Environment, Player, Score, State, Time
 from gndclient import DODO_STR, GOPHER_STR, start
@@ -68,6 +68,18 @@ def strategy_first_legal_network(
     return env, action
 
 
+def strategy_random_network(
+    env: Environment, _: State, player: Player, time_left: Time
+) -> tuple[Environment, Action]:
+    """
+    The random strategy for a network game
+    """
+    del time_left
+    action = strategy_random(env, player)
+    print(action)
+    return env, action
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="ClientTesting", description="Test the IA02 python client"
@@ -95,8 +107,9 @@ if __name__ == "__main__":
         available_games,
         initialize_for_network,
         # strategy_min_max_network,
-        # strategy_brain,
-        strategy_first_legal_network,
+        # strategy_random_network,
+        strategy_brain,
+        # strategy_first_legal_network,
         final_result,
         gui=True,
     )
