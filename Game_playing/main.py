@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from Dodo.grid import GRID4
+from Dodo.grid import INIT_GRID, GRID4
 from Dodo.strategies_dodo import (
     Strategy,
     strategy_minmax,
@@ -47,14 +47,11 @@ def dodo(
         if env.current_player.id == 1:
             tour += 1
 
-            current_action = strategy_1(
-                env, env.current_player, env.grid
-            )
-            # current_action = mcts.search(env)
+            #current_action = strategy_1(env, env.current_player)
+            current_action = mcts.search(env)
         else:
-            current_action = strategy_2(
-                env, env.current_player, env.grid
-            )
+            current_action = strategy_2(env, env.current_player)
+            #current_action = mcts.search(env)
 
         env.play(current_action)
 
@@ -294,13 +291,14 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     if name == "Dodo":
         for i in range(game_number):
             player1: Player = Player(1, DOWN_DIRECTIONS)
-            init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            #init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            init_grid = INIT_GRID4
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,
                 strategy_minmax,
-                strategy_random,
-                debug=False,
+                strategy_minmax,
+                debug=True,
                 graphics=False,
             )
             list_results.append(res)

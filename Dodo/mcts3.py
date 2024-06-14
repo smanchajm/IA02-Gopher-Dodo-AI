@@ -173,7 +173,7 @@ class MCTS:
         stack: deque[Action]
 
         # walk through 1000 iterations
-        for iteration in range(1000):
+        for iteration in range(2000):
             #print(f"iteration: {iteration}")
             # select a node (selection phase)
             node, stack = self.select(self.root)

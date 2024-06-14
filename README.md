@@ -18,7 +18,7 @@ These two games were created by Mark Steere.
   - [x] minmax simple
   - [x] alpha-beta simple
   - [x] fonction d'évaluation
-  - [ ] MCTS
+  - [x] MCTS
   - [x] stratégie copie joueur adverse / librairie first moves
 - [ ] optimisations
   - [ ] multithreading

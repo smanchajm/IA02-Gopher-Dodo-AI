@@ -19,16 +19,16 @@ Strategy = Callable[[Environment, Player, Grid], Action]
 # Define a type alias for the memoization key
 MemoKey = tuple[GridDict, int]
 
+
 def strategy_first_legal(
     env: Environment,
-    state: State,
     player: Player,
-    time: Time
+    state: State,
 ) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
     """
-    return env,env.legals(player)[0]
+    return env.legals(player)[0]
 
 
 def strategy_random(
@@ -203,7 +203,6 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
-
     env: Environment, player: Player
 ) -> Action:
     """
