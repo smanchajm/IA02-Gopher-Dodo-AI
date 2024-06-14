@@ -236,7 +236,7 @@ class GameGopher(Environment):
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
-        
+
         for cell in self.grid:
             if self.grid[cell] == self.max_player.id:
                 self.max_positions.positions[cell] = self.max_player.id

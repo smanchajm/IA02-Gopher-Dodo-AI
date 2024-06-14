@@ -50,6 +50,7 @@ def strategy_min_max_network(
     """
     The minmax strategy with alpha-beta pruning for a network game
     """
+    del time_left
     action = strategy_minmax(env, player)
     print(action)
     return env, action
@@ -61,6 +62,7 @@ def strategy_first_legal_network(
     """
     The first legal strategy for a network game
     """
+    del time_left
     action = strategy_first_legal(env, player)
     print(action)
     return env, action

@@ -17,7 +17,9 @@ from Dodo.strategies_dodo import (
 
 import Game_playing.hexagonal_board as hexa
 from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, Player, Time, convert_grid, new_gopher, print_dodo
+from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
+    UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, \
+        Player, Time, convert_grid, new_gopher, print_dodo
 
 matplotlib.use("TkAgg")
 
