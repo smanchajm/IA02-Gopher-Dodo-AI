@@ -10,7 +10,7 @@ import pandas as pd
 
 from Dodo.grid import INIT_GRID, GRID4
 from Dodo.strategies_dodo import (
-    Strategy,
+    StrategyLocal,
     strategy_minmax,
     strategy_random,
 )
@@ -19,15 +19,16 @@ import Game_playing.hexagonal_board as hexa
 from Game_playing.hexagonal_board import Grid
 from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
     UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, \
-        Player, Time, convert_grid, new_gopher, print_dodo
+        PlayerLocal, Time, convert_grid, new_gopher, print_dodo
 
 matplotlib.use("TkAgg")
+
 
 # Boucle de jeu Dodo
 def dodo(
     env: GameDodo,
-    strategy_1: Strategy,
-    strategy_2: Strategy,
+    strategy_1: StrategyLocal,
+    strategy_2: StrategyLocal,
     debug: bool = False,
     graphics: bool = False,
 ) -> dict[str, int | float | Any]:
@@ -46,13 +47,11 @@ def dodo(
         if env.current_player.id == 1:
             tour += 1
             current_action = strategy_1(
-
                 env, env.current_player
             )
         else:
             current_action = strategy_2(
                 env, env.current_player
-
             )
 
         env.play(current_action)
@@ -95,8 +94,8 @@ def dodo(
 # Boucle de jeu Gopher
 def gopher(
     env: GameGopher,
-    strategy_1: Strategy,
-    strategy_2: Strategy,
+    strategy_1: StrategyLocal,
+    strategy_2: StrategyLocal,
     debug: bool = False,
     graphics: bool = False,
 ) -> dict[str, int | float | Any]:
@@ -118,13 +117,13 @@ def gopher(
         if env.current_player.id == env.max_player.id:
             tour += 1
             current_action = strategy_1(
-                env, env.current_player, actual_grid
+                env, env.current_player
             )
             print(f"Action minmax {current_action}")
             env.play(current_action)
         else:
             current_action = strategy_2(
-                env, env.current_player, actual_grid
+                env, env.current_player
             )
             env.play(current_action)
 
@@ -171,24 +170,44 @@ def gopher(
 
 # Initialisation de l'environnement
 def initialize(
-    game: str, grid: GridDict, player: Player, hex_size: int, total_time: Time
+    game: str, grid: GridDict, player: int, hex_size: int, total_time: Time
 ) -> GameDodo | GameGopher:
     """
     Fonction permettant d'initialiser l'environnement de jeu
     """
     # Initialisation de l'environnement du jeu Dodo
     if game == "Dodo":
-        return GameDodo(
-            grid, player, Player(2, UP_DIRECTIONS), player, hex_size, total_time
-        )
+        if player == 1:
+            player_selected: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
+            return GameDodo(
+                grid, player_selected, PlayerLocal(2, UP_DIRECTIONS), player_selected, hex_size, total_time
+            )
+        else:
+            player_selected: PlayerLocal = PlayerLocal(2, UP_DIRECTIONS)
+            player_opponent: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
+            return GameDodo(
+                grid, player_selected, player_opponent, player_opponent, hex_size, total_time
+            )
 
     # Initialisation de l'environnement du jeu Gopher
     grid = new_gopher(hex_size)
+    if player == 1:
+        player_param: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
+        return GameGopher(
+            grid,
+            player_param,
+            PlayerLocal(2, ALL_DIRECTIONS),
+            player_param,
+            hex_size,
+            total_time,
+        )
+    player_param: PlayerLocal = PlayerLocal(2, ALL_DIRECTIONS)
+    player_opponent: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
     return GameGopher(
         grid,
-        player,
-        Player(2, ALL_DIRECTIONS),
-        player,
+        player_param,
+        player_opponent,
+        player_opponent,
         hex_size,
         total_time,
     )
@@ -291,9 +310,9 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     size_init_grid = 7
     if name == "Dodo":
         for i in range(game_number):
-            player1: Player = Player(1, DOWN_DIRECTIONS)
+            player1: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
             init_grid = convert_grid(INIT_GRID, size_init_grid)
-            game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
+            game = initialize("Dodo", init_grid, 1, size_init_grid, 5)
             res = dodo(
                 game,
                 strategy_minmax,
@@ -305,10 +324,10 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             print(f"Partie {i + 1}: {res}")
 
     else:
-        player1: Player = Player(1, ALL_DIRECTIONS)
+        player1: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
         init_grid = new_gopher(7)
         for i in range(game_number):
-            game = initialize("Gopher", init_grid, player1, 7, 5)
+            game = initialize("Gopher", init_grid, 1, 7, 5)
             res = gopher(
                 game,
                 strategy_minmax,

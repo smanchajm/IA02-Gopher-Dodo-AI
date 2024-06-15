@@ -8,13 +8,15 @@ from Game_playing.structures_classes import (
     Action,
     Environment,
     Grid,
-    Player,
+    PlayerLocal,
+    GridDict
 )
 
-Strategy = Callable[[Environment, Player, Grid], Action]
+Strategy = Callable[[Environment, PlayerLocal, GridDict], Action]
 
 """ La base du code de l'algorithme MCTS est inspirée 
 de l'article suivant: https://ai-boson.github.io/mcts/"""
+
 
 # voir si on change de player quand on va plus loin dans l'arbre
 class MonteCarloTreeSearchNode:

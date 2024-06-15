@@ -9,17 +9,18 @@ from Game_playing.structures_classes import (
     Environment,
     Grid,
     GridDict,
-    Player,
+    PlayerLocal,
 )
 
-Strategy = Callable[[Environment, Player, Grid], Action]
+StrategyLocal = Callable[[Environment, PlayerLocal], Action]
 
 # Define a type alias for the memoization key
 MemoKey = tuple[GridDict, int]
 
+
 def strategy_first_legal(
     env: Environment,
-    player: Player,
+    player: PlayerLocal,
 ) -> Action:
     """
     Stratégie qui retourne la première action légale calculée
@@ -29,7 +30,7 @@ def strategy_first_legal(
 
 def strategy_random(
     env: Environment,
-    player: Player,
+    player: PlayerLocal,
 ) -> Action:
     """
     Stratégie qui retourne une action légale aléatoire
@@ -51,7 +52,7 @@ def is_near_edge(cell: Cell, grid_height: int, grid_width: int) -> bool:
 
 
 # nombre de coups pour gagner ?
-def evaluate_dynamic(env: Environment, grid: GridDict, player: Player) -> int:
+def evaluate_dynamic(env: Environment, grid: GridDict, player: PlayerLocal) -> int:
     """
     Fonction d'évaluation pour le jeu Dodo avec une récompense dynamique pour la proximité du bord
     """
@@ -99,7 +100,7 @@ def distance_to_edge(cell: Cell, grid_height: int, grid_width: int) -> int:
 
 # Minimax Strategy (sans cache)
 def minmax_action(
-    env: Environment, player: Player, depth: int = 0
+    env: Environment, player: PlayerLocal, depth: int = 0
 ) -> tuple[int, Action]:
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax pour le jeu Dodo
@@ -132,7 +133,7 @@ def minmax_action(
 
 
 def minmax_action_alpha_beta_pruning(
-    env: Environment, player: Player, depth: int = 0
+    env: Environment, player: PlayerLocal, depth: int = 0
 ) -> tuple[float, Action]:
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
@@ -140,7 +141,7 @@ def minmax_action_alpha_beta_pruning(
 
     def minmax_alpha_beta_pruning(
         env: Environment,
-        player: Player,
+        player: PlayerLocal,
         depth: int,
         alpha: float,
         beta: float,
@@ -194,7 +195,7 @@ def minmax_action_alpha_beta_pruning(
 
 
 def strategy_minmax(
-    env: Environment, player: Player
+    env: Environment, player: PlayerLocal
 ) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax

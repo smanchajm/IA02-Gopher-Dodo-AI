@@ -1,15 +1,16 @@
 """ Module contenant les fonctions de jeu pour une partie en réseau """
+import sys
 
 import ast
 import argparse
 from Dodo.strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
 from Game_playing.main import initialize
-from Game_playing.structures_classes import Action, Environment, Player, Score, State, Time
-from gndclient import DODO_STR, GOPHER_STR, start
+from Game_playing.structures_classes import Action, Environment, Score, State, Time, GridDict
+from gndclient import DODO_STR, GOPHER_STR, start, Player
 
 
 def initialize_for_network(
-    game: str, state: State, player: Player, hex_size: int, total_time: Time
+    game: str, state: State, player: int, hex_size: int, total_time: Time
 ) -> Environment:
     """
     Initialize the game for a network game
@@ -19,8 +20,13 @@ def initialize_for_network(
         f"{game} playing {player} on a grid of size {hex_size}. Time remaining: {total_time}"
     )
 
+    grid: GridDict = {}
+    for cell in state:
+        grid[cell[0]] = cell[1]
+
+
     # Initialize the game here
-    return initialize(game, state, player, hex_size, total_time)
+    return initialize(game, grid, player, hex_size, total_time)
 
 
 def strategy_brain(
@@ -36,7 +42,7 @@ def strategy_brain(
     print()
     t = ast.literal_eval(s)
     print(t)
-    return (env, t)
+    return env, t
 
 
 def final_result(_: State, score: Score, player: Player):
@@ -50,8 +56,9 @@ def strategy_min_max_network(
     """
     The minmax strategy with alpha-beta pruning for a network game
     """
-    del time_left
-    action = strategy_minmax(env, player)
+    env.total_time = time_left
+    param_player = env.max_player if player == env.max_player.id else env.min_player
+    action = strategy_minmax(env, param_player)
     print(action)
     return env, action
 
@@ -62,8 +69,9 @@ def strategy_first_legal_network(
     """
     The first legal strategy for a network game
     """
-    del time_left
-    action = strategy_first_legal(env, player)
+    env.total_time = time_left
+    param_player = env.max_player if player == env.max_player.id else env.min_player
+    action = strategy_first_legal(env, param_player)
     print(action)
     return env, action
 
@@ -74,13 +82,18 @@ def strategy_random_network(
     """
     The random strategy for a network game
     """
-    del time_left
-    action = strategy_random(env, player)
+    env.total_time = time_left
+    param_player = env.max_player if player == env.max_player.id else env.min_player
+    action = strategy_random(env, param_player)
     print(action)
     return env, action
 
 
 if __name__ == "__main__":
+    sys.path.append('C:/Users/samma/Documents/Programmation/IA02/IA02-Gopher-Dodo-AI/Dodo')
+    sys.path.append('C:/Users/samma/Documents/Programmation/IA02/IA02-Gopher-Dodo-AI/Game_playing')
+    sys.path.append('C:/Users/samma/Documents/Programmation/IA02/IA02-Gopher-Dodo-AI/Gopher')
+
     parser = argparse.ArgumentParser(
         prog="ClientTesting", description="Test the IA02 python client"
     )

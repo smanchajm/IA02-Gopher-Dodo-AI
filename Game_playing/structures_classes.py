@@ -39,9 +39,9 @@ ALL_DIRECTIONS: List[tuple[int, int]] = [
     (0, 1),
 ]
 
-# DataClass Player
+# DataClass PlayerLocal
 @dataclass
-class Player:
+class PlayerLocal:
     """
     Classe représentant un joueur
     """
@@ -60,14 +60,14 @@ class Environment(ABC):
     """Classe représentant un jeu"""
 
     grid: GridDict
-    max_player: Player
-    min_player: Player
-    current_player: Player
+    max_player: PlayerLocal
+    min_player: PlayerLocal
+    current_player: PlayerLocal
     hex_size: int
     total_time: Time
 
     @abstractmethod
-    def legals(self, player: Player) -> list[Action]:
+    def legals(self, player: PlayerLocal) -> list[Action]:
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
@@ -96,8 +96,8 @@ class Environment(ABC):
 class GameDodo(Environment):
     """Classe représentant le jeu Dodo"""
 
-    max_positions = MaxPositionsCr(player=Player(1, DOWN_DIRECTIONS), positions={})
-    min_positions = MinPositionsCr(player=Player(2, UP_DIRECTIONS), positions={})
+    max_positions = MaxPositionsCr(player=PlayerLocal(1, DOWN_DIRECTIONS), positions={})
+    min_positions = MinPositionsCr(player=PlayerLocal(2, UP_DIRECTIONS), positions={})
 
     # Initialisation des positions des joueurs
     def __post_init__(self):
@@ -119,7 +119,7 @@ class GameDodo(Environment):
                 self.min_positions.positions[cell] = self.min_player.id
 
     # Fonction retournant les actions possibles d'un joueur pour un état donné (voir optimisation)
-    def legals(self, player: Player) -> list[ActionDodo]:
+    def legals(self, player: PlayerLocal) -> list[ActionDodo]:
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
@@ -215,8 +215,8 @@ class GameDodo(Environment):
 class GameGopher(Environment):
     """Classe représentant le jeu Gopher"""
 
-    max_positions = MaxPositionsCr(player=Player(1, ALL_DIRECTIONS), positions={})
-    min_positions = MinPositionsCr(player=Player(2, ALL_DIRECTIONS), positions={})
+    max_positions = MaxPositionsCr(player=PlayerLocal(1, ALL_DIRECTIONS), positions={})
+    min_positions = MinPositionsCr(player=PlayerLocal(2, ALL_DIRECTIONS), positions={})
 
     # Initialisation des positions des joueurs
     def __post_init__(self):
@@ -229,11 +229,6 @@ class GameGopher(Environment):
             self.total_time,
         )
 
-        # force max_player to be an instance of the class Player
-        self.max_player = Player(self.max_player, ALL_DIRECTIONS)
-        self.min_player = Player(self.min_player, ALL_DIRECTIONS)
-        self.current_player = self.max_player
-
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
 
@@ -243,7 +238,7 @@ class GameGopher(Environment):
             elif self.grid[cell] == self.min_player.id:
                 self.min_positions.positions[cell] = self.min_player.id
 
-    def legals(self, player: Player) -> list[ActionGopher]:
+    def legals(self, player: PlayerLocal) -> list[ActionGopher]:
         """
         Fonction retournant les actions possibles d'un joueur pour un état donné
         """
@@ -347,7 +342,7 @@ class GameGopher(Environment):
         )
 
 
-Strategy = Callable[[Environment, Player, GridDict, dict], Action]
+Strategy = Callable[[Environment, PlayerLocal, GridDict, dict], Action]
 
 
 def new_gopher(h: int) -> GridDict:
