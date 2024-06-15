@@ -2,10 +2,10 @@ import random
 import time
 from typing import Dict, List, Set, Tuple
 
-from Dodo.grid import INIT_GRID4
-import Game_playing.hexagonal_board as hexa
-from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import DOWN_DIRECTIONS, EMPTY, UP_DIRECTIONS, Action, ActionDodo, Player, Score, Strategy
+from grid import INIT_GRID4
+import hexagonal_board as hexa
+from hexagonal_board import Grid
+from structures_classes import DOWN_DIRECTIONS, EMPTY, UP_DIRECTIONS, Action, ActionDodo, Player, Score, Strategy
 
 # Quelques constantes
 PLAYER1: Player = 1  # Player bleu

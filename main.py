@@ -8,16 +8,16 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from Dodo.grid import INIT_GRID, GRID4, INIT_GRID4, GRID2
-from Dodo.strategies_dodo import (
+from grid import GRID4, INIT_GRID4
+from strategies_dodo import (
     StrategyLocal,
     strategy_minmax,
     strategy_random,
 )
 
-import Game_playing.hexagonal_board as hexa
-from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
+import hexagonal_board as hexa
+from hexagonal_board import Grid
+from structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
     UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, \
         PlayerLocal, Time, convert_grid, new_gopher, print_dodo
 
@@ -176,13 +176,13 @@ def initialize(
     # Initialisation de l'environnement du jeu Dodo
     if game == "Dodo":
         if player == 1:
-            player_selected: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
+            player_selected: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
             return GameDodo(
-                grid, player_selected, PlayerLocal(2, UP_DIRECTIONS), player_selected, hex_size, total_time
+                grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS), player_selected, hex_size, total_time
             )
         else:
-            player_selected: PlayerLocal = PlayerLocal(2, UP_DIRECTIONS)
-            player_opponent: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
+            player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
+            player_opponent: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
             return GameDodo(
                 grid, player_selected, player_opponent, player_opponent, hex_size, total_time
             )

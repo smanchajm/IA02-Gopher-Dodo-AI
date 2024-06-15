@@ -1,11 +1,11 @@
 """ Module contenant les fonctions de jeu pour une partie en réseau """
 import sys
-
+import time
 import ast
 import argparse
-from Dodo.strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
-from Game_playing.main import initialize
-from Game_playing.structures_classes import Action, Environment, Score, State, Time, GridDict
+from strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
+from main import initialize
+from structures_classes import Action, Environment, Score, State, Time, GridDict
 from gndclient import DODO_STR, GOPHER_STR, start, Player
 
 
@@ -24,9 +24,12 @@ def initialize_for_network(
     for cell in state:
         grid[cell[0]] = cell[1]
 
-
+    if game == "dodo":
+        game_param = "Dodo"
+    else:
+        game_param = "Gopher"
     # Initialize the game here
-    return initialize(game, grid, player, hex_size, total_time)
+    return initialize(game_param, grid, player, hex_size, total_time)
 
 
 def strategy_brain(
@@ -51,14 +54,27 @@ def final_result(_: State, score: Score, player: Player):
 
 
 def strategy_min_max_network(
-    env: Environment, _: State, player: Player, time_left: Time
+    env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The minmax strategy with alpha-beta pruning for a network game
     """
     env.total_time = time_left
     param_player = env.max_player if player == env.max_player.id else env.min_player
-    action = strategy_minmax(env, param_player)
+    grid: GridDict = {}
+    for cell in state:
+        grid[cell[0]] = cell[1]
+    env.grid = grid
+    env.max_positions.positions.clear()
+    env.min_positions.positions.clear()
+
+    for cell in env.grid:
+        if env.grid[cell] == env.max_player.id:
+            env.max_positions.positions[cell] = env.max_player.id
+        elif env.grid[cell] == env.min_player.id:
+            env.min_positions.positions[cell] = env.min_player.id
+    env.current_player = param_player
+    action = strategy_minmax(env, env.max_player)
     print(action)
     return env, action
 
@@ -77,22 +93,36 @@ def strategy_first_legal_network(
 
 
 def strategy_random_network(
-    env: Environment, _: State, player: Player, time_left: Time
+    env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The random strategy for a network game
     """
     env.total_time = time_left
     param_player = env.max_player if player == env.max_player.id else env.min_player
-    action = strategy_random(env, param_player)
+    grid: GridDict = {}
+    for cell in state:
+        grid[cell[0]] = cell[1]
+    env.grid = grid
+    env.max_positions.positions.clear()
+    env.min_positions.positions.clear()
+
+    for cell in env.grid:
+        if env.grid[cell] == env.max_player.id:
+            env.max_positions.positions[cell] = env.max_player.id
+        elif env.grid[cell] == env.min_player.id:
+            env.min_positions.positions[cell] = env.min_player.id
+    env.current_player = param_player
+
+    action = strategy_random(env, env.max_player)
     print(action)
     return env, action
 
 
 if __name__ == "__main__":
-    sys.path.append('C:/Users/samma/Documents/Programmation/IA02/IA02-Gopher-Dodo-AI/Dodo')
-    sys.path.append('C:/Users/samma/Documents/Programmation/IA02/IA02-Gopher-Dodo-AI/Game_playing')
-    sys.path.append('C:/Users/samma/Documents/Programmation/IA02/IA02-Gopher-Dodo-AI/Gopher')
+    sys.path.append('/Dodo')
+    sys.path.append('/Game_playing')
+    sys.path.append('/Gopher')
 
     parser = argparse.ArgumentParser(
         prog="ClientTesting", description="Test the IA02 python client"
@@ -119,10 +149,10 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
-        # strategy_min_max_network,
-        # strategy_random_network,
-        strategy_brain,
-        # strategy_first_legal_network,
+        strategy_min_max_network,
+        #strategy_random_network,
+        #strategy_brain,
+        #strategy_first_legal_network,
         final_result,
-        gui=True,
+        gui=True
     )

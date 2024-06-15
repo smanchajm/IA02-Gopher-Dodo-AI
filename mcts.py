@@ -4,10 +4,9 @@ from collections import defaultdict
 import numpy as np
 
 
-from Game_playing.structures_classes import (
+from structures_classes import (
     Action,
     Environment,
-    Grid,
     PlayerLocal,
     GridDict
 )

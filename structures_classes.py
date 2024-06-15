@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Union
 from collections import namedtuple
 from abc import ABC, abstractmethod
 
-import Game_playing.hexagonal_board as hexa
+import hexagonal_board as hexa
 
 # Types de base utilisés par l'arbitre
 
@@ -96,8 +96,8 @@ class Environment(ABC):
 class GameDodo(Environment):
     """Classe représentant le jeu Dodo"""
 
-    max_positions = MaxPositionsCr(player=PlayerLocal(1, DOWN_DIRECTIONS), positions={})
-    min_positions = MinPositionsCr(player=PlayerLocal(2, UP_DIRECTIONS), positions={})
+    max_positions = MaxPositionsCr(player=PlayerLocal(2, DOWN_DIRECTIONS), positions={})
+    min_positions = MinPositionsCr(player=PlayerLocal(1, UP_DIRECTIONS), positions={})
 
     # Initialisation des positions des joueurs
     def __post_init__(self):

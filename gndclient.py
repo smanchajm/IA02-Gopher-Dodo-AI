@@ -238,7 +238,6 @@ def grid_state(state: State, hex_size: int) -> str:
             grid[x][y] = "B"
         else:
             grid[x][y] = " "
-
     return "\n".join("".join(c for c in line) for line in grid)
 
 
