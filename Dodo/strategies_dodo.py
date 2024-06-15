@@ -138,7 +138,6 @@ def minmax_action_alpha_beta_pruning(
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
     """
-
     def minmax_alpha_beta_pruning(
         env: Environment,
         player: PlayerLocal,
@@ -159,7 +158,7 @@ def minmax_action_alpha_beta_pruning(
             score = evaluate_dynamic(env, env.grid, player)
             return score, (-1, -1)
 
-        if player == env.max_player.id:  # Maximizing player
+        if player.id == env.max_player.id:  # Maximizing player
             best_max: tuple[float, Action] = (float("-inf"), (-1, -1))
             for action in env.legals(player):
                 env.play(action)
@@ -174,7 +173,7 @@ def minmax_action_alpha_beta_pruning(
                     break
             return best_max
 
-        if player == env.min_player.id:  # Minimizing player
+        if player.id == env.min_player.id:  # Minimizing player
             best_min: tuple[float, Action] = (float("inf"), (-1, -1))
             for item in env.legals(player):
                 env.play(item)

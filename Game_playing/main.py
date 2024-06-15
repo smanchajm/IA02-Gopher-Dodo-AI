@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from Dodo.grid import INIT_GRID, GRID4
+from Dodo.grid import INIT_GRID, GRID4, INIT_GRID4, GRID2
 from Dodo.strategies_dodo import (
     StrategyLocal,
     strategy_minmax,
@@ -53,7 +53,6 @@ def dodo(
             current_action = strategy_2(
                 env, env.current_player
             )
-
         env.play(current_action)
 
         iteration_time_end = (
@@ -119,7 +118,6 @@ def gopher(
             current_action = strategy_1(
                 env, env.current_player
             )
-            print(f"Action minmax {current_action}")
             env.play(current_action)
         else:
             current_action = strategy_2(
@@ -307,11 +305,11 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     # Liste pour stocker les résultats des parties
     list_results = []
-    size_init_grid = 7
+    size_init_grid = 4
     if name == "Dodo":
         for i in range(game_number):
             player1: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
-            init_grid = convert_grid(INIT_GRID, size_init_grid)
+            init_grid = convert_grid(INIT_GRID4, size_init_grid)
             game = initialize("Dodo", init_grid, 1, size_init_grid, 5)
             res = dodo(
                 game,
