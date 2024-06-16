@@ -38,7 +38,6 @@ def dodo(
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
-    mcts = MCTS()
     res = env.final()
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
@@ -46,13 +45,14 @@ def dodo(
             print(f"Tour \033[36m {tour}\033[0m.")
         if env.current_player.id == 1:
             tour += 1
-
+            mcts = MCTS(4000, True)
             #current_action = strategy_1(env, env.current_player)
             current_action = mcts.search(env)
+            print(f"grid {env.grid}")
+            print(f"player {env.current_player.id} action {current_action}")
         else:
             current_action = strategy_2(env, env.current_player)
             #current_action = mcts.search(env)
-
         env.play(current_action)
 
         iteration_time_end = (
@@ -60,7 +60,7 @@ def dodo(
         )  # Fin du chronomètre pour la durée de cette itération
 
         if debug:
-            print_dodo(env, GRID4)
+            print_dodo(env, GRID2)
 
         if debug:
             print(
@@ -135,7 +135,7 @@ def gopher(
             time_history.append(iteration_time_end - iteration_time_start)
 
         if debug:
-            print_gopher(env, GRID4)
+            print_gopher(env, GRID2)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -292,7 +292,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
         for i in range(game_number):
             player1: Player = Player(1, DOWN_DIRECTIONS)
             #init_grid = convert_grid(INIT_GRID4, size_init_grid)
-            init_grid = INIT_GRID4
+            init_grid = INIT_GRID
             game = initialize("Dodo", init_grid, player1, size_init_grid, 5)
             res = dodo(
                 game,

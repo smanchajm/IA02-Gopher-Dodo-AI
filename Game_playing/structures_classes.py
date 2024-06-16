@@ -165,11 +165,15 @@ class GameDodo(Environment):
         self.grid[action[0]] = 0
 
         # Debug
+        """
         if (
             action[0] not in self.max_positions.positions
             and self.current_player.id == self.max_positions.player.id
         ):
+            print(f"action :{action}")
             print(f" error action[0]:{action[0]}")
+            print(f" error action[1]:{action[1]}")
+            print(f" error pos:{self.max_positions.positions}")"""
 
         # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
