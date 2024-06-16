@@ -102,7 +102,6 @@ def gopher(
     Fonction représentant la boucle de jeu de Gopher
     """
     time_history: List[float] = []
-    actual_grid: GridDict = env.grid
     current_action: Action
     tour: int = 0
     total_time_start = time.time()  # Chronomètre
@@ -180,12 +179,12 @@ def initialize(
             return GameDodo(
                 grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS), player_selected, hex_size, total_time
             )
-        else:
-            player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
-            player_opponent: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
-            return GameDodo(
-                grid, player_selected, player_opponent, player_opponent, hex_size, total_time
-            )
+
+        player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
+        player_opponent: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
+        return GameDodo(
+            grid, player_selected, player_opponent, player_opponent, hex_size, total_time
+        )
 
     # Initialisation de l'environnement du jeu Gopher
     grid = new_gopher(hex_size)
@@ -308,7 +307,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     size_init_grid = 4
     if name == "Dodo":
         for i in range(game_number):
-            player1: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
             init_grid = convert_grid(INIT_GRID4, size_init_grid)
             game = initialize("Dodo", init_grid, 1, size_init_grid, 5)
             res = dodo(

@@ -1,6 +1,5 @@
 """ Module contenant les fonctions de jeu pour une partie en réseau """
 import sys
-import time
 import ast
 import argparse
 from strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
@@ -75,7 +74,6 @@ def strategy_min_max_network(
             env.min_positions.positions[cell] = env.min_player.id
     env.current_player = param_player
     action = strategy_minmax(env, env.max_player)
-    print(action)
     return env, action
 
 
@@ -88,7 +86,6 @@ def strategy_first_legal_network(
     env.total_time = time_left
     param_player = env.max_player if player == env.max_player.id else env.min_player
     action = strategy_first_legal(env, param_player)
-    print(action)
     return env, action
 
 
@@ -115,7 +112,6 @@ def strategy_random_network(
     env.current_player = param_player
 
     action = strategy_random(env, env.max_player)
-    print(action)
     return env, action
 
 
