@@ -124,8 +124,6 @@ def gopher(
             )
             env.play(current_action)
 
-        actual_grid = env.grid
-
         iteration_time_end = (
             time.time()
         )  # Fin du chronomètre pour la durée de cette itération
@@ -177,7 +175,8 @@ def initialize(
         if player == 1:
             player_selected: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
             return GameDodo(
-                grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS), player_selected, hex_size, total_time
+                grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS), \
+                    player_selected, hex_size, total_time
             )
 
         player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
@@ -320,7 +319,6 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             print(f"Partie {i + 1}: {res}")
 
     else:
-        player1: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
         init_grid = new_gopher(7)
         for i in range(game_number):
             game = initialize("Gopher", init_grid, 1, 7, 5)

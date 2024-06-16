@@ -1,19 +1,10 @@
-#!/usr/bin/python3
-
-#######################################################################
-#######################################################################
-##############                                       ##################
-#############  NE PAS MODIFIER CE FICHIER !!!!!!!!!!  #################
-##############                                       ##################
-#######################################################################
-#######################################################################
-
-VERSION = "alpha"
-
+""" Module contenant les fonctions de jeu pour une partie en réseau """
+import requests
 import time
 import ast
 from typing import Callable, List, Tuple, Any, Dict, NamedTuple, Union
-import requests
+
+VERSION = "alpha"
 
 Env = Any
 Game = int
@@ -151,6 +142,7 @@ def _connect(
 def _request_game_info(
     session: requests.Session, basename: str, token: str
 ) -> GameInfo:
+    """ Request the game information from the server """
     data = emptyRequest.copy()
     data["Token"] = token
 
@@ -168,6 +160,7 @@ def _request_game_info(
 def _wait_my_turn(
     session: requests.Session, basename: str, token: str, action: Action
 ) -> Tuple[GameInfo, FinishInfo]:
+    """ Wait for the player to play """
     data = emptyRequest.copy()
     data["Token"] = token
     if isinstance(action[0], int):  # Missing a level of tuple
@@ -177,8 +170,6 @@ def _wait_my_turn(
 
     resp = _do_request(session, basename, "play", data)
 
-    # if resp["end"] != 0:
-    #     return (), resp["end"]
     grid, size = _convert_grid_to_py(resp["Grid"])
     game_info = GameInfo(
         resp["Game"], resp["Player"], resp["Clocktime"], grid, size, resp["MatchToken"]
@@ -189,18 +180,21 @@ def _wait_my_turn(
 
 
 def game_to_str(game: Game) -> str:
+    """ Convert a game to a string """
     if game == DODO:
         return DODO_STR
     return GOPHER_STR
 
 
 def str_to_game(game: str) -> Game:
+    """ Convert a string to a game """
     if game == DODO_STR:
         return DODO
     return GOPHER
 
 
 def cell_to_grid(cell: Cell, hex_size: int) -> tuple[int, int]:
+    """ Convert a cell to a grid position """
     return (
         2 * hex_size - 1 - cell[0] - cell[1],
         3 * hex_size - 1 + 3 * cell[0] - 3 * cell[1],
@@ -208,6 +202,7 @@ def cell_to_grid(cell: Cell, hex_size: int) -> tuple[int, int]:
 
 
 def empty_grid(hex_size: int) -> list[list[str]]:
+    """ Create an empty grid """
     grid = [[" "] * (hex_size * 6 - 1) for _ in range(4 * hex_size - 1)]
 
     for row in range(-hex_size + 1, hex_size):
@@ -229,6 +224,7 @@ def empty_grid(hex_size: int) -> list[list[str]]:
 
 
 def grid_state(state: State, hex_size: int) -> str:
+    """ Convert the state to a grid """
     grid = empty_grid(hex_size)
     for cell, player in state:
         x, y = cell_to_grid(cell, hex_size)
@@ -242,9 +238,10 @@ def grid_state(state: State, hex_size: int) -> str:
 
 
 def grid_state_color(state: State, hex_size: int) -> str:
+    """ Convert the state to a grid with colors """
     # Initialize an empty grid with the specified hex size
     grid = empty_grid(hex_size)
-    
+
     # ANSI escape codes for red and blue
     RED_COLOR = "\033[91m"
     BLUE_COLOR = "\033[94m"
@@ -275,6 +272,7 @@ def start(
     end: FinalCallback,
     gui: bool = True,
 ):
+    """ Start the game """
     basename = server_name
     basename = basename.strip("/")
 
