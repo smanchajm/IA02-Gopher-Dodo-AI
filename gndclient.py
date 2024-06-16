@@ -246,7 +246,7 @@ def grid_state_color(state: State, hex_size: int) -> str:
     RED_COLOR = "\033[91m"
     BLUE_COLOR = "\033[94m"
     RESET_COLOR = "\033[0m"
-    
+
     for cell, player in state:
         x, y = cell_to_grid(cell, hex_size)
         if player == RED:
@@ -255,7 +255,7 @@ def grid_state_color(state: State, hex_size: int) -> str:
             grid[x][y] = f"{BLUE_COLOR}B{RESET_COLOR}"
         else:
             grid[x][y] = " "
-    
+
     # Convert the grid to a string
     return "\n".join("".join(c for c in line) for line in grid)
 
