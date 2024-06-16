@@ -301,6 +301,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     Fonction permettant de lancer plusieurs parties de jeu
     """
+    debug = True
     if game_number > 1:
         debug = False
     # Liste pour stocker les résultats des parties
@@ -351,7 +352,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(10, "Dodo")
+    launch_multi_game(1, "Dodo")
 
 
 if __name__ == "__main__":

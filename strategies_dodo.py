@@ -207,7 +207,7 @@ def strategy_minmax(
 
     bonus = 1
 
-    if env.hex_size <= 5:
+    if env.hex_size <= 4:
         bonus = 1.5
 
     depth = 6 + round(depth_factor * bonus)
