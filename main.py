@@ -301,6 +301,8 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     """
     Fonction permettant de lancer plusieurs parties de jeu
     """
+    if game_number > 1:
+        debug = False
     # Liste pour stocker les résultats des parties
     list_results = []
     size_init_grid = 4
@@ -312,7 +314,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=True,
+                debug=debug,
                 graphics=False,
             )
             list_results.append(res)
@@ -326,7 +328,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
                 game,
                 strategy_minmax,
                 strategy_random,
-                debug=True,
+                debug=debug,
                 graphics=False,
             )
             list_results.append(res)
@@ -349,7 +351,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(10, "Dodo")
 
 
 if __name__ == "__main__":

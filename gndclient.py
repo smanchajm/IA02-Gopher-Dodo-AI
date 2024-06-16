@@ -150,6 +150,7 @@ def _request_game_info(
     # Bloquant si 2ème joueur
     # Spécifier à quel jeux ont joue
     grid, size = _convert_grid_to_py(resp["Grid"])
+
     info = GameInfo(
         resp["Game"], resp["Player"], resp["Clocktime"], grid, size, resp["MatchToken"]
     )
