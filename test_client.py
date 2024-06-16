@@ -2,6 +2,8 @@
 import sys
 import ast
 import argparse
+
+from mcts import MCTS
 from strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
 from main import initialize
 from structures_classes import Action, Environment, Score, State, Time, GridDict
@@ -113,6 +115,33 @@ def strategy_random_network(
 
     action = strategy_random(env, env.max_player)
     return env, action
+
+
+def strategy_mcts_network(
+    env: Environment, state: State, player: Player, time_left: Time
+) -> tuple[Environment, Action]:
+    """
+    The mcts strategy for a network game
+    """
+    env.total_time = time_left
+    param_player = env.max_player if player == env.max_player.id else env.min_player
+    grid: GridDict = {}
+    for cell in state:
+        grid[cell[0]] = cell[1]
+    env.grid = grid
+    env.max_positions.positions.clear()
+    env.min_positions.positions.clear()
+
+    for cell in env.grid:
+        if env.grid[cell] == env.max_player.id:
+            env.max_positions.positions[cell] = env.max_player.id
+        elif env.grid[cell] == env.min_player.id:
+            env.min_positions.positions[cell] = env.min_player.id
+    env.current_player = param_player
+    mcts = MCTS()
+    action = mcts.search(env)
+    return env, action
+
 
 
 if __name__ == "__main__":

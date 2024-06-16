@@ -95,10 +95,6 @@ class Environment(ABC):
 @dataclass
 class GameDodo(Environment):
     """Classe représentant le jeu Dodo"""
-
-    max_positions = MaxPositionsCr(player=PlayerLocal(2, DOWN_DIRECTIONS), positions={})
-    min_positions = MinPositionsCr(player=PlayerLocal(1, UP_DIRECTIONS), positions={})
-
     # Initialisation des positions des joueurs
     def __post_init__(self):
         super().__init__(
@@ -108,7 +104,10 @@ class GameDodo(Environment):
             self.current_player,
             self.hex_size,
             self.total_time,
+
         )
+        self.max_positions = MaxPositionsCr(player=self.max_player, positions={})
+        self.min_positions = MinPositionsCr(player=self.min_player, positions={})
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
