@@ -1,7 +1,5 @@
 """ Module concernant l'implémentation de l'algorithme Monte Carlo Tree Search """
-import time
 from collections import deque
-from concurrent.futures import ThreadPoolExecutor
 
 from Dodo.grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
 from copy import deepcopy
@@ -38,16 +36,14 @@ class TreeNode:
         self.score = 0
         # init current node's children
         self.children: list[TreeNode] = []
-        self.unexplored_actions = self.env.legals(self.env.max_player)
+        self.unexplored_actions = self.env.legals(self.env.current_player)
 
 
 # MCTS class definition
 class MCTS:
     # search for the best move in the current position
-    def __init__(self, max_simulations=1000, parallel=False):
+    def __init__(self):
         self.root = None
-        self.max_simulations = max_simulations
-        self.parallel = parallel
 
     def reinit_pos(self, env: Environment):
         env.max_positions.positions.clear()
@@ -119,14 +115,14 @@ class MCTS:
             node = node.parent
 
     # select the best node basing on UCB1 formula
-    def get_best_move(self, node: TreeNode, exploration_constant):
+    def get_best_move(self, param_node: TreeNode, exploration_constant=math.sqrt(2)):
         # define best score & best moves
-
         choices_weights = [
-            (child.score / child.visits) + exploration_constant * math.sqrt((math.log(node.visits) / child.visits))
-            for child in node.children
+            (child.score / child.visits) + exploration_constant * math.sqrt((math.log(param_node.visits) / child.visits))
+            for child in param_node.children
         ]
-        return node.children[choices_weights.index(max(choices_weights))]
+
+        return param_node.children[choices_weights.index(max(choices_weights))]
 
 
     # select most promising node
@@ -134,8 +130,10 @@ class MCTS:
         stack: deque[Action] = deque()
         current_node: TreeNode = node
         self.reinit_pos(current_node.env)
+
         # make sure that we're dealing with non-terminal nodes
         while not current_node.is_terminal:
+
             if not len(current_node.unexplored_actions) == 0:
                 return self.expand(current_node), stack
             else:
@@ -147,29 +145,15 @@ class MCTS:
 
         return current_node, stack
 
-    def best_action(self, root: TreeNode):
-        simulations = range(self.max_simulations)
-        if self.parallel:
-            print("parallel")
-            with ThreadPoolExecutor() as executor:
-                lroot = [deepcopy(root)] * self.max_simulations
-                for sel_root in lroot:
-                    self.reinit_pos(sel_root.env)
-                executor.map(self.run_simulation, lroot)
-                self.reinit_pos(self.root.env)
-        else:
-            for _ in simulations:
-                print("not parallel")
-                self.run_simulation(root)
-        return self.get_best_move(root, math.sqrt(2)).parent_action
-
-    def run_simulation(self, root: TreeNode):
-        node, stack = self.select(self.root)
-        score = self.rollout(node.env)
-        while len(stack) > 0:
-            self.root.env.reverse_action(stack.pop())
-        self.backpropagate(node, score)
-        self.reinit_pos(self.root.env)
+    def get_most_winning(self, node: TreeNode):
+        max_score = -80000
+        best_node = None
+        for child in node.children:
+            score = child.score / child.visits
+            if score > max_score:
+                max_score = score
+                best_node = child
+        return best_node
 
     def search(self, initial_state: Environment):
         # create root node
@@ -178,15 +162,15 @@ class MCTS:
         stack: deque[Action]
 
         # walk through 1000 iterations
-        for iteration in range(self.max_simulations):
-            # print(f"iteration: {iteration}")
+        for iteration in range(2000):
+            #print(f"iteration: {iteration}")
             # select a node (selection phase)
             node, stack = self.select(self.root)
 
             # score current node (simulation phase)
             score = self.rollout(node.env)
 
-            # print(f"stack: {stack}")
+            #print(f"stack: {stack}")
             while len(stack) > 0:
                 self.root.env.reverse_action(stack.pop())
 
@@ -195,7 +179,17 @@ class MCTS:
 
             self.reinit_pos(self.root.env)
 
-        best = self.get_best_move(self.root, math.sqrt(2))
+        best = self.get_most_winning(self.root)
+        print(f"root {self.root.visits}")
+
+        for child in self.root.children:
+            print(f"action: {child.parent_action}")
+            print(f"child: {child.visits}")
+            print(f"score: {child.score}\n")
+            print(f"uct: {(child.score / child.visits) + math.sqrt(2) * math.sqrt((math.log(self.root.visits) / child.visits))}\n")
+
+        print(f"len children: {len(self.root.children)}")
+        print(f"len leg root: {len(self.root.env.legals(self.root.env.current_player))}")
 
         return best.parent_action
 
@@ -204,20 +198,13 @@ def main():
     player1: Player = Player(1, DOWN_DIRECTIONS)
     init_grid = convert_grid(INIT_GRID4, 4)
     print(init_grid)
-
     game = GameDodo(init_grid, player1, Player(2, UP_DIRECTIONS), player1, 4, 2)
-    total_time_start = time.time()  # Chronomètre
-    mcts = MCTS(2000, False)
+    mcts = MCTS()
     selected_node = mcts.search(game)
-    end_time = time.time()  # Chronomètre
+
     print(selected_node)
-    print("Temps d'exécution avec para: ", end_time - total_time_start, " secondes")
-
-
     return
 
 
 if __name__ == "__main__":
     main()
-
-
