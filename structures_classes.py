@@ -92,9 +92,11 @@ class Environment(ABC):
 
 
 # DataClass Game Dodo
+
 @dataclass
 class GameDodo(Environment):
     """Classe représentant le jeu Dodo"""
+
     # Initialisation des positions des joueurs
     def __post_init__(self):
         super().__init__(
@@ -104,8 +106,8 @@ class GameDodo(Environment):
             self.current_player,
             self.hex_size,
             self.total_time,
-
         )
+
         self.max_positions = MaxPositionsCr(player=self.max_player, positions={})
         self.min_positions = MinPositionsCr(player=self.min_player, positions={})
 
@@ -164,11 +166,15 @@ class GameDodo(Environment):
         self.grid[action[0]] = 0
 
         # Debug
+        """
         if (
             action[0] not in self.max_positions.positions
             and self.current_player.id == self.max_positions.player.id
         ):
+            print(f"action :{action}")
             print(f" error action[0]:{action[0]}")
+            print(f" error action[1]:{action[1]}")
+            print(f" error pos:{self.max_positions.positions}")"""
 
         # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
@@ -186,6 +192,29 @@ class GameDodo(Environment):
         )
 
     def reverse_action(self, action: ActionDodo):
+        """
+        Fonction annulant un coup pour un joueur donné
+        """
+        # Changement de joueur
+        self.current_player = (
+            self.min_player
+            if self.current_player == self.max_player
+            else self.max_player
+        )
+
+        # Mise à jour de la grille
+        self.grid[action[0]] = self.current_player.id
+        self.grid[action[1]] = EMPTY
+
+        # Mise à jour des positions des joueurs
+        if self.current_player.id == self.min_positions.player.id:
+            self.min_positions.positions.pop(action[1])
+            self.min_positions.positions[action[0]] = self.min_positions.player.id
+        else:
+            self.max_positions.positions.pop(action[1])
+            self.max_positions.positions[action[0]] = self.max_positions.player.id
+
+    def reverse_action_player(self, action: ActionDodo, player: PlayerLocal):
         """
         Fonction annulant un coup pour un joueur donné
         """

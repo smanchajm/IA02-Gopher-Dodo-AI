@@ -146,7 +146,7 @@ class MCTS:
         return current_node, stack
 
     def get_most_winning(self, node: TreeNode):
-        max_score = -80000
+        max_score = -80000.0
         best_node = None
         for child in node.children:
             score = child.score / child.visits
@@ -162,7 +162,7 @@ class MCTS:
         stack: deque[Action]
 
         # walk through 1000 iterations
-        for iteration in range(2000):
+        for iteration in range(800):
             #print(f"iteration: {iteration}")
             # select a node (selection phase)
             node, stack = self.select(self.root)
@@ -180,6 +180,8 @@ class MCTS:
             self.reinit_pos(self.root.env)
 
         best = self.get_most_winning(self.root)
+
+        """
         print(f"root {self.root.visits}")
         for child in self.root.children:
             print(f"action: {child.parent_action}")
@@ -189,7 +191,7 @@ class MCTS:
 
         print(f"len children: {len(self.root.children)}")
         print(f"len leg root: {len(self.root.env.legals(self.root.env.current_player))}")
-
+        """
         return best.parent_action
 
 

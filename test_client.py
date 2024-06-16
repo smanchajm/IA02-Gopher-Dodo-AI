@@ -143,7 +143,6 @@ def strategy_mcts_network(
     return env, action
 
 
-
 if __name__ == "__main__":
     sys.path.append('/Dodo')
     sys.path.append('/Game_playing')
@@ -174,7 +173,8 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
-        strategy_min_max_network,
+        strategy_mcts_network,
+        #strategy_min_max_network,
         #strategy_random_network,
         #strategy_brain,
         #strategy_first_legal_network,
