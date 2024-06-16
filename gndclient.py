@@ -241,6 +241,29 @@ def grid_state(state: State, hex_size: int) -> str:
     return "\n".join("".join(c for c in line) for line in grid)
 
 
+def grid_state_color(state: State, hex_size: int) -> str:
+    # Initialize an empty grid with the specified hex size
+    grid = empty_grid(hex_size)
+    
+    # ANSI escape codes for red and blue
+    RED_COLOR = "\033[91m"
+    BLUE_COLOR = "\033[94m"
+    RESET_COLOR = "\033[0m"
+    
+    for cell, player in state:
+        x, y = cell_to_grid(cell, hex_size)
+        if player == RED:
+            grid[x][y] = f"{RED_COLOR}R{RESET_COLOR}"
+        elif player == BLUE:
+            grid[x][y] = f"{BLUE_COLOR}B{RESET_COLOR}"
+        else:
+            grid[x][y] = " "
+    
+    # Convert the grid to a string
+    return "\n".join("".join(c for c in line) for line in grid)
+
+
+
 def start(
     server_name: str,
     group: str,
@@ -279,7 +302,7 @@ def start(
     finish_info = FinishInfo(False, 0, 0)
     while not finish_info.finished:
         if gui:
-            print(grid_state(game_info.state, game_info.grid_size))
+            print(grid_state_color(game_info.state, game_info.grid_size))
         # Call of strategy client function
         newenv, action = strategy(
             env, game_info.state, game_info.player, game_info.clocktime
