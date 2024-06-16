@@ -21,8 +21,9 @@ jobs:
         pip install numpy
         pip install matplotlib
         pip install pandas
+        pip install requests
     - name: Setting up PythonPath & Analysing the code with pylint
       run: |
         PWD=$(pwd)
         export PYTHONPATH=$PWD/src:$PWD/tests:$PYTHONPATH
-        pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116 --exit-zero
+        pylint $(git ls-files '*.py') --exit-zero
