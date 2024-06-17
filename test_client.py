@@ -76,6 +76,7 @@ def strategy_min_max_network(
             env.min_positions.positions[cell] = env.min_player.id
     env.current_player = param_player
     action = strategy_minmax(env, env.max_player)
+
     return env, action
 
 
@@ -173,8 +174,8 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
-        strategy_mcts_network,
-        # strategy_min_max_network,
+        #strategy_mcts_network,
+        strategy_min_max_network,
         # strategy_random_network,
         #strategy_brain,
         #strategy_first_legal_network,

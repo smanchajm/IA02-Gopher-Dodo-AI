@@ -17,9 +17,9 @@ from Dodo.strategies_dodo import (
 
 import Game_playing.hexagonal_board as hexa
 from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
-    UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, \
-        PlayerLocal, Time, convert_grid, new_gopher, print_dodo
+from Game_playing.structures_classes import( ALL_DIRECTIONS, DOWN_DIRECTIONS,
+    UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict,
+        PlayerLocal, Time, convert_grid, new_gopher, print_dodo)
 
 matplotlib.use("TkAgg")
 
@@ -108,6 +108,7 @@ def gopher(
 
     res = env.final()
 
+
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
@@ -175,8 +176,8 @@ def initialize(
         if player == 1:
             player_selected: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
             return GameDodo(
-                grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS), \
-                    player_selected, hex_size, total_time
+                grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS),
+                player_selected, hex_size, total_time
             )
 
         player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
@@ -302,8 +303,7 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
     Fonction permettant de lancer plusieurs parties de jeu
     """
     debug = True
-    if game_number > 1:
-        debug = False
+
     # Liste pour stocker les résultats des parties
     list_results = []
     size_init_grid = 4
@@ -322,9 +322,9 @@ def launch_multi_game(game_number: int = 1, name: str = "Dodo"):
             print(f"Partie {i + 1}: {res}")
 
     else:
-        init_grid = new_gopher(7)
+        init_grid = new_gopher(4)
         for i in range(game_number):
-            game = initialize("Gopher", init_grid, 1, 7, 5)
+            game = initialize("Gopher", init_grid, 1, size_init_grid, 500)
             res = gopher(
                 game,
                 strategy_minmax,
@@ -352,7 +352,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(1, "Dodo")
+    launch_multi_game(10, "Gopher")
 
 
 if __name__ == "__main__":

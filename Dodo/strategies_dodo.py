@@ -8,8 +8,11 @@ from Game_playing.structures_classes import (
     Cell,
     Environment,
     GridDict,
-    PlayerLocal,
+    PlayerLocal, new_gopher,
 )
+
+from Game_playing.structures_classes import DOWN_DIRECTIONS, UP_DIRECTIONS, convert_grid, GameGopher, ALL_DIRECTIONS
+from Game_playing.grid import INIT_GRID4
 
 StrategyLocal = Callable[[Environment, PlayerLocal], Action]
 
@@ -205,7 +208,7 @@ def strategy_minmax(
         depth_factor = 1
     depth_factor = depth_factor.real # convert depth factor to a float
 
-    bonus = 1
+    bonus = 1.0
 
     if env.hex_size <= 4:
         bonus = 1.5
@@ -214,3 +217,18 @@ def strategy_minmax(
     # depth = min(6 + round(depth_factor), 15)
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]
+
+
+def main():
+    player1: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
+    player2: PlayerLocal = PlayerLocal(2, ALL_DIRECTIONS)
+
+    env = GameGopher(new_gopher(4), player1, player2, player1, 4, 200)
+    print((len(env.legals(player1)) == len(env.grid)))
+
+
+    print(strategy_minmax(env, player1))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,11 +1,21 @@
 """ Module concernant l'implémentation de l'algorithme Monte Carlo Tree Search """
+
 import math
 import random
 
 from collections import deque
 
 from Game_playing.grid import INIT_GRID4
-from Game_playing.structures_classes import DOWN_DIRECTIONS, UP_DIRECTIONS, Action, Environment, GameDodo, PlayerLocal, convert_grid
+from Game_playing.structures_classes import (
+    DOWN_DIRECTIONS,
+    UP_DIRECTIONS,
+    Action,
+    Environment,
+    GameDodo,
+    PlayerLocal,
+    convert_grid,
+)
+
 
 # tree node class definition
 class TreeNode:
@@ -44,6 +54,10 @@ class MCTS:
         self.root = None
 
     def reinit_pos(self, env: Environment):
+        """
+        Méthode permettant de réinitialiser les positions des joueurs
+        """
+
         env.max_positions.positions.clear()
         env.min_positions.positions.clear()
         for cell in env.grid:
@@ -54,13 +68,14 @@ class MCTS:
 
     # expand node
     def expand(self, node: TreeNode):
-        #print(f"grid before expand: {node.env.grid}")
-        #print(f"pos before expand: {node.env.max_positions.positions}")
+        """
+        Méthode d'expansion qui permet d'ajouter un enfant à un noeud
+        :param node:
+        :return:
+        """
         self.reinit_pos(node.env)
-        #print(f"actions unex: {node.unexplored_actions}")
         action: Action = node.unexplored_actions.pop()
         node.env.play(action)
-        # leg: list[Action] = node.env.legals(node.env.current_player)
         child = TreeNode(env=node.env, parent=node, p_action=action)
         node.env.reverse_action(action)
         self.reinit_pos(child.env)
@@ -73,37 +88,34 @@ class MCTS:
 
     # simulate the game via making random moves until reach end of the game --> ça marche
     def rollout(self, param_env: Environment):
-        #print(f"grid before rollout: {param_env.grid}")
+        """
+        Méthode de simulation qui permet de simuler une partie en faisant des coups aléatoires à partir du noeud actuel
+        """
         # make random moves for both sides until terminal state of the game is reached
         i = 0
         self.reinit_pos(param_env)
 
         stack: deque = deque()
-        while param_env.legals(param_env.max_player) and param_env.legals(param_env.min_player):
+        while param_env.legals(param_env.max_player) and param_env.legals(
+            param_env.min_player
+        ):
             i += 1
-            #print(f"prof {i}")
             action: Action = random.choice(param_env.legals(param_env.current_player))
-            #print(f"action: {action}, player: {param_env.current_player.id}")
             stack.append(action)
             param_env.play(action)
 
         score: int = param_env.final()
-        #print(f"score: {score}")
-        #print(f"stack rollout: {stack}")
-        #print(f"grid after rollout: {param_env.grid}")
-
 
         while len(stack) > 0:
             sel_action = stack.pop()
-            #print(f"reverse action: {sel_action}, player: {param_env.current_player.id}")
             param_env.reverse_action(sel_action)
 
-        #print(f"grid DEStck rollout: {param_env.grid}")
         return score
 
-    # backpropagate the number of visits and score up to the root node
-    def backpropagate(self, node: TreeNode, score: int):  # a voir si on le modif
-        # update nodes's up to root node
+    def backpropagate(self, node: TreeNode, score: int):
+        """
+        Méthode de backpropagation qui permet de remonter les visites et les scores jusqu'au noeud racine
+        """
         while node is not None:
             # update node's visits
             node.visits += 1
@@ -112,20 +124,26 @@ class MCTS:
             # set node to parent
             node = node.parent
 
-    # select the best node basing on UCB1 formula
     def get_best_move(self, param_node: TreeNode, exploration_constant=math.sqrt(2)):
+        """
+        Méthode qui permet de sélectionner le meilleur enfant en fonction de la formule UCB1
+        """
         # define best score & best moves
         choices_weights = [
-            (child.score / child.visits) + exploration_constant * \
-                math.sqrt((math.log(param_node.visits) / child.visits))
+            (child.score / child.visits)
+            + exploration_constant
+            * math.sqrt((math.log(param_node.visits) / child.visits))
             for child in param_node.children
         ]
 
         return param_node.children[choices_weights.index(max(choices_weights))]
 
-
     # select most promising node
     def select(self, node: TreeNode):
+        """
+        Méthode de sélection qui permet de sélectionner l'enfant le plus prometteur des enfants du noeud actuel
+        ou d'ajouter (expand) un enfant si le noeud actuel n'est pas terminal
+        """
         stack: deque[Action] = deque()
         current_node: TreeNode = node
         self.reinit_pos(current_node.env)
@@ -145,6 +163,11 @@ class MCTS:
         return current_node, stack
 
     def get_most_winning(self, node: TreeNode):
+        """
+        Méthode qui permet de retourner le noeud enfant avec le meilleur ratio de victoires
+        :param node:
+        :return:
+        """
         max_score = -80000.0
         best_node = None
         for child in node.children:
@@ -155,6 +178,10 @@ class MCTS:
         return best_node
 
     def search(self, initial_state: Environment):
+        """
+        Méthode de recherche qui permet de lancer l'algorithme MCTS pour n simulations
+        select -> expand -> rollout -> backpropagate
+        """
         # create root node
         self.root = TreeNode(initial_state, None)
         node: TreeNode
@@ -191,18 +218,3 @@ class MCTS:
         print(f"len leg root: {len(self.root.env.legals(self.root.env.current_player))}")
         """
         return best.parent_action
-
-
-def main():
-    player1: PlayerLocal = PlayerLocal(1, DOWN_DIRECTIONS)
-    init_grid = convert_grid(INIT_GRID4, 4)
-    game = GameDodo(init_grid, player1, PlayerLocal(2, UP_DIRECTIONS), player1, 4, 2)
-
-    mcts = MCTS()
-    selected_node = mcts.search(game)
-
-    print(selected_node)
-    return
-
-if __name__ == "__main__":
-    main()
