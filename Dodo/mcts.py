@@ -162,14 +162,12 @@ class MCTS:
 
         # walk through 1000 iterations
         for _ in range(1600):
-            #print(f"iteration: {iteration}")
             # select a node (selection phase)
             node, stack = self.select(self.root)
 
             # score current node (simulation phase)
             score = self.rollout(node.env)
 
-            #print(f"stack: {stack}")
             while len(stack) > 0:
                 self.root.env.reverse_action(stack.pop())
 

@@ -7,7 +7,7 @@ from Dodo.mcts import MCTS
 from Dodo.strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
 from Game_playing.main import initialize
 from Game_playing.structures_classes import Action, Environment, Score, State, Time, GridDict
-from gndclient import DODO_STR, GOPHER_STR, start, Player
+from Serveur.gndclient import DODO_STR, GOPHER_STR, start, Player
 
 
 def initialize_for_network(
@@ -145,7 +145,7 @@ def strategy_mcts_network(
 
 if __name__ == "__main__":
     sys.path.append('')
-    sys.path.append('Game_playing')
+    sys.path.append('../Game_playing')
     sys.path.append('Gopher')
 
     parser = argparse.ArgumentParser(
