@@ -289,7 +289,7 @@ def start(
     )
     print("Connected, requesting next game")
     game_info = _request_game_info(session, basename, token)
-
+    print("before init")
     # Call of initialization client function
     env = init(
         game_to_str(game_info.game),
@@ -298,6 +298,7 @@ def start(
         game_info.grid_size,
         game_info.clocktime,
     )
+    print("after init")
     finish_info = FinishInfo(False, 0, 0)
     while not finish_info.finished:
         if gui:

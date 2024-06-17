@@ -3,10 +3,10 @@ import sys
 import ast
 import argparse
 
-from mcts import MCTS
-from strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
-from main import initialize
-from structures_classes import Action, Environment, Score, State, Time, GridDict
+from Dodo.mcts import MCTS
+from Dodo.strategies_dodo import strategy_first_legal, strategy_minmax, strategy_random
+from Game_playing.main import initialize
+from Game_playing.structures_classes import Action, Environment, Score, State, Time, GridDict
 from gndclient import DODO_STR, GOPHER_STR, start, Player
 
 
@@ -144,9 +144,9 @@ def strategy_mcts_network(
 
 
 if __name__ == "__main__":
-    sys.path.append('/Dodo')
-    sys.path.append('/Game_playing')
-    sys.path.append('/Gopher')
+    sys.path.append('')
+    sys.path.append('Game_playing')
+    sys.path.append('Gopher')
 
     parser = argparse.ArgumentParser(
         prog="ClientTesting", description="Test the IA02 python client"
@@ -173,9 +173,9 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
-        strategy_mcts_network,
+        #strategy_mcts_network,
         #strategy_min_max_network,
-        #strategy_random_network,
+        strategy_random_network,
         #strategy_brain,
         #strategy_first_legal_network,
         final_result,

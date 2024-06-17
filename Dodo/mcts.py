@@ -1,9 +1,8 @@
 """ Module concernant l'implémentation de l'algorithme Monte Carlo Tree Search """
 from collections import deque
 
-from grid import GRID1, GRID2, INIT_GRID, INIT_GRID4, GRID4
-from copy import deepcopy
-from structures_classes import *
+from Game_playing.grid import INIT_GRID4
+from Game_playing.structures_classes import *
 
 import math
 import random

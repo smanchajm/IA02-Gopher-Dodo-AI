@@ -8,16 +8,16 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from grid import GRID4, INIT_GRID4
-from strategies_dodo import (
+from Game_playing.grid import GRID4, INIT_GRID4
+from Dodo.strategies_dodo import (
     StrategyLocal,
     strategy_minmax,
     strategy_random,
 )
 
-import hexagonal_board as hexa
-from hexagonal_board import Grid
-from structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
+import Game_playing.hexagonal_board as hexa
+from Game_playing.hexagonal_board import Grid
+from Game_playing.structures_classes import ALL_DIRECTIONS, DOWN_DIRECTIONS, \
     UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict, \
         PlayerLocal, Time, convert_grid, new_gopher, print_dodo
 
@@ -214,7 +214,7 @@ def append_to_csv(dataframe: pd.DataFrame, filename: str):
     Fonction permettant d'ajouter une ligne à un fichier CSV
     """
     parent_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    path_file = os.path.join(parent_dir, "Benchmarks", filename)
+    path_file = os.path.join(parent_dir, "../Benchmarks", filename)
 
     # Vérifier si le fichier existe
     file_exists = os.path.isfile(path_file)

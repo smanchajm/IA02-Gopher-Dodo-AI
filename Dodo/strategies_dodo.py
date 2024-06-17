@@ -3,7 +3,7 @@ from cmath import log
 import random
 from typing import Callable
 
-from structures_classes import (
+from Game_playing.structures_classes import (
     Action,
     Cell,
     Environment,
