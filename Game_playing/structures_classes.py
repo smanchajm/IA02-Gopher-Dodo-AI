@@ -146,7 +146,7 @@ class GameDodo(Environment):
         return list(actions.keys())
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
-    def final(self, debug: bool = False) -> int:
+    def final(self) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
@@ -166,15 +166,15 @@ class GameDodo(Environment):
         self.grid[action[0]] = 0
 
         # Debug
-        """
-        if (
-            action[0] not in self.max_positions.positions
-            and self.current_player.id == self.max_positions.player.id
-        ):
-            print(f"action :{action}")
-            print(f" error action[0]:{action[0]}")
-            print(f" error action[1]:{action[1]}")
-            print(f" error pos:{self.max_positions.positions}")"""
+    
+        # if (
+        #     action[0] not in self.max_positions.positions
+        #     and self.current_player.id == self.max_positions.player.id
+        # ):
+        #     print(f"action :{action}")
+        #     print(f" error action[0]:{action[0]}")
+        #     print(f" error action[1]:{action[1]}")
+        #     print(f" error pos:{self.max_positions.positions}")
 
         # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
@@ -214,7 +214,7 @@ class GameDodo(Environment):
             self.max_positions.positions.pop(action[1])
             self.max_positions.positions[action[0]] = self.max_positions.player.id
 
-    def reverse_action_player(self, action: ActionDodo, player: PlayerLocal):
+    def reverse_action_player(self, action: ActionDodo, _: PlayerLocal):
         """
         Fonction annulant un coup pour un joueur donné
         """
