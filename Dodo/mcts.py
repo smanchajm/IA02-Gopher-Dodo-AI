@@ -1,12 +1,11 @@
 """ Module concernant l'implémentation de l'algorithme Monte Carlo Tree Search """
-from collections import deque
-
-from Game_playing.grid import INIT_GRID4
-from Game_playing.structures_classes import *
-
 import math
 import random
 
+from collections import deque
+
+from Game_playing.grid import INIT_GRID4
+from Game_playing.structures_classes import DOWN_DIRECTIONS, UP_DIRECTIONS, Action, Environment, GameDodo, PlayerLocal, convert_grid
 
 # tree node class definition
 class TreeNode:
@@ -117,7 +116,8 @@ class MCTS:
     def get_best_move(self, param_node: TreeNode, exploration_constant=math.sqrt(2)):
         # define best score & best moves
         choices_weights = [
-            (child.score / child.visits) + exploration_constant * math.sqrt((math.log(param_node.visits) / child.visits))
+            (child.score / child.visits) + exploration_constant * \
+                math.sqrt((math.log(param_node.visits) / child.visits))
             for child in param_node.children
         ]
 
@@ -186,7 +186,8 @@ class MCTS:
             print(f"action: {child.parent_action}")
             print(f"child: {child.visits}")
             print(f"score: {child.score}\n")
-            print(f"uct: {(child.score / child.visits) + math.sqrt(2) * math.sqrt((math.log(self.root.visits) / child.visits))}\n")
+            print(f"uct: {(child.score / child.visits) + math.sqrt(2) * \
+                math.sqrt((math.log(self.root.visits) / child.visits))}\n")
 
         print(f"len children: {len(self.root.children)}")
         print(f"len leg root: {len(self.root.env.legals(self.root.env.current_player))}")
@@ -204,7 +205,6 @@ def main():
 
     print(selected_node)
     return
-
 
 if __name__ == "__main__":
     main()

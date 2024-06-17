@@ -1,8 +1,9 @@
 """ Module contenant les fonctions de jeu pour une partie en réseau """
-import requests
 import time
 import ast
 from typing import Callable, List, Tuple, Any, Dict, NamedTuple, Union
+
+import requests
 
 VERSION = "alpha"
 
