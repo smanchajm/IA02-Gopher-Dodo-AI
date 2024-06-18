@@ -4,8 +4,8 @@ import os
 import time
 from typing import Any, List
 
-import matplotlib
-import matplotlib.pyplot as plt
+#import matplotlib
+#import matplotlib.pyplot as plt
 import pandas as pd  # type: ignore
 
 from Game_playing.grid import GRID4, INIT_GRID4
@@ -15,13 +15,15 @@ from Dodo.strategies_dodo import (
     strategy_random,
 )
 
+from Dodo.mcts import MCTS
+
 import Game_playing.hexagonal_board as hexa
 from Game_playing.hexagonal_board import Grid
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict,
                                              PlayerLocal, Time, convert_grid, new_gopher, print_dodo)
 
-matplotlib.use("TkAgg")
+#matplotlib.use("TkAgg")
 
 
 # Boucle de jeu Dodo
@@ -71,13 +73,14 @@ def dodo(
         res = env.final()
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
+    """
     if graphics:
         print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
         plt.plot(time_history)
         plt.ylabel("Temps d'itération (s)")
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
-        plt.show()
+        plt.show()"""
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
@@ -114,9 +117,16 @@ def gopher(
             print(f"Tour \033[36m {tour}\033[0m.")
         if env.current_player.id == env.max_player.id:
             tour += 1
+            """
             current_action = strategy_1(
                 env, env.current_player
-            )
+            )"""
+            if tour == 1:
+                current_action = (0, env.hex_size - 1)
+                env.play(current_action)
+            else:
+                mcts = MCTS()
+                current_action = mcts.search(env, round_time=6)
             env.play(current_action)
         else:
             current_action = strategy_2(
@@ -144,13 +154,15 @@ def gopher(
         print(f"min {env.legals(env.min_player)}")
 
     total_time_end = time.time()  # Fin du chronomètre pour la durée totale de la partie
+    """
     if graphics:
+        
         print(f"Temps total écoulé: {total_time_end - total_time_start} secondes")
         plt.plot(time_history)
         plt.ylabel("Temps d'itération (s)")
         plt.xlabel("Itération")
         plt.title("Temps d'itération en fonction de l'itération")
-        plt.show()
+        plt.show()"""
 
     # Retourne un dictionnaire contenant les informations de la partie (benchmarking)
     return {
@@ -176,13 +188,13 @@ def initialize(
             player_selected: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
             return GameDodo(
                 grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS),
-                player_selected, hex_size, total_time, 0
+                player_selected, hex_size, total_time, 0, grid
             )
 
         player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
         player_opponent: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
         return GameDodo(
-            grid, player_selected, player_opponent, player_opponent, hex_size, total_time, 0
+            grid, player_selected, player_opponent, player_opponent, hex_size, total_time, 0, grid
         )
 
     # Initialisation de l'environnement du jeu Gopher
@@ -196,7 +208,8 @@ def initialize(
             player_param,
             hex_size,
             total_time,
-            0
+            0,
+            grid
         )
     player_param: PlayerLocal = PlayerLocal(2, ALL_DIRECTIONS)
     player_opponent: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
@@ -207,7 +220,8 @@ def initialize(
         player_opponent,
         hex_size,
         total_time,
-        0
+        0,
+        grid
     )
 
 
@@ -353,7 +367,7 @@ def main():
     Fonction principale de jeu Dodo
     """
 
-    launch_multi_game(10, "Gopher")
+    launch_multi_game(1, "Gopher")
 
 
 if __name__ == "__main__":

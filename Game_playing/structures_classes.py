@@ -67,6 +67,7 @@ class Environment(ABC):
     hex_size: int
     total_time: Time
     current_round: int
+    precedent_state: GridDict
 
     @abstractmethod
     def legals(self, player: PlayerLocal) -> list[Action]:
@@ -108,8 +109,11 @@ class GameDodo(Environment):
             self.current_player,
             self.hex_size,
             self.total_time,
-            self.current_round
+            self.current_round,
+            self.precedent_state
         )
+
+        self.precedent_state = self.grid.copy()
 
         self.max_positions = MaxPositionsCr(player=self.max_player, positions={})
         self.min_positions = MinPositionsCr(player=self.min_player, positions={})
@@ -255,9 +259,10 @@ class GameGopher(Environment):
             self.current_player,
             self.hex_size,
             self.total_time,
-            self.current_round
+            self.current_round,
+            self.precedent_state
         )
-
+        self.precedent_state = self.grid.copy()
         self.neighbor_dict = {}
         for cell in self.grid:
             neighbors = hexa.neighbor_gopher(cell[0], cell[1], ALL_DIRECTIONS)

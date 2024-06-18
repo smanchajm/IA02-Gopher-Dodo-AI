@@ -16,7 +16,7 @@ def reinit(env: Environment, time_left: Time, state: State, player: int):
     """
     env.total_time = time_left
     param_player = env.max_player if player == env.max_player.id else env.min_player
-
+    env.precedent_state = env.grid.copy()
     grid: GridDict = {}
     for cell in state:
         grid[cell[0]] = cell[1]
@@ -36,9 +36,30 @@ def reinit(env: Environment, time_left: Time, state: State, player: int):
 
     return env
 
+
+def copie_action(env: Environment) -> Action:
+    """
+    Copie de l'action
+    """
+    actions = []
+    print("Etat précédent ", env.precedent_state)
+    print("Etat actuel ", env.grid)
+    for cell in env.grid:
+        if env.precedent_state[cell] != env.grid[cell]:
+            actions.append(cell)
+    print("Action copiée ", actions)
+
+    action = (actions[0], actions[1])
+    res = ((env.hex_size - 1 - action[0][0], env.hex_size - 1 - action[0][1]),
+           (env.hex_size - 1 - action[1][0], env.hex_size - 1 - action[1][1]))
+
+    return res
+
+
 def initialize_for_network(
-    game: str, state: State, player: int, hex_size: int, total_time: Time
+        game: str, state: State, player: int, hex_size: int, total_time: Time
 ) -> Environment:
+    print("oui")
     """
     Initialize the game for a network game
     """
@@ -60,7 +81,7 @@ def initialize_for_network(
 
 
 def strategy_brain(
-    env: Environment, state: State, _: Player, time_left: Time
+        env: Environment, state: State, _: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The strategy of the player
@@ -80,9 +101,8 @@ def final_result(_: State, score: Score, player: Player):
     print(f"Ending: {player} wins with a score of {score}")
 
 
-
 def strategy_min_max_network(
-    env: Environment, state: State, player: Player, time_left: Time
+        env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The minmax strategy with alpha-beta pruning for a network game
@@ -94,7 +114,7 @@ def strategy_min_max_network(
 
 
 def strategy_first_legal_network(
-    env: Environment, _: State, player: Player, time_left: Time
+        env: Environment, _: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The first legal strategy for a network game
@@ -106,7 +126,7 @@ def strategy_first_legal_network(
 
 
 def strategy_random_network(
-    env: Environment, state: State, player: Player, time_left: Time
+        env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The random strategy for a network game
@@ -118,7 +138,7 @@ def strategy_random_network(
 
 
 def strategy_mcts_network(
-    env: Environment, state: State, player: Player, time_left: Time
+        env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The mcts strategy for a network game
@@ -130,19 +150,37 @@ def strategy_mcts_network(
 
 
 def strategy_dodo(
-    env: Environment, state: State, player: Player, time_left: Time
+        env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The mcts strategy for a network game
     """
     env = reinit(env, time_left, state, player)
 
-    """
     if env.max_player.id == 2 and env.current_round < 10:
-        action = ...  # Botte secrete
-    elif env.current_round < 10:
-        action = ...
-    else:"""
+        action = copie_action(env)
+    else:
+        mcts = MCTS()
+        action = mcts.search(env, round_time=6)
+        print("time left", env.total_time)
+
+    return env, action
+
+
+def strategy_gopher(
+        env: Environment, state: State, player: Player, time_left: Time
+) -> tuple[Environment, Action]:
+    """
+    The mcts strategy for a network game
+    """
+    print(1)
+    env = reinit(env, time_left, state, player)
+    print(2)
+    if env.max_player.id == 1 and env.current_round == 0 or env.current_round == 1:
+        print(3)
+
+        return env, (0, env.hex_size - 1)
+    print(4)
     mcts = MCTS()
     action = mcts.search(env, round_time=6)
     print("time left", env.total_time)
@@ -177,12 +215,12 @@ if __name__ == "__main__":
         available_games,
         initialize_for_network,
         strategy_dodo,
-        #strategy_mcts_network,
-        #strategy_min_max_network,
-        #strategy_random_network,
-        #strategy_brain,
-        #strategy_first_legal_network,
+        #strategy_gopher,
+        # strategy_mcts_network,
+        # strategy_min_max_network,
+        # strategy_random_network,
+        # strategy_brain,
+        # strategy_first_legal_network,
         final_result,
         gui=True
     )
-
