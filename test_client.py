@@ -10,6 +10,32 @@ from Game_playing.structures_classes import Action, Environment, Score, State, T
 from Serveur.gndclient import DODO_STR, GOPHER_STR, start, Player
 
 
+def reinit(env: Environment, time_left: Time, state: State, player: int):
+    """
+    MAJ des positions du temps et du joueur
+    """
+    env.total_time = time_left
+    param_player = env.max_player if player == env.max_player.id else env.min_player
+
+    grid: GridDict = {}
+    for cell in state:
+        grid[cell[0]] = cell[1]
+    env.grid = grid
+
+    env.max_positions.positions.clear()
+    env.min_positions.positions.clear()
+
+    for cell in env.grid:
+        if env.grid[cell] == env.max_player.id:
+            env.max_positions.positions[cell] = env.max_player.id
+        elif env.grid[cell] == env.min_player.id:
+            env.min_positions.positions[cell] = env.min_player.id
+    env.current_player = param_player
+    env.current_round += 1
+    print("Round ", env.current_round)
+
+    return env
+
 def initialize_for_network(
     game: str, state: State, player: int, hex_size: int, total_time: Time
 ) -> Environment:
@@ -54,29 +80,16 @@ def final_result(_: State, score: Score, player: Player):
     print(f"Ending: {player} wins with a score of {score}")
 
 
+
 def strategy_min_max_network(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
     The minmax strategy with alpha-beta pruning for a network game
     """
-    env.total_time = time_left
-    param_player = env.max_player if player == env.max_player.id else env.min_player
-    grid: GridDict = {}
-    for cell in state:
-        grid[cell[0]] = cell[1]
-    env.grid = grid
-    env.max_positions.positions.clear()
-    env.min_positions.positions.clear()
+    env = reinit(env, time_left, state, player)
 
-    for cell in env.grid:
-        if env.grid[cell] == env.max_player.id:
-            env.max_positions.positions[cell] = env.max_player.id
-        elif env.grid[cell] == env.min_player.id:
-            env.min_positions.positions[cell] = env.min_player.id
-    env.current_player = param_player
     action = strategy_minmax(env, env.max_player)
-
     return env, action
 
 
@@ -98,22 +111,8 @@ def strategy_random_network(
     """
     The random strategy for a network game
     """
-    env.total_time = time_left
-    param_player = env.max_player if player == env.max_player.id else env.min_player
-    grid: GridDict = {}
-    for cell in state:
-        grid[cell[0]] = cell[1]
-    env.grid = grid
-    env.max_positions.positions.clear()
-    env.min_positions.positions.clear()
 
-    for cell in env.grid:
-        if env.grid[cell] == env.max_player.id:
-            env.max_positions.positions[cell] = env.max_player.id
-        elif env.grid[cell] == env.min_player.id:
-            env.min_positions.positions[cell] = env.min_player.id
-    env.current_player = param_player
-
+    env = reinit(env, time_left, state, player)
     action = strategy_random(env, env.max_player)
     return env, action
 
@@ -124,23 +123,30 @@ def strategy_mcts_network(
     """
     The mcts strategy for a network game
     """
-    env.total_time = time_left
-    param_player = env.max_player if player == env.max_player.id else env.min_player
-    grid: GridDict = {}
-    for cell in state:
-        grid[cell[0]] = cell[1]
-    env.grid = grid
-    env.max_positions.positions.clear()
-    env.min_positions.positions.clear()
-
-    for cell in env.grid:
-        if env.grid[cell] == env.max_player.id:
-            env.max_positions.positions[cell] = env.max_player.id
-        elif env.grid[cell] == env.min_player.id:
-            env.min_positions.positions[cell] = env.min_player.id
-    env.current_player = param_player
+    env = reinit(env, time_left, state, player)
     mcts = MCTS()
-    action = mcts.search(env)
+    action = mcts.search(env, 300)
+    return env, action
+
+
+def strategy_dodo(
+    env: Environment, state: State, player: Player, time_left: Time
+) -> tuple[Environment, Action]:
+    """
+    The mcts strategy for a network game
+    """
+    env = reinit(env, time_left, state, player)
+
+    """
+    if env.max_player.id == 2 and env.current_round < 10:
+        action = ...  # Botte secrete
+    elif env.current_round < 10:
+        action = ...
+    else:"""
+    mcts = MCTS()
+    action = mcts.search(env, round_time=6)
+    print("time left", env.total_time)
+
     return env, action
 
 
@@ -174,9 +180,10 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
+        strategy_dodo,
         #strategy_mcts_network,
-        strategy_min_max_network,
-        # strategy_random_network,
+        #strategy_min_max_network,
+        #strategy_random_network,
         #strategy_brain,
         #strategy_first_legal_network,
         final_result,

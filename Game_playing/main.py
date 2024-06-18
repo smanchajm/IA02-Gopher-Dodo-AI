@@ -6,7 +6,7 @@ from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd
+import pandas as pd  # type: ignore
 
 from Game_playing.grid import GRID4, INIT_GRID4
 from Dodo.strategies_dodo import (
@@ -17,9 +17,9 @@ from Dodo.strategies_dodo import (
 
 import Game_playing.hexagonal_board as hexa
 from Game_playing.hexagonal_board import Grid
-from Game_playing.structures_classes import( ALL_DIRECTIONS, DOWN_DIRECTIONS,
-    UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict,
-        PlayerLocal, Time, convert_grid, new_gopher, print_dodo)
+from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
+                                             UP_DIRECTIONS, Action, GameDodo, GameGopher, GridDict,
+                                             PlayerLocal, Time, convert_grid, new_gopher, print_dodo)
 
 matplotlib.use("TkAgg")
 
@@ -108,7 +108,6 @@ def gopher(
 
     res = env.final()
 
-
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
@@ -183,7 +182,7 @@ def initialize(
         player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
         player_opponent: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
         return GameDodo(
-            grid, player_selected, player_opponent, player_opponent, hex_size, total_time
+            grid, player_selected, player_opponent, player_opponent, hex_size, total_time, 0
         )
 
     # Initialisation de l'environnement du jeu Gopher
@@ -197,6 +196,7 @@ def initialize(
             player_param,
             hex_size,
             total_time,
+            0
         )
     player_param: PlayerLocal = PlayerLocal(2, ALL_DIRECTIONS)
     player_opponent: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)

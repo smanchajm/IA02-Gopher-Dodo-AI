@@ -2,23 +2,21 @@
 
 import math
 import random
+import time
 
 from collections import deque
 
-from Game_playing.grid import INIT_GRID4
 from Game_playing.structures_classes import (
-    DOWN_DIRECTIONS,
-    UP_DIRECTIONS,
     Action,
     Environment,
-    GameDodo,
-    PlayerLocal,
-    convert_grid,
 )
 
 
 # tree node class definition
 class TreeNode:
+    """
+    Classe représentant un noeud de l'arbre de recherche
+    """
     # class constructor (create tree node class instance)
     def __init__(self, env: Environment, parent=None, p_action=None):
         # init associated board state
@@ -49,6 +47,9 @@ class TreeNode:
 
 # MCTS class definition
 class MCTS:
+    """
+    Classe représentant l'algorithme Monte Carlo Tree Search
+    """
     # search for the best move in the current position
     def __init__(self):
         self.root = None
@@ -177,7 +178,7 @@ class MCTS:
                 best_node = child
         return best_node
 
-    def search(self, initial_state: Environment):
+    def search(self, initial_state: Environment, nb_simulations=800, round_time= None):
         """
         Méthode de recherche qui permet de lancer l'algorithme MCTS pour n simulations
         select -> expand -> rollout -> backpropagate
@@ -187,22 +188,41 @@ class MCTS:
         node: TreeNode
         stack: deque[Action]
 
-        # walk through 1000 iterations
-        for _ in range(1600):
-            # select a node (selection phase)
-            node, stack = self.select(self.root)
+        start_time = time.time()
 
-            # score current node (simulation phase)
-            score = self.rollout(node.env)
+        if round_time is None:
+            for _ in range(nb_simulations):
+                # select a node (selection phase)
+                node, stack = self.select(self.root)
 
-            while len(stack) > 0:
-                self.root.env.reverse_action(stack.pop())
+                # score current node (simulation phase)
+                score = self.rollout(node.env)
 
-            # backpropagate results
-            self.backpropagate(node, score)
+                while len(stack) > 0:
+                    self.root.env.reverse_action(stack.pop())
 
-            self.reinit_pos(self.root.env)
+                # backpropagate results
+                self.backpropagate(node, score)
 
+                self.reinit_pos(self.root.env)
+        else:
+            i = 0
+            while (time.time() - start_time) < round_time:
+                i += 1
+                # select a node (selection phase)
+                node, stack = self.select(self.root)
+
+                # score current node (simulation phase)
+                score = self.rollout(node.env)
+
+                while len(stack) > 0:
+                    self.root.env.reverse_action(stack.pop())
+
+                # backpropagate results
+                self.backpropagate(node, score)
+
+                self.reinit_pos(self.root.env)
+            print(f"nombre de simulations: {i}")
         best = self.get_most_winning(self.root)
 
         """

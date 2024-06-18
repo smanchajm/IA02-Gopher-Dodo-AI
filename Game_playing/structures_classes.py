@@ -66,6 +66,7 @@ class Environment(ABC):
     current_player: PlayerLocal
     hex_size: int
     total_time: Time
+    current_round: int
 
     @abstractmethod
     def legals(self, player: PlayerLocal) -> list[Action]:
@@ -107,6 +108,7 @@ class GameDodo(Environment):
             self.current_player,
             self.hex_size,
             self.total_time,
+            self.current_round
         )
 
         self.max_positions = MaxPositionsCr(player=self.max_player, positions={})
@@ -253,6 +255,7 @@ class GameGopher(Environment):
             self.current_player,
             self.hex_size,
             self.total_time,
+            self.current_round
         )
 
         self.neighbor_dict = {}
