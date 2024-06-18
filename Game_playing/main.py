@@ -176,7 +176,7 @@ def initialize(
             player_selected: PlayerLocal = PlayerLocal(1, UP_DIRECTIONS)
             return GameDodo(
                 grid, player_selected, PlayerLocal(2, DOWN_DIRECTIONS),
-                player_selected, hex_size, total_time
+                player_selected, hex_size, total_time, 0
             )
 
         player_selected: PlayerLocal = PlayerLocal(2, DOWN_DIRECTIONS)
@@ -207,6 +207,7 @@ def initialize(
         player_opponent,
         hex_size,
         total_time,
+        0
     )
 
 
