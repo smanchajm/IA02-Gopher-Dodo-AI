@@ -68,7 +68,7 @@ def initialize_for_network(
     game: str, state: State, player: int, hex_size: int, total_time: Time
 ) -> Environment:
     """
-    Fonction d'initialisation de l'environnement de jeu pour une partie en réseau (Gopher ou Strategies)
+    Fonction d'initialisation de l'environnement de jeu pour une partie en réseau (Gopher ou Dodo)
     """
 
     print(
@@ -81,7 +81,7 @@ def initialize_for_network(
         grid[cell[0]] = cell[1]
 
     if game == "dodo":
-        game_param = "Strategies"
+        game_param = "Dodo"
     else:
         game_param = "Gopher"
 
@@ -167,7 +167,7 @@ def strategy_dodo(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
-    Stratégie complète pour le jeu Strategies
+    Stratégie complète pour le jeu Dodo
     """
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)

@@ -94,11 +94,11 @@ class Environment(ABC):
         """
 
 
-# DataClass Game Strategies
+# DataClass Game Dodo
 
 @dataclass
 class GameDodo(Environment):
-    """Classe représentant le jeu Strategies"""
+    """Classe représentant le jeu Dodo"""
 
     # Initialisation des positions des joueurs
     def __post_init__(self):
@@ -153,7 +153,7 @@ class GameDodo(Environment):
         return list(actions.keys())
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
-    def final(self) -> int:
+    def final(self, debug: bool = False) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
@@ -171,17 +171,6 @@ class GameDodo(Environment):
         # Mise à jour de la grille
         self.grid[action[1]] = self.current_player.id
         self.grid[action[0]] = 0
-
-        # Debug
-
-        # if (
-        #     action[0] not in self.max_positions.positions
-        #     and self.current_player.id == self.max_positions.player.id
-        # ):
-        #     print(f"action :{action}")
-        #     print(f" error action[0]:{action[0]}")
-        #     print(f" error action[1]:{action[1]}")
-        #     print(f" error pos:{self.max_positions.positions}")
 
         # Mise à jour des positions des joueurs
         if self.current_player.id == self.max_positions.player.id:
@@ -300,12 +289,11 @@ class GameGopher(Environment):
             else self.max_positions.positions
         )
 
-        oponnent_player = self.min_player if player == self.max_player else self.max_player
+        opponent_player = self.min_player if player == self.max_player else self.max_player
 
         for position in opponent_positions.keys():
             moves = []
             for neighbor in self.neighbor_dict[position]:
-                # print(f"neighbor: {neighbor}")
                 if self.grid[neighbor] == 0:
                     moves.append(neighbor)
 
@@ -315,7 +303,7 @@ class GameGopher(Environment):
                 for neighbor in self.neighbor_dict[move]:
                     if self.grid[neighbor] == player.id:
                         friendly += 1
-                    elif self.grid[neighbor] == oponnent_player.id:
+                    elif self.grid[neighbor] == opponent_player.id:
                         enemy += 1
                 if friendly == 0 and enemy == 1:
                     result.append(move)
@@ -395,7 +383,7 @@ def new_gopher(h: int) -> GridDict:
 
 def print_dodo(env: GameDodo, empty_grid: Grid):
     """
-    Fonction permettant d'afficher une grille de jeu Strategies
+    Fonction permettant d'afficher une grille de jeu Dodo
     """
     temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
     for position in env.max_positions.positions:
