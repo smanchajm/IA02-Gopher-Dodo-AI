@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 from Game_playing.benchmark import add_to_benchmark
 from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
 from Strategies.mcts import MCTS
-from Strategies.strategies import (StrategyLocal, strategy_minmax)
+from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
 
 import Game_playing.hexagonal_board as hexa
-from Game_playing.grid import GRID4, INIT_GRID4
+from Game_playing.grid import GRID2, GRID4, INIT_GRID4
 from Game_playing.hexagonal_board import Grid
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, GameDodo,
@@ -176,7 +176,7 @@ def gopher(
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
-            print_gopher(env, GRID4)
+            print_gopher(env, GRID2)
             print(
                 f"Temps écoulé pour cette itération: {time.time() - iteration_time_start}"
                 f" secondes"
@@ -379,7 +379,7 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", "mcts", strategy_minmax)
+    launch_multi_game(1, "Gopher", "mcts", strategy_random)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
