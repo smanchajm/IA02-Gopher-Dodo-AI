@@ -3,57 +3,52 @@
 import math
 import random
 import time
-
 from collections import deque
 
-from Game_playing.structures_classes import (
-    Action,
-    Environment,
-)
+from Game_playing.structures_classes import Action, Environment
 
 
 # tree node class definition
 class TreeNode:
     """
-    Classe représentant un noeud de l'arbre de recherche
+    Classe représentant un nœud de l'arbre de recherche
     """
-    # class constructor (create tree node class instance)
+
     def __init__(self, env: Environment, parent=None, p_action=None):
-        # init associated board state
+        # initialisation de l'environnement
         self.env = env
 
-        # init is node terminal flag
+        # initialisation de l'état terminal ou non
         if not self.env.legals(self.env.current_player):
-            # we have a terminal node
             self.is_terminal = True
-        # otherwise
         else:
-            # we have a non-terminal node
             self.is_terminal = False
 
-        # init is fully expanded flag
+        # initialisation du flag indiquant si le nœud est complètement développé
         self.is_fully_expanded = self.is_terminal
-        # init parent node if available
+        # initialisation du parent du nœud
         self.parent: TreeNode = parent
         self.parent_action: Action = p_action
-        # init the number of node visits
+        # initialisation du nombre de visites du nœud
         self.visits = 0
-        # init the total score of the node
+        # initialisation du score du nœud
         self.score = 0
-        # init current node's children
+        # initialisation des enfants du nœud
         self.children: list[TreeNode] = []
         self.unexplored_actions = self.env.legals(self.env.current_player)
 
 
-# MCTS class definition
 class MCTS:
     """
-    Classe représentant l'algorithme Monte Carlo Tree Search
+    Classe représentant l'algorithme Monte Carlo Tree Search (MCTS)
+
+    Ajouter les sources :
     """
-    # search for the best move in the current position
+
     def __init__(self):
         self.root = None
 
+    # reinitialisation des positions des joueurs
     def reinit_pos(self, env: Environment):
         """
         Méthode permettant de réinitialiser les positions des joueurs
@@ -67,18 +62,22 @@ class MCTS:
             elif env.grid[cell] == env.min_player.id:
                 env.min_positions.positions[cell] = env.min_player.id
 
-    # expand node
     def expand(self, node: TreeNode):
         """
-        Méthode d'expansion qui permet d'ajouter un enfant à un noeud
-        :param node:
-        :return:
+        Méthode d'expansion qui permet d'ajouter un enfant à un nœud donné
         """
         self.reinit_pos(node.env)
-        action: Action = node.unexplored_actions.pop()
-        node.env.play(action)
-        child = TreeNode(env=node.env, parent=node, p_action=action)
-        node.env.reverse_action(action)
+
+        action: Action = (
+            node.unexplored_actions.pop()
+        )  # on récupère une action enfant non explorée
+        node.env.play(action)  # on joue l'action
+        child = TreeNode(
+            env=node.env, parent=node, p_action=action
+        )  # on crée un nouveau nœud enfant
+        node.env.reverse_action(action)  # on annule l'action
+
+        # reinitialisation des positions des joueurs
         self.reinit_pos(child.env)
         self.reinit_pos(node.env)
 
@@ -87,16 +86,19 @@ class MCTS:
 
         return child
 
-    # simulate the game via making random moves until reach end of the game --> ça marche
     def rollout(self, param_env: Environment):
         """
-        Méthode de simulation qui permet de simuler une partie en faisant des coups aléatoires à partir du noeud actuel
+        Méthode de simulation qui permet de simuler une partie
+        en faisant des coups aléatoires à partir du nœud actuel
         """
-        # make random moves for both sides until terminal state of the game is reached
+
         i = 0
         self.reinit_pos(param_env)
 
+        # Création d'une pile pour stocker les actions effectuées
         stack: deque = deque()
+
+        # Tant que la partie n'est pas terminée on joue des coups aléatoires
         while param_env.legals(param_env.max_player) and param_env.legals(
             param_env.min_player
         ):
@@ -105,8 +107,11 @@ class MCTS:
             stack.append(action)
             param_env.play(action)
 
-        score: int = param_env.final()
+        score: int = (
+            param_env.final()
+        )  # on récupère le score final de la partie (-1, 1)
 
+        # on annule les actions effectuées pour revenir à l'état initial
         while len(stack) > 0:
             sel_action = stack.pop()
             param_env.reverse_action(sel_action)
@@ -115,8 +120,11 @@ class MCTS:
 
     def backpropagate(self, node: TreeNode, score: int):
         """
-        Méthode de backpropagation qui permet de remonter les visites et les scores jusqu'au noeud racine
+        Méthode de backpropagation
+        qui permet de remonter les visites et les scores jusqu'au nœud racine
         """
+
+        # on remonte les visites et les scores jusqu'au nœud racine
         while node is not None:
             # update node's visits
             node.visits += 1
@@ -129,7 +137,8 @@ class MCTS:
         """
         Méthode qui permet de sélectionner le meilleur enfant en fonction de la formule UCB1
         """
-        # define best score & best moves
+
+        # calcul des poids des enfants
         choices_weights = [
             (child.score / child.visits)
             + exploration_constant
@@ -137,104 +146,103 @@ class MCTS:
             for child in param_node.children
         ]
 
+        # retourner l'enfant avec le poids le plus élevé
         return param_node.children[choices_weights.index(max(choices_weights))]
 
-    # select most promising node
     def select(self, node: TreeNode):
         """
-        Méthode de sélection qui permet de sélectionner l'enfant le plus prometteur des enfants du noeud actuel
-        ou d'ajouter (expand) un enfant si le noeud actuel n'est pas terminal
+        Méthode de sélection
+        qui permet de sélectionner l'enfant le plus prometteur des enfants du nœud actuel
+        ou d'ajouter (expand) un enfant si le nœud actuel n'est pas terminal
         """
-        stack: deque[Action] = deque()
-        current_node: TreeNode = node
+
+        stack: deque[Action] = (
+            deque()
+        )  # on crée une pile pour stocker les actions effectuées
+        current_node: TreeNode = node  # on initialise le nœud actuel
         self.reinit_pos(current_node.env)
 
-        # make sure that we're dealing with non-terminal nodes
+        # Tant que le nœud actuel n'est pas terminal on sélectionne le meilleur enfant
         while not current_node.is_terminal:
 
+            # si le nœud actuel n'est pas complètement développé on ajoute un enfant
             if not len(current_node.unexplored_actions) == 0:
                 return self.expand(current_node), stack
-            else:
-                current_node = self.get_best_move(current_node, math.sqrt(2))
-                stack.append(current_node.parent_action)
-                node.env.play(current_node.parent_action)
 
-                self.reinit_pos(current_node.env)
+            # si le nœud actuel est complètement développé on sélectionne le meilleur enfant
+            current_node = self.get_best_move(current_node, math.sqrt(2))
+            stack.append(current_node.parent_action)
+            node.env.play(current_node.parent_action)
+
+            self.reinit_pos(current_node.env)
 
         return current_node, stack
 
     def get_most_winning(self, node: TreeNode):
         """
-        Méthode qui permet de retourner le noeud enfant avec le meilleur ratio de victoires
-        :param node:
-        :return:
+        Méthode qui permet de retourner le nœud enfant avec le meilleur ratio de victoires
         """
-        max_score = -80000.0
+
+        # initialisation des variables
+        max_score = -float("inf")
         best_node = None
+
+        # on parcourt les enfants du nœud actuel et on retourne le meilleur enfant
         for child in node.children:
             score = child.score / child.visits
             if score > max_score:
                 max_score = score
                 best_node = child
+
         return best_node
 
-    def search(self, initial_state: Environment, nb_simulations=800, round_time= None):
+    def search(self, initial_state: Environment, nb_simulations=800, round_time=None):
         """
-        Méthode de recherche qui permet de lancer l'algorithme MCTS pour n simulations
-        select -> expand -> rollout -> backpropagate
+        Méthode principale de l'algorithme MCTS qui permet de rechercher la meilleure action à jouer en fonction de
+        l'état initial select -> expand -> rollout -> backpropagate
         """
-        # create root node
-        self.root = TreeNode(initial_state, None)
-        node: TreeNode
-        stack: deque[Action]
 
+        self.root = TreeNode(initial_state, None)  # création du nœud racine
+        node: TreeNode
+        stack: deque[
+            Action
+        ]  # initialisation de la pile pour stocker les actions effectuées
         start_time = time.time()
 
+        # si le temps de simulation est None on effectue un nombre de simulations donné
         if round_time is None:
             for _ in range(nb_simulations):
-                # select a node (selection phase)
-                node, stack = self.select(self.root)
+                node, stack = self.select(self.root)  # selection d'un nœud (sélection)
 
-                # score current node (simulation phase)
-                score = self.rollout(node.env)
+                score = self.rollout(node.env)  # simulation d'une partie (simulation)
 
+                # on annule les actions effectuées pour revenir à l'état initial
                 while len(stack) > 0:
                     self.root.env.reverse_action(stack.pop())
 
-                # backpropagate results
-                self.backpropagate(node, score)
+                self.backpropagate(node, score)  # backpropagation des résultats
 
                 self.reinit_pos(self.root.env)
+
+        # si le temps de simulation est donné on effectue des simulations jusqu'à ce que le temps soit écoulé
         else:
             i = 0
             while (time.time() - start_time) < round_time:
                 i += 1
-                # select a node (selection phase)
-                node, stack = self.select(self.root)
+
+                node, stack = self.select(self.root)  # Séléction d'un nœud (sélection)
 
                 # score current node (simulation phase)
-                score = self.rollout(node.env)
+                score = self.rollout(node.env)  # Simulation d'une partie (simulation)
 
+                # On annule les actions effectuées pour revenir à l'état initial
                 while len(stack) > 0:
                     self.root.env.reverse_action(stack.pop())
 
-                # backpropagate results
-                self.backpropagate(node, score)
+                self.backpropagate(node, score)  # Backpropagation des résultats
 
                 self.reinit_pos(self.root.env)
             print(f"nombre de simulations: {i}")
-        best = self.get_most_winning(self.root)
 
-        """
-        print(f"root {self.root.visits}")
-        for child in self.root.children:
-            print(f"action: {child.parent_action}")
-            print(f"child: {child.visits}")
-            print(f"score: {child.score}\n")
-            print(f"uct: {(child.score / child.visits) + math.sqrt(2) * \
-                math.sqrt((math.log(self.root.visits) / child.visits))}\n")
-
-        print(f"len children: {len(self.root.children)}")
-        print(f"len leg root: {len(self.root.env.legals(self.root.env.current_player))}")
-        """
-        return best.parent_action
+        # On retourne le nœud enfant avec le meilleur ratio de victoires
+        return self.get_most_winning(self.root).parent_action
