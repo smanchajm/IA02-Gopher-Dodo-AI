@@ -149,13 +149,17 @@ def strategy_mcts_network(
     return env, action
 
 
+ouverture = [((), ())]
+
 def strategy_dodo(
         env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
-    The mcts strategy for a network game
+    Strategy for the Dodo game
     """
     env = reinit(env, time_left, state, player)
+
+    play_time = time_left / (30 + max(60 - env.current_round, 0))
 
     if env.max_player.id == 2 and env.current_round < 10:
         action = copie_action(env)
@@ -171,18 +175,17 @@ def strategy_gopher(
         env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
-    The mcts strategy for a network game
+    Strategy for the Gopher game
     """
-    print(1)
     env = reinit(env, time_left, state, player)
-    print(2)
     if env.max_player.id == 1 and env.current_round == 0 or env.current_round == 1:
-        print(3)
-
+        print("ouverture")
         return env, (0, env.hex_size - 1)
-    print(4)
-    mcts = MCTS()
-    action = mcts.search(env, round_time=6)
+    if time_left < 5:
+        print("strategy_first_legal")
+        return env, strategy_first_legal(env, env.max_player)
+    print("strategy_minmax")
+    action = strategy_minmax(env, env.max_player)
     print("time left", env.total_time)
 
     return env, action

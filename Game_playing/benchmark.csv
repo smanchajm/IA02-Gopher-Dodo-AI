@@ -1,0 +1,4 @@
+strategy_1,strategy_2,Grid,game_number,win_rate,average_turns,min_turns,max_turns,average_iteration_time,average_iteration_time_max,average_iteration_time_min,average_total_time,average_turns_win,average_turns_loss
+alpha-beta,mcts,4,1,1.0,3.0,3,3,15.000420808792114,2.6686474482218423,15.000420808792114,38.006783962249756,3.0,0
+strategy_1,strategy_2,Grid,game_number,win_rate,average_turns,min_turns,max_turns,average_iteration_time,average_iteration_time_max,average_iteration_time_min,average_total_time,average_turns_win,average_turns_loss
+mcts,alpha-beta,7,50,0.62,29.54,19,34,12.778717167669358,12.559620191295288,12.778717098758698,737.9694215011597,28.225806451612904,31.68421052631579
