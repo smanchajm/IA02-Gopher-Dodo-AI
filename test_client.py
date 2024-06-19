@@ -195,12 +195,11 @@ def strategy_gopher(
     env = reinit(env, time_left, state, player)
 
     # Ouverture déterministe dans un coin
-    if env.max_player.id == 1 and env.current_round == 0 or env.current_round == 1:
+    if env.max_player.id == 1 and (env.current_round == 0 or env.current_round == 1):
         return env, (0, env.hex_size - 1)
 
     # Stratégie de survie si le temps restant est inférieur à 5 secondes
     if time_left < 5:
-        print("strategy_first_legal")
         return env, strategy_first_legal(env, env.max_player)
 
     # Appel de l'algorithme alpha-beta
@@ -208,6 +207,18 @@ def strategy_gopher(
     print("time left", env.total_time)
 
     return env, action
+
+
+def main_strategy(
+    env: Environment, state: State, player: Player, time_left: Time
+) -> tuple[Environment, Action]:
+
+    if env.game == "Dodo":
+        print("strategy_dodo")
+        return strategy_dodo(env, state, player, time_left)
+
+    print("strategy_gopher")
+    return strategy_gopher(env, state, player, time_left)
 
 
 if __name__ == "__main__":
@@ -236,11 +247,12 @@ if __name__ == "__main__":
         args.password,
         available_games,
         initialize_for_network,
-        strategy_dodo,
+        main_strategy,
+        #strategy_dodo,
         # strategy_gopher,
         # strategy_mcts_network,
         # strategy_min_max_network,
-        # strategy_random_network,
+        #strategy_random_network,
         # strategy_brain,
         # strategy_first_legal_network,
         final_result,

@@ -68,6 +68,7 @@ class Environment(ABC):
     total_time: Time
     current_round: int
     precedent_state: GridDict
+    game: str
 
     @abstractmethod
     def legals(self, player: PlayerLocal) -> list[Action]:
@@ -110,7 +111,8 @@ class GameDodo(Environment):
             self.hex_size,
             self.total_time,
             self.current_round,
-            self.precedent_state
+            self.precedent_state,
+            self.game
         )
 
         self.precedent_state = self.grid.copy()
@@ -249,7 +251,8 @@ class GameGopher(Environment):
             self.hex_size,
             self.total_time,
             self.current_round,
-            self.precedent_state
+            self.precedent_state,
+            self.game
         )
         self.precedent_state = self.grid.copy()
         self.neighbor_dict = {}
@@ -291,22 +294,25 @@ class GameGopher(Environment):
 
         opponent_player = self.min_player if player == self.max_player else self.max_player
 
-        for position in opponent_positions.keys():
-            moves = []
-            for neighbor in self.neighbor_dict[position]:
-                if self.grid[neighbor] == 0:
-                    moves.append(neighbor)
+        for position in opponent_positions:
+            # Trouver toutes les actions possibles pour une position donnée
+            possible_actions = [neighbor for neighbor in self.neighbor_dict[position] if self.grid[neighbor] == 0]
 
-            for move in moves:
-                enemy: int = 0
-                friendly: int = 0
-                for neighbor in self.neighbor_dict[move]:
+            for action in possible_actions:
+                # Initialiser les compteurs de connexions
+                enemy_connection = 0
+                friendly_connection = 0
+
+                # Compter les connexions amies et ennemies
+                for neighbor in self.neighbor_dict[action]:
                     if self.grid[neighbor] == player.id:
-                        friendly += 1
+                        friendly_connection += 1
                     elif self.grid[neighbor] == opponent_player.id:
-                        enemy += 1
-                if friendly == 0 and enemy == 1:
-                    result.append(move)
+                        enemy_connection += 1
+
+                # Ajouter l'action au résultat si les conditions sont remplies
+                if friendly_connection == 0 and enemy_connection == 1:
+                    result.append(action)
 
         return result
 

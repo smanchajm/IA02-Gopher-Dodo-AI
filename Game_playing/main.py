@@ -149,22 +149,16 @@ def gopher(
             if tour == 1 and env.current_player == env.max_player:
                 current_action = (0, env.hex_size - 1)
             else:
-                if strategy_1 == strategy_minmax:
-                    current_action = strategy_1(env, env.current_player)
-                else:
-                    mcts = MCTS()
-                    current_action = mcts.search(env, round_time=13)
+                current_action = strategy_1(env, env.current_player)
+
             time_history_max.append(
                 time.time() - iteration_time_start
             )  # Stockage du temps d'itération
 
         # Lancement de la stratégie 2
         else:
-            if strategy_2 == strategy_minmax:
-                current_action = strategy_2(env, env.current_player)
-            else:
-                mcts = MCTS()
-                current_action = mcts.search(env, round_time=13)
+            current_action = strategy_2(env, env.current_player)
+
             time_history_min.append(time.time() - iteration_time_start)
 
         # Jouer l'action courante
@@ -172,6 +166,8 @@ def gopher(
 
         if env.current_player == env.max_player:
             time_history.append(time.time() - iteration_time_start)
+
+        res = env.final()
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
@@ -228,6 +224,7 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
                 total_time,
                 0,
                 grid,
+                "Dodo"
             )
 
         # Initialisation de l'environnement du jeu Dodo si nous jouons en second
@@ -244,6 +241,7 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
             total_time,
             0,
             grid,
+            "Dodo"
         )
 
     # Initialisation de l'environnement du jeu Gopher
@@ -262,6 +260,7 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
             total_time,
             0,
             grid,
+            "Gopher"
         )
 
     # Initialisation de l'environnement du jeu Gopher si nous jouons en second
@@ -277,6 +276,7 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
         total_time,
         0,
         grid,
+        "Gopher"
     )
 
 
@@ -318,7 +318,7 @@ def launch_multi_game(
         graphics = False
 
     list_results = []  # Liste pour stocker les résultats des parties
-    size_init_grid = 4  # Taille de la grille de jeu
+    size_init_grid = 7  # Taille de la grille de jeu
 
     if name == "Dodo":
         # Lancement de n parties de jeu Dodo
@@ -365,7 +365,7 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", strategy_minmax, strategy_random)
+    launch_multi_game(1, "Gopher", strategy_random, strategy_random)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")

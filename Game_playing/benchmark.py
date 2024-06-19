@@ -21,7 +21,7 @@ def append_to_csv(dataframe: pd.DataFrame, filename: str):
         if not file_exists:
             dataframe.to_csv(f, header=True, index=False)
         else:
-            dataframe.to_csv(f, header=True, index=False)
+            dataframe.to_csv(f, header=False, index=False)
 
 
 def add_to_benchmark(

@@ -196,6 +196,13 @@ class MCTS:
 
         return best_node
 
+    def stop(self, n, time_left, time_spent, visits_best, visits_second_best):
+        """
+        Implémentation de la stratégie STOP pour déterminer si la recherche peut s'arrêter
+        """
+
+        return (n * (time_left / time_spent) * 1.2) < (visits_best - visits_second_best)
+
     def search(self, initial_state: Environment, nb_simulations=800, round_time=None):
         """
         Méthode principale de l'algorithme MCTS qui permet de rechercher la meilleure action à jouer en fonction de
@@ -208,10 +215,12 @@ class MCTS:
             Action
         ]  # initialisation de la pile pour stocker les actions effectuées
         start_time = time.time()
+        n: int = 0
 
         # si le temps de simulation est None on effectue un nombre de simulations donné
         if round_time is None:
             for _ in range(nb_simulations):
+                n += 1
                 node, stack = self.select(self.root)  # selection d'un nœud (sélection)
 
                 score = self.rollout(node.env)  # simulation d'une partie (simulation)
@@ -226,9 +235,8 @@ class MCTS:
 
         # si le temps de simulation est donné on effectue des simulations jusqu'à ce que le temps soit écoulé
         else:
-            i = 0
             while (time.time() - start_time) < round_time:
-                i += 1
+                n += 1
 
                 node, stack = self.select(self.root)  # Séléction d'un nœud (sélection)
 
@@ -242,7 +250,24 @@ class MCTS:
                 self.backpropagate(node, score)  # Backpropagation des résultats
 
                 self.reinit_pos(self.root.env)
-            print(f"nombre de simulations: {i}")
+
+                # Mise à jour des variables pour la stratégie STOP
+                visits_best = max(self.root.children, key=lambda child: child.visits).visits
+                visits_second_best = max(
+                    [child for child in self.root.children if child.visits != visits_best],
+                    key=lambda child: child.visits,
+                    default=self.root
+                ).visits
+
+                # On vérifie si on peut arrêter la recherche STOP
+                time_spent = time.time() - start_time
+                time_left = round_time - time_spent if round_time else 0
+                if time_spent > 0 and self.stop(n, time_left, time_spent, visits_best, visits_second_best):
+                    print("\nSTOP\n")
+                    print(f"temps économisé: {time_left}")
+                    break
+
+            print(f"nombre de simulations: {n}")
 
         # On retourne le nœud enfant avec le meilleur ratio de victoires
         return self.get_most_winning(self.root).parent_action
