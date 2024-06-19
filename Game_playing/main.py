@@ -6,6 +6,7 @@ from typing import Any, List
 import matplotlib
 import matplotlib.pyplot as plt
 from Game_playing.benchmark import add_to_benchmark
+from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
 from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
 
@@ -199,6 +200,19 @@ def gopher(
     }
 
 
+def print_grid_state(state: State, hex_size: int) -> str:
+    grid = empty_grid(hex_size)
+    for cell, player in state:
+        x, y = cell_to_grid(cell, hex_size)
+        if player == RED:
+            grid[x][y] = "R"
+        elif player == BLUE:
+            grid[x][y] = "B"
+        else:
+            grid[x][y] = " "
+    return "\n".join("".join(c for c in line) for line in grid)
+
+
 # Initialisation de l'environnement
 def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time: Time):
     """
@@ -280,8 +294,6 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
     )
 
 
-
-
 def print_gopher(env: GameGopher, empty_grid: Grid):
     """
     Fonction permettant d'afficher une grille de jeu Gopher
@@ -321,6 +333,7 @@ def launch_multi_game(
     size_init_grid = 7  # Taille de la grille de jeu
 
     if name == "Dodo":
+        print("Lancement de Dodo")
         # Lancement de n parties de jeu Dodo
         for i in range(game_number):
             init_grid = convert_grid(INIT_GRID4, size_init_grid)
@@ -337,6 +350,7 @@ def launch_multi_game(
 
     # Lancement de n parties de jeu Gopher
     else:
+        print("Lancement de Gopher")
         init_grid = new_gopher(size_init_grid)
         for i in range(game_number):
             game = initialize("Gopher", init_grid, 1, size_init_grid, 720)
@@ -365,7 +379,7 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", strategy_random, strategy_random)
+    launch_multi_game(1, "Gopher", "mcts", strategy_random)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
