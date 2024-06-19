@@ -43,7 +43,7 @@ GRID4 = (
 )
 
 
-# Exemple de grille initiale de taille 7 pour Dodo
+# Exemple de grille initiale de taille 7 pour Strategies
 INIT_GRID = (
     (-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1),
     (-1, -1, -1, -1, -1, 0, 1, 1, 1, 1, 1, 1, 1),

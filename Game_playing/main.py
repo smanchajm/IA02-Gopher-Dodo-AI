@@ -1,4 +1,4 @@
-""" Module concernant l'environnement du jeu Gopher-Dodo """
+""" Module concernant l'environnement du jeu Gopher-Strategies """
 
 import os
 import time
@@ -7,9 +7,9 @@ from typing import Any, List
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd  # type: ignore
-from Dodo.mcts import MCTS
-from Dodo.strategies_dodo import (StrategyLocal, strategy_minmax,
-                                  strategy_random)
+from Strategies.mcts import MCTS
+from Strategies.strategies import (StrategyLocal, strategy_minmax,
+                                   strategy_random)
 
 import Game_playing.hexagonal_board as hexa
 from Game_playing.grid import GRID2, GRID4, INIT_GRID4
@@ -37,7 +37,7 @@ def view_graphic(
     plt.show()
 
 
-# Boucle de jeu Dodo
+# Boucle de jeu Strategies
 def dodo(
     env: GameDodo,
     strategy_1: StrategyLocal,
@@ -46,7 +46,7 @@ def dodo(
     graphics: bool = False,
 ):
     """
-    Fonction représentant la boucle de jeu de Dodo
+    Fonction représentant la boucle de jeu de Strategies
     """
 
     # Initialisation du stockage de données pour le benchmark
@@ -216,13 +216,13 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
     player_selected: PlayerLocal
     player_opponent: PlayerLocal
 
-    # Initialisation de l'environnement du jeu Dodo
-    if game == "Dodo":
-        # Initialisation de l'environnement du jeu Dodo si nous jouons en premier
+    # Initialisation de l'environnement du jeu Strategies
+    if game == "Strategies":
+        # Initialisation de l'environnement du jeu Strategies si nous jouons en premier
         if player == 1:
             player_selected = PlayerLocal(1, UP_DIRECTIONS)
             player_opponent = PlayerLocal(2, DOWN_DIRECTIONS)
-            # Retourne l'environnement du jeu Dodo initialisé
+            # Retourne l'environnement du jeu Strategies initialisé
             return GameDodo(
                 grid,
                 player_selected,
@@ -234,11 +234,11 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
                 grid,
             )
 
-        # Initialisation de l'environnement du jeu Dodo si nous jouons en second
+        # Initialisation de l'environnement du jeu Strategies si nous jouons en second
         player_selected = PlayerLocal(2, DOWN_DIRECTIONS)
         player_opponent = PlayerLocal(1, UP_DIRECTIONS)
 
-        # Retourne l'environnement du jeu Dodo initialisé
+        # Retourne l'environnement du jeu Strategies initialisé
         return GameDodo(
             grid,
             player_selected,
@@ -389,7 +389,7 @@ def print_gopher(env: GameGopher, empty_grid: Grid):
 
 def launch_multi_game(
     game_number: int = 1,
-    name: str = "Dodo",
+    name: str = "Strategies",
     strategy_1: Any = strategy_minmax,
     strategy_2: Any = strategy_minmax,
 ):
@@ -400,11 +400,11 @@ def launch_multi_game(
 
     list_results = []  # Liste pour stocker les résultats des parties
     size_init_grid = 7  # Taille de la grille de jeu
-    if name == "Dodo":
-        # Lancement de n parties de jeu Dodo
+    if name == "Strategies":
+        # Lancement de n parties de jeu Strategies
         for i in range(game_number):
             init_grid = convert_grid(INIT_GRID4, size_init_grid)
-            game = initialize("Dodo", init_grid, 1, size_init_grid, 5)
+            game = initialize("Strategies", init_grid, 1, size_init_grid, 5)
             res = dodo(
                 game,
                 strategy_1,
@@ -443,7 +443,7 @@ def launch_multi_game(
     )
 
 
-# Fonction principale de jeu Dodo
+# Fonction principale de jeu Strategies
 def main():
 
     # mcts first player alpha-beta second player

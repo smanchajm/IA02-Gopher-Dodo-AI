@@ -3,13 +3,13 @@
 import argparse
 import ast
 
-from Dodo.mcts import MCTS
-from Dodo.strategies_dodo import (strategy_first_legal, strategy_minmax,
-                                  strategy_random)
+from Strategies.mcts import MCTS
+from Strategies.strategies import (strategy_first_legal, strategy_minmax,
+                                   strategy_random)
 from Game_playing.main import initialize
 from Game_playing.structures_classes import (Action, Environment, GridDict,
                                              Score, State, Time)
-from Serveur.gndclient import DODO_STR, GOPHER_STR, Player, start
+from Server.gndclient import DODO_STR, GOPHER_STR, Player, start
 
 
 def reinit(env: Environment, time_left: Time, state: State, player: int):
@@ -68,7 +68,7 @@ def initialize_for_network(
     game: str, state: State, player: int, hex_size: int, total_time: Time
 ) -> Environment:
     """
-    Fonction d'initialisation de l'environnement de jeu pour une partie en réseau (Gopher ou Dodo)
+    Fonction d'initialisation de l'environnement de jeu pour une partie en réseau (Gopher ou Strategies)
     """
 
     print(
@@ -81,7 +81,7 @@ def initialize_for_network(
         grid[cell[0]] = cell[1]
 
     if game == "dodo":
-        game_param = "Dodo"
+        game_param = "Strategies"
     else:
         game_param = "Gopher"
 
@@ -167,7 +167,7 @@ def strategy_dodo(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
     """
-    Stratégie complète pour le jeu Dodo
+    Stratégie complète pour le jeu Strategies
     """
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)

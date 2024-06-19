@@ -3,7 +3,6 @@
 from typing import List, Tuple
 
 Grid = tuple[tuple[int, ...], ...]  # Array de Array en diagonal
-# Grid = tuple[tuple[int]]  # Array de Array en diagonal
 Directions = list[tuple[int, int]]  # Liste de directions
 
 

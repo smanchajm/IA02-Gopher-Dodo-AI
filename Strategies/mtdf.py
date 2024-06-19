@@ -8,7 +8,7 @@ from Game_playing.structures_classes import (
     Environment, convert_grid, PlayerLocal, ALL_DIRECTIONS, GameGopher, new_gopher, GridDict,
 )
 
-from Dodo.strategies_dodo import evaluate_dynamic, strategy_minmax
+from Strategies.strategies import evaluate_dynamic, strategy_minmax
 
 
 class NegaScoutEngine:

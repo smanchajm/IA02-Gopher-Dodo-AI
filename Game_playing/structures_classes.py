@@ -94,11 +94,11 @@ class Environment(ABC):
         """
 
 
-# DataClass Game Dodo
+# DataClass Game Strategies
 
 @dataclass
 class GameDodo(Environment):
-    """Classe représentant le jeu Dodo"""
+    """Classe représentant le jeu Strategies"""
 
     # Initialisation des positions des joueurs
     def __post_init__(self):
@@ -395,7 +395,7 @@ def new_gopher(h: int) -> GridDict:
 
 def print_dodo(env: GameDodo, empty_grid: Grid):
     """
-    Fonction permettant d'afficher une grille de jeu Dodo
+    Fonction permettant d'afficher une grille de jeu Strategies
     """
     temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
     for position in env.max_positions.positions:
