@@ -1,15 +1,13 @@
 """ Module concernant l'environnement du jeu Gopher-Strategies """
 
-import os
 import time
 from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd  # type: ignore
+from Game_playing.benchmark import add_to_benchmark
 from Strategies.mcts import MCTS
-from Strategies.strategies import (StrategyLocal, strategy_minmax,
-                                   strategy_random)
+from Strategies.strategies import (StrategyLocal, strategy_minmax)
 
 import Game_playing.hexagonal_board as hexa
 from Game_playing.grid import GRID2, GRID4, INIT_GRID4
@@ -37,7 +35,6 @@ def view_graphic(
     plt.show()
 
 
-# Boucle de jeu Strategies
 def dodo(
     env: GameDodo,
     strategy_1: StrategyLocal,
@@ -155,13 +152,12 @@ def gopher(
                 if strategy_1 == strategy_minmax:
                     current_action = strategy_1(env, env.current_player)
                 else:
-                    print("MCTS")
-                    print(f"current player: {env.current_player.id}")
                     mcts = MCTS()
                     current_action = mcts.search(env, round_time=13)
             time_history_max.append(
                 time.time() - iteration_time_start
             )  # Stockage du temps d'itération
+
         # Lancement de la stratégie 2
         else:
             if strategy_2 == strategy_minmax:
@@ -172,7 +168,7 @@ def gopher(
             time_history_min.append(time.time() - iteration_time_start)
 
         # Jouer l'action courante
-        env.play(current_action)  # type: ignore
+        env.play(current_action)
 
         if env.current_player == env.max_player:
             time_history.append(time.time() - iteration_time_start)
@@ -284,88 +280,6 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
     )
 
 
-def append_to_csv(dataframe: pd.DataFrame, filename: str):
-    """
-    Fonction permettant d'ajouter une ligne à un fichier CSV
-    """
-    parent_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    path_file = os.path.join(parent_dir, "../Benchmarks", filename)
-
-    # Vérifier si le fichier existe
-    file_exists = os.path.isfile(path_file)
-
-    # Créer le dossier Benchmarks s'il n'existe pas déjà
-    os.makedirs(os.path.dirname(path_file), exist_ok=True)
-
-    # Écrire dans le fichier
-    with open("benchmark.csv", "a", newline="", encoding="utf-8") as f:
-        if not file_exists:
-            dataframe.to_csv(f, header=True, index=False)
-        else:
-            dataframe.to_csv(f, header=True, index=False)
-
-
-def add_to_benchmark(
-    list_results,
-    filename: str,
-    game_number: int,
-    strategy_1: str,
-    strategy_2: str,
-    grid: int,
-):
-    """
-    Fonction permettant d'ajouter les statistiques d'une partie à un fichier CSV
-    """
-
-    # Calcul des statistiques
-    win_number = sum(res["winner"] == 1 for res in list_results)
-    loss_number = game_number - win_number
-    new_benchmark = {
-        "strategy_1": strategy_1,
-        "strategy_2": strategy_2,
-        "Grid": grid,
-        "game_number": game_number,
-        "win_rate": sum(res["winner"] == 1 for res in list_results) / game_number,
-        "average_turns": sum(res["total_turns"] for res in list_results) / game_number,
-        "min_turns": min(res["total_turns"] for res in list_results),
-        "max_turns": max(res["total_turns"] for res in list_results),
-        "average_iteration_time": sum(
-            res["average_iteration_time"] for res in list_results
-        )
-        / game_number,
-        "average_iteration_time_max": sum(
-            res["average_iteration_time_max"] for res in list_results
-        )
-        / game_number,
-        "average_iteration_time_min": sum(
-            res["average_iteration_time_min"] for res in list_results
-        )
-        / game_number,
-        "average_total_time": sum(res["total_time"] for res in list_results)
-        / game_number,
-        "average_turns_win": (
-            (
-                sum(res["total_turns"] for res in list_results if res["winner"] == 1)
-                / win_number
-            )
-            if win_number > 0
-            else 0
-        ),
-        "average_turns_loss": (
-            (
-                sum(res["total_turns"] for res in list_results if res["winner"] == -1)
-                / loss_number
-            )
-            if loss_number > 0
-            else 0
-        ),
-    }
-
-    # Création d'un DataFrame avec une seule ligne
-    df_results = pd.DataFrame([new_benchmark])
-    print(f"Résultats : {df_results}")
-    # Ajout des statistiques à un fichier CSV
-    append_to_csv(df_results, f"{filename}.csv")
 
 
 def print_gopher(env: GameGopher, empty_grid: Grid):
@@ -396,21 +310,27 @@ def launch_multi_game(
     """
     Fonction permettant de lancer plusieurs parties de jeu à la suite
     """
-    debug = True
+    if game_number <= 1:
+        debug = True
+        graphics = True
+    else:
+        debug = False
+        graphics = False
 
     list_results = []  # Liste pour stocker les résultats des parties
-    size_init_grid = 7  # Taille de la grille de jeu
+    size_init_grid = 4  # Taille de la grille de jeu
+
     if name == "Strategies":
         # Lancement de n parties de jeu Strategies
         for i in range(game_number):
             init_grid = convert_grid(INIT_GRID4, size_init_grid)
-            game = initialize("Strategies", init_grid, 1, size_init_grid, 5)
+            game = initialize("Strategies", init_grid, 1, size_init_grid, 720)
             res = dodo(
                 game,
                 strategy_1,
                 strategy_2,
                 debug=debug,
-                graphics=False,
+                graphics=graphics,
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
@@ -419,15 +339,13 @@ def launch_multi_game(
     else:
         init_grid = new_gopher(size_init_grid)
         for i in range(game_number):
-            game = initialize("Gopher", init_grid, 1, size_init_grid, 500)
-            print(f"max player: {game.max_player.id}")
-
+            game = initialize("Gopher", init_grid, 1, size_init_grid, 720)
             res = gopher(
                 game,
                 strategy_1,
                 strategy_2,
-                debug=False,
-                graphics=False,
+                debug=debug,
+                graphics=graphics,
             )
             list_results.append(res)
             print(f"Partie {i + 1}: {res}")
@@ -437,8 +355,8 @@ def launch_multi_game(
         list_results,
         "benchmark",
         game_number,
-        "alpha-beta",
-        "mcts",
+        str(strategy_1),
+        str(strategy_2),
         size_init_grid,
     )
 
@@ -447,9 +365,10 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(50, "Gopher", "mcts", strategy_minmax)
+    launch_multi_game(1, "Gopher", "mcts", strategy_minmax)
+    
     # alpha-beta first player mcts second player
-    launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
+    # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
 
 
 if __name__ == "__main__":

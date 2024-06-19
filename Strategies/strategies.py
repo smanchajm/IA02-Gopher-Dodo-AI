@@ -207,6 +207,17 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
         bonus = 1.5
 
     depth = 6 + round(depth_factor * bonus)
-    # depth = min(6 + round(depth_factor), 15)
+    # try:
+    #     depth_factor = 1 / (log(len(env.legals(player)), 2) / 5) * 1.2
+    # except ZeroDivisionError:
+    #     depth_factor = 1
+    # depth_factor = depth_factor.real  # convert depth factor to a float
+
+    # bonus = 1.0
+
+    # if env.hex_size <= 4:
+    #     bonus = 1.5
+
+    # depth = 6 + round(depth_factor * bonus)
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]
