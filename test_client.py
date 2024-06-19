@@ -59,11 +59,9 @@ def copie_action(env: Environment) -> Action:
 def initialize_for_network(
         game: str, state: State, player: int, hex_size: int, total_time: Time
 ) -> Environment:
-    print("oui")
     """
     Initialize the game for a network game
     """
-    print("Init")
     print(
         f"{game} playing {player} on a grid of size {hex_size}. Time remaining: {total_time}"
     )
@@ -160,13 +158,19 @@ def strategy_dodo(
     env = reinit(env, time_left, state, player)
 
     play_time = time_left / (30 + max(60 - env.current_round, 0))
+    print("play_time", play_time)
+    print(f"time left {time_left}")
 
+    """
     if env.max_player.id == 2 and env.current_round < 10:
         action = copie_action(env)
     else:
         mcts = MCTS()
         action = mcts.search(env, round_time=6)
         print("time left", env.total_time)
+    """
+    mcts = MCTS()
+    action = mcts.search(env, round_time=play_time)
 
     return env, action
 
