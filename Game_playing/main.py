@@ -1,18 +1,17 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
+import argparse
 import time
 from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
-from Game_playing.benchmark import add_to_benchmark
 from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
 from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
-
+from Game_playing.benchmark import add_to_benchmark
 import Game_playing.hexagonal_board as hexa
-from Game_playing.grid import GRID2, GRID4, INIT_GRID4, INIT_GRID
-from Game_playing.hexagonal_board import Grid
+from Game_playing.grid import INIT_GRID, INIT_GRID4
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, GameDodo,
                                              GameGopher, GridDict, PlayerLocal,
@@ -59,6 +58,7 @@ def dodo(
 
     # Boucle de jeu tant que la partie n'est pas dans un état final
     res = env.final()
+
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
@@ -82,7 +82,7 @@ def dodo(
         )  # Fin du chronomètre pour la durée de cette itération
 
         if debug:
-            print_dodo(env, GRID4)
+            print_dodo(env, INIT_GRID)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -150,7 +150,10 @@ def gopher(
             if tour == 1 and env.current_player == env.max_player:
                 current_action = (0, env.hex_size - 1)
             else:
-                current_action = strategy_1(env, env.current_player)
+                # current_action = strategy_1(env, env.current_player)
+                mcts = MCTS()
+
+                current_action = mcts.search(env)
 
             time_history_max.append(
                 time.time() - iteration_time_start
@@ -172,7 +175,7 @@ def gopher(
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
-            print_gopher(env, GRID4)
+            print_gopher(env)
             print(
                 f"Temps écoulé pour cette itération: {time.time() - iteration_time_start}"
                 f" secondes"
@@ -198,19 +201,6 @@ def gopher(
             sum(time_history_min) / len(time_history_min) if time_history_min else 0
         ),
     }
-
-
-def print_grid_state(state: State, hex_size: int) -> str:
-    grid = empty_grid(hex_size)
-    for cell, player in state:
-        x, y = cell_to_grid(cell, hex_size)
-        if player == RED:
-            grid[x][y] = "R"
-        elif player == BLUE:
-            grid[x][y] = "B"
-        else:
-            grid[x][y] = " "
-    return "\n".join("".join(c for c in line) for line in grid)
 
 
 # Initialisation de l'environnement
@@ -259,7 +249,8 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
         )
 
     # Initialisation de l'environnement du jeu Gopher
-    grid = new_gopher(hex_size)  # Création de la grille de jeu Gopher
+    grid = new_gopher(hex_size) # Création de la grille de jeu Gopher
+
     # Initialisation de l'environnement du jeu Gopher si nous jouons en premier
     if player == 1:
         player_param = PlayerLocal(1, ALL_DIRECTIONS)
@@ -294,23 +285,45 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
     )
 
 
-def print_gopher(env: GameGopher, empty_grid: Grid):
+def grid_state_color(state: State, hex_size: int) -> str:
+    """ Convert the state to a grid with colors """
+    # Initialize an empty grid with the specified hex size
+    grid = empty_grid(hex_size)
+
+    # ANSI escape codes for red and blue
+    RED_COLOR = "\033[91m"
+    BLUE_COLOR = "\033[94m"
+    RESET_COLOR = "\033[0m"
+
+    for cell, player in state:
+        x, y = cell_to_grid(cell, hex_size)
+        if player == RED:
+            grid[x][y] = f"{RED_COLOR}R{RESET_COLOR}"
+        elif player == BLUE:
+            grid[x][y] = f"{BLUE_COLOR}B{RESET_COLOR}"
+        else:
+            grid[x][y] = " "
+
+    # Convert the grid to a string
+    return "\n".join("".join(c for c in line) for line in grid)
+
+
+def print_gopher(env: GameGopher):
     """
     Fonction permettant d'afficher une grille de jeu Gopher
     """
 
-    # Initialisation de la grille de jeu
-    temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
+    # convert env.grid which is a dict into a state
+    state = []
+    for cell, player in env.grid.items():
+        if player == 1:
+            state.append((cell, RED))
+        elif player == 2:
+            state.append((cell, BLUE))
+        else:
+            state.append((cell, player))
 
-    # Affichage des positions des joueurs en convertissant les coordonnées
-    for position, _ in env.max_positions.positions.items():
-        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
-        temp_grid[conv_pos[0]][conv_pos[1]] = 1
-    for position, _ in env.min_positions.positions.items():
-        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
-        temp_grid[conv_pos[0]][conv_pos[1]] = 2
-
-    hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
+    print(grid_state_color(state, env.hex_size))
 
 
 def launch_multi_game(
@@ -350,6 +363,7 @@ def launch_multi_game(
 
     # Lancement de n parties de jeu Gopher
     else:
+        name = "Gopher"
         print("Lancement de Gopher")
         init_grid = new_gopher(size_init_grid)
         for i in range(game_number):
@@ -362,29 +376,65 @@ def launch_multi_game(
                 debug=debug,
                 graphics=graphics,
             )
+            print_gopher(game)
             list_results.append(res)
-            print(f"Partie {i + 1}: {res}")
+            print(f"Partie {i + 1} : winner is {res["winner"]}")
 
     # Ajout des stat à un fichier CSV
     add_to_benchmark(
         list_results,
         "benchmark",
+        name,
         game_number,
-        str(strategy_1),
-        str(strategy_2),
+        str(strategy_1.__name__),
+        str(strategy_2.__name__),
         size_init_grid,
     )
 
 
-# Fonction principale de jeu Dodo
 def main():
+    """Main function to launch the game based on command-line arguments."""
+    parser = argparse.ArgumentParser(description="Launch Gopher or Dodo game")
+    parser.add_argument("game", choices=["dodo", "gopher"], help="Specify the game to launch")
+    parser.add_argument(
+        "--games", type=int, default=1, help="Number of games to play (default: 1)"
+    )
+    parser.add_argument(
+        "--strategy1", choices=["minmax", "random"], default="random",
+        # "--strategy1", choices=["minmax", "random", "mcts"], default="random",
+        help="Strategy for player 1 (default: random)"
+    )
+    parser.add_argument(
+        "--strategy2", choices=["minmax", "random"], default="minmax",
+        # "--strategy2", choices=["minmax", "random", "mcts"], default="minmax",
+        help="Strategy for player 2 (default: minmax)"
+    )
 
-    # mcts first player alpha-beta second player
-    launch_multi_game(1, "Dodo", strategy_random, strategy_random)
+    args = parser.parse_args()
 
-    # alpha-beta first player mcts second player
-    # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
+    strategies = {
+        "minmax": strategy_minmax,
+        "random": strategy_random,
+        # "mcts": MCTS().search
+    }
 
+    strategy_1 = strategies[args.strategy1]
+    strategy_2 = strategies[args.strategy2]
+
+    if args.game == "dodo":
+        launch_multi_game(
+            game_number=args.games,
+            name="Dodo",
+            strategy_1=strategy_1,
+            strategy_2=strategy_2,
+        )
+    else:
+        launch_multi_game(
+            game_number=args.games,
+            name="Gopher",
+            strategy_1=strategy_1,
+            strategy_2=strategy_2,
+        )
 
 if __name__ == "__main__":
     main()

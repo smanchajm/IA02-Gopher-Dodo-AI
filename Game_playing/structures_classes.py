@@ -122,6 +122,7 @@ class GameDodo(Environment):
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
+
         for cell in self.grid:
             if self.grid[cell] == self.max_player.id:
                 self.max_positions.positions[cell] = self.max_player.id
@@ -154,8 +155,7 @@ class GameDodo(Environment):
                             actions[(position, neighbor)] = None
         return list(actions.keys())
 
-    # Fonction retournant le score si nous sommes dans un état final (fin de partie)
-    def final(self, debug: bool = False) -> int:
+    def final(self) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
@@ -297,7 +297,8 @@ class GameGopher(Environment):
 
         for position in opponent_positions:
             # Trouver toutes les actions possibles pour une position donnée
-            possible_actions = [neighbor for neighbor in self.neighbor_dict[position] if self.grid[neighbor] == 0]
+            possible_actions = \
+                [neighbor for neighbor in self.neighbor_dict[position] if self.grid[neighbor] == 0]
 
             for action in possible_actions:
                 # Initialiser les compteurs de connexions
@@ -321,9 +322,11 @@ class GameGopher(Environment):
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
-        if not self.legals(self.max_positions.player) and self.max_positions.player.id == self.current_player.id:
+        if not self.legals(self.max_positions.player) and \
+            self.max_positions.player.id == self.current_player.id:
             return -1
-        if not self.legals(self.min_positions.player) and self.min_positions.player.id == self.current_player.id:
+        if not self.legals(self.min_positions.player) and \
+            self.min_positions.player.id == self.current_player.id:
             return 1
         return 0
 

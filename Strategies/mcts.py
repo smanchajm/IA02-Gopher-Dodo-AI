@@ -205,8 +205,8 @@ class MCTS:
 
     def search(self, initial_state: Environment, nb_simulations=800, round_time=None):
         """
-        Méthode principale de l'algorithme MCTS qui permet de rechercher la meilleure action à jouer en fonction de
-        l'état initial select -> expand -> rollout -> backpropagate
+        Méthode principale de l'algorithme MCTS qui permet de rechercher la meilleure action 
+        à jouer en fonction de l'état initial select -> expand -> rollout -> backpropagate
         """
 
         self.root = TreeNode(initial_state, None)  # création du nœud racine
@@ -233,7 +233,8 @@ class MCTS:
 
                 self.reinit_pos(self.root.env)
 
-        # si le temps de simulation est donné on effectue des simulations jusqu'à ce que le temps soit écoulé
+        # si le temps de simulation est donné
+        # on effectue des simulations jusqu'à ce que le temps soit écoulé
         else:
             while (time.time() - start_time) < round_time:
                 n += 1
@@ -262,7 +263,8 @@ class MCTS:
                 # On vérifie si on peut arrêter la recherche STOP
                 time_spent = time.time() - start_time
                 time_left = round_time - time_spent if round_time else 0
-                if time_spent > 0 and self.stop(n, time_left, time_spent, visits_best, visits_second_best):
+                if time_spent > 0 and \
+                    self.stop(n, time_left, time_spent, visits_best, visits_second_best):
                     print("\nSTOP\n")
                     print(f"temps économisé: {time_left}")
                     break
