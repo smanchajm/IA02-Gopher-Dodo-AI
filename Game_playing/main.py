@@ -394,7 +394,7 @@ def launch_multi_game(
 def main():
     """ Fonction principale """
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", strategy_minmax, strategy_random)
+    launch_multi_game(1, "Gopher", strategy_random, strategy_minmax)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
