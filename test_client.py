@@ -2,7 +2,9 @@
 
 import argparse
 import ast
+from typing import List
 
+from Game_playing.hexagonal_board import neighbor_gopher
 from Strategies.mcts import MCTS
 from Strategies.strategies import (strategy_first_legal, strategy_minmax,
                                    strategy_random)
@@ -20,13 +22,14 @@ def reinit(env: Environment, time_left: Time, state: State, player: int):
     env.total_time = time_left
     param_player = env.max_player if player == env.max_player.id else env.min_player
 
+    # Sauvegarde de l'état précédent
+    env.precedent_state = env.grid.copy()
+
     grid: GridDict = {}
     for cell in state:
         grid[cell[0]] = cell[1]
     env.grid = grid
 
-    # Sauvegarde de l'état précédent
-    env.precedent_state = env.grid.copy()
 
     # Réinitialisation des positions des joueurs
     env.max_positions.positions.clear()
@@ -49,19 +52,11 @@ def copie_action(env: Environment) -> Action:
     """
     Fonction permettant de copier l'action de l'adversaire
     """
-    actions = []
     for cell in env.grid:
-        if env.precedent_state[cell] != env.grid[cell]:
-            actions.append(cell)
-    print("Action copiée ", actions)
+        if env.precedent_state[cell] != env.grid[cell] and env.grid[cell] == env.min_player.id:
+            return cell
 
-    action = (actions[0], actions[1])
-    res = (
-        (env.hex_size - 1 - action[0][0], env.hex_size - 1 - action[0][1]),
-        (env.hex_size - 1 - action[1][0], env.hex_size - 1 - action[1][1]),
-    )
-
-    return res
+    return None
 
 
 def initialize_for_network(
@@ -160,7 +155,8 @@ def strategy_mcts_network(
     return env, action
 
 
-ouverture = [((), ())]
+up_oppenings = [((-1, -1), (0, 0)), ((-2, 0), (-1, 1)), ((0, -2), (1, -1))]
+down_oppenings = [((1, 1), (0, 0)), ((2, 0), (-1, 1)), ((2, 0), (1, -1))]
 
 
 def strategy_dodo(
@@ -172,7 +168,28 @@ def strategy_dodo(
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)
     # Calcul du temps de jeu en fonction du nombre de tours restants (voir article ReadMe)
-    play_time = time_left / (25 + max(50 - env.current_round, 0))
+
+    """
+    if player == 1:
+        leg: List[Action] = env.legals(env.max_player)
+        print(f"leg {leg}")
+        for action in up_oppenings:
+            if action not in leg:
+                print("opening")
+                return env, action
+    else:
+        leg: List[Action] = env.legals(env.min_player)
+        print(f"leg {leg}")
+        for action in down_oppenings:
+            if action not in leg:
+                print("opening")
+                print(f"action {action}")
+                return env, action """
+
+    if env.hex_size == 7:
+        play_time = time_left / (100 + max(100 - env.current_round, 0))
+    else:
+        play_time = time_left / (25 + max(50 - env.current_round, 0))
     print("play_time", play_time)
     print(f"time left {time_left}")
 
@@ -213,6 +230,33 @@ def strategy_gopher(
     return env, action
 
 
+def optimal_strategy(env: Environment, state: State, player: Player, time_left: Time) -> tuple[Environment, Action]:
+    """
+    Fonction permettant de jouer la stratégie optimale pour Gopher
+    si nous sommes joueur un et que nous sommes sur une grille impaire
+    """
+    # Réinitialisation de l'environnement
+    env = reinit(env, time_left, state, player)
+
+    # Ouverture déterministe dans un coin
+    if env.max_player.id == 1 and (env.current_round == 0 or env.current_round == 1):
+        env.precedent_action = (0, env.hex_size - 1)
+        return env, (0, env.hex_size - 1)
+
+    opponent_action = copie_action(env)
+    for cell in neighbor_gopher(opponent_action[0], opponent_action[1], env.max_player.directions):
+        if cell in env.grid and env.grid[cell] == env.max_player.id:
+            neighbor_action = cell
+
+
+    delta = (opponent_action[0] - neighbor_action[0], opponent_action[1] - neighbor_action[1])
+    action = (opponent_action[0] + delta[0], opponent_action[1] + delta[1])
+    env.precedent_action = action
+
+    return env, action
+
+
+
 def main_strategy(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
@@ -221,6 +265,10 @@ def main_strategy(
     if env.game == "Dodo":
         print("strategy_dodo")
         return strategy_dodo(env, state, player, time_left)
+
+    if env.game == "Gopher" and env.hex_size % 2 == 1 and player == 1:
+        print("optimal_strategy")
+        return optimal_strategy(env, state, player, time_left)
 
     print("strategy_gopher")
     return strategy_gopher(env, state, player, time_left)
@@ -234,7 +282,7 @@ if __name__ == "__main__":
     parser.add_argument("group_id")
     parser.add_argument("members")
     parser.add_argument("password")
-    parser.add_argument("-s", "--server-url", default="http://localhost:8080/")
+    parser.add_argument("-s", "--server-url", default="http://localhost:8080")
     parser.add_argument("-d", "--disable-dodo", action="store_true")
     parser.add_argument("-g", "--disable-gopher", action="store_true")
     args = parser.parse_args()

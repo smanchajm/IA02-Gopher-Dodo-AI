@@ -255,6 +255,8 @@ class GameGopher(Environment):
             self.precedent_state,
             self.game
         )
+        self.precedent_action = None
+
         self.precedent_state = self.grid.copy()
         self.neighbor_dict = {}
         for cell in self.grid:
