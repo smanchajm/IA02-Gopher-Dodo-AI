@@ -30,7 +30,7 @@ Both games are played on a hexagonal board. The implementation is freely inspire
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/gopher-dodo.git
+git clone https://github.com/smanchajm/gopher-dodo.git
 cd Game_playing
 ```
 
