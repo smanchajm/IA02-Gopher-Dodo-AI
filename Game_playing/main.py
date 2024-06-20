@@ -385,7 +385,7 @@ def launch_multi_game(
             # print_gopher(game)
             print_grid(game)
             list_results.append(res)
-            print(f"Partie {i + 1} : winner is {res["winner"]}")
+            print(f"Partie {i + 1} : winner is {res['winner']}")
 
     # Ajout des stat à un fichier CSV
     add_to_benchmark(
