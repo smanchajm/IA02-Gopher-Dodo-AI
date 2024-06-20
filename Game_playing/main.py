@@ -5,6 +5,7 @@ from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
+from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
 from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
 from Game_playing.benchmark import add_to_benchmark
@@ -151,6 +152,7 @@ def gopher(
             else:
                 # current_action = strategy_1(env, env.current_player)
                 mcts = MCTS()
+
                 current_action = mcts.search(env)
 
             time_history_max.append(
@@ -173,7 +175,7 @@ def gopher(
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
-            print_gopher(env, GRID2)
+            print_gopher(env)
             print(
                 f"Temps écoulé pour cette itération: {time.time() - iteration_time_start}"
                 f" secondes"
@@ -282,23 +284,45 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
     )
 
 
-def print_gopher(env: GameGopher, empty_grid: Grid):
+def grid_state_color(state: State, hex_size: int) -> str:
+    """ Convert the state to a grid with colors """
+    # Initialize an empty grid with the specified hex size
+    grid = empty_grid(hex_size)
+
+    # ANSI escape codes for red and blue
+    RED_COLOR = "\033[91m"
+    BLUE_COLOR = "\033[94m"
+    RESET_COLOR = "\033[0m"
+
+    for cell, player in state:
+        x, y = cell_to_grid(cell, hex_size)
+        if player == RED:
+            grid[x][y] = f"{RED_COLOR}R{RESET_COLOR}"
+        elif player == BLUE:
+            grid[x][y] = f"{BLUE_COLOR}B{RESET_COLOR}"
+        else:
+            grid[x][y] = " "
+
+    # Convert the grid to a string
+    return "\n".join("".join(c for c in line) for line in grid)
+
+
+def print_gopher(env: GameGopher):
     """
     Fonction permettant d'afficher une grille de jeu Gopher
     """
 
-    # Initialisation de la grille de jeu
-    temp_grid = hexa.grid_tuple_to_grid_list(empty_grid)
+    # convert env.grid which is a dict into a state
+    state = []
+    for cell, player in env.grid.items():
+        if player == 1:
+            state.append((cell, RED))
+        elif player == 2:
+            state.append((cell, BLUE))
+        else:
+            state.append((cell, player))
 
-    # Affichage des positions des joueurs en convertissant les coordonnées
-    for position, _ in env.max_positions.positions.items():
-        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
-        temp_grid[conv_pos[0]][conv_pos[1]] = 1
-    for position, _ in env.min_positions.positions.items():
-        conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
-        temp_grid[conv_pos[0]][conv_pos[1]] = 2
-
-    hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
+    print(grid_state_color(state, env.hex_size))
 
 
 def launch_multi_game(
@@ -351,7 +375,7 @@ def launch_multi_game(
                 graphics=graphics,
             )
             list_results.append(res)
-            print(f"Partie {i + 1}: {res}")
+            print(f"Partie {i + 1} : winner is {res["winner"]}")
 
     # Ajout des stat à un fichier CSV
     add_to_benchmark(
@@ -369,7 +393,7 @@ def launch_multi_game(
 def main():
     """ Fonction principale """
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", strategy_random, strategy_minmax)
+    launch_multi_game(1, "Gopher", strategy_minmax, strategy_random)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
