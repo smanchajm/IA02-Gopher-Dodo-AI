@@ -350,6 +350,7 @@ def launch_multi_game(
 
     # Lancement de n parties de jeu Gopher
     else:
+        name = "Gopher"
         print("Lancement de Gopher")
         init_grid = new_gopher(size_init_grid)
         for i in range(game_number):
@@ -368,9 +369,10 @@ def launch_multi_game(
     add_to_benchmark(
         list_results,
         "benchmark",
+        name,
         game_number,
-        str(strategy_1),
-        str(strategy_2),
+        str(strategy_1.__name__),
+        str(strategy_2.__name__),
         size_init_grid,
     )
 
@@ -379,7 +381,7 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", "mcts", strategy_random)
+    launch_multi_game(1, "Gopher", strategy_random, strategy_minmax)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")

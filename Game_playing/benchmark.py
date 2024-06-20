@@ -27,6 +27,7 @@ def append_to_csv(dataframe: pd.DataFrame, filename: str):
 def add_to_benchmark(
     list_results,
     filename: str,
+    game: str,
     game_number: int,
     strategy_1: str,
     strategy_2: str,
@@ -40,6 +41,7 @@ def add_to_benchmark(
     win_number = sum(res["winner"] == 1 for res in list_results)
     loss_number = game_number - win_number
     new_benchmark = {
+        "game": game,
         "strategy_1": strategy_1,
         "strategy_2": strategy_2,
         "Grid": grid,
