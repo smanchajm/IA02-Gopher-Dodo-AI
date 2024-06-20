@@ -374,6 +374,7 @@ def launch_multi_game(
                 debug=debug,
                 graphics=graphics,
             )
+            print_gopher(game)
             list_results.append(res)
             print(f"Partie {i + 1} : winner is {res["winner"]}")
 

@@ -84,6 +84,5 @@ def add_to_benchmark(
 
     # Création d'un DataFrame avec une seule ligne
     df_results = pd.DataFrame([new_benchmark])
-    print(f"Temps de la partie : {df_results["average_total_time"]}")
     # Ajout des statistiques à un fichier CSV
     append_to_csv(df_results, f"{filename}.csv")
