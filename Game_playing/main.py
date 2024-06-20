@@ -13,10 +13,9 @@ from Game_playing.benchmark import add_to_benchmark
 import Game_playing.hexagonal_board as hexa
 from Game_playing.grid import INIT_GRID, INIT_GRID4
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
-                                             UP_DIRECTIONS, Action, GameDodo,
+                                             UP_DIRECTIONS, Action, Environment, GameDodo,
                                              GameGopher, GridDict, PlayerLocal,
-                                             Time, convert_grid, new_gopher,
-                                             print_dodo)
+                                             Time, convert_grid, new_gopher)
 
 matplotlib.use("TkAgg")
 
@@ -82,7 +81,11 @@ def dodo(
         )  # Fin du chronomètre pour la durée de cette itération
 
         if debug:
-            print_dodo(env, INIT_GRID)
+            # if env.hex_size == 4:
+                # print_dodo(env, INIT_GRID4)
+            # else:
+                # print_dodo(env, INIT_GRID)
+            print_grid(env)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -308,7 +311,7 @@ def grid_state_color(state: State, hex_size: int) -> str:
     return "\n".join("".join(c for c in line) for line in grid)
 
 
-def print_gopher(env: GameGopher):
+def print_grid(env: Environment):
     """
     Fonction permettant d'afficher une grille de jeu Gopher
     """
@@ -349,7 +352,10 @@ def launch_multi_game(
         print("Lancement de Dodo")
         # Lancement de n parties de jeu Dodo
         for i in range(game_number):
-            init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            if size_init_grid == 4:
+                init_grid = convert_grid(INIT_GRID4, size_init_grid)
+            else:
+                init_grid = convert_grid(INIT_GRID, size_init_grid)
             game = initialize("Dodo", init_grid, 1, size_init_grid, 720)
             res = dodo(
                 game,
@@ -376,7 +382,8 @@ def launch_multi_game(
                 debug=debug,
                 graphics=graphics,
             )
-            print_gopher(game)
+            # print_gopher(game)
+            print_grid(game)
             list_results.append(res)
             print(f"Partie {i + 1} : winner is {res["winner"]}")
 

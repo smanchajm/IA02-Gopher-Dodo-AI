@@ -403,6 +403,7 @@ def print_dodo(env: GameDodo, empty_grid: Grid):
         conv_pos = hexa.reverse_convert(position[0], position[1], env.hex_size)
         temp_grid[conv_pos[0]][conv_pos[1]] = 2
     hexa.display_grid(hexa.grid_list_to_grid_tuple(temp_grid))
+    
 
 
 def convert_grid(grid: Grid, hex_size: int) -> GridDict:
