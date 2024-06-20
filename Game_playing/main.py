@@ -5,6 +5,7 @@ from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
+from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
 from Game_playing.benchmark import add_to_benchmark
 import Game_playing.hexagonal_board as hexa
@@ -148,7 +149,9 @@ def gopher(
             if tour == 1 and env.current_player == env.max_player:
                 current_action = (0, env.hex_size - 1)
             else:
-                current_action = strategy_1(env, env.current_player)
+                # current_action = strategy_1(env, env.current_player)
+                mcts = MCTS()
+                current_action = mcts.search(env)
 
             time_history_max.append(
                 time.time() - iteration_time_start
@@ -366,7 +369,7 @@ def launch_multi_game(
 def main():
     """ Fonction principale """
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Dodo", strategy_random, strategy_minmax)
+    launch_multi_game(1, "Gopher", strategy_random, strategy_minmax)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")

@@ -210,5 +210,6 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
 
     if env.game == "Gopher":
         depth += 1
+        depth = min(depth, 10)
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]
