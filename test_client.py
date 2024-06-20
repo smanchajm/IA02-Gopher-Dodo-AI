@@ -212,6 +212,7 @@ def strategy_gopher(
 def main_strategy(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
+    """ Main strategy function """
 
     if env.game == "Dodo":
         print("strategy_dodo")
