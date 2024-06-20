@@ -1,5 +1,5 @@
+""" Module permettant de gérer les statistiques des parties jouées """
 import os
-
 import pandas as pd
 
 

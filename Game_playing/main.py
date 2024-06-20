@@ -5,11 +5,8 @@ from typing import Any, List
 
 import matplotlib
 import matplotlib.pyplot as plt
-from Game_playing.benchmark import add_to_benchmark
-from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
-from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
-
+from Game_playing.benchmark import add_to_benchmark
 import Game_playing.hexagonal_board as hexa
 from Game_playing.grid import GRID2, GRID4, INIT_GRID4
 from Game_playing.hexagonal_board import Grid
@@ -201,19 +198,6 @@ def gopher(
     }
 
 
-def print_grid_state(state: State, hex_size: int) -> str:
-    grid = empty_grid(hex_size)
-    for cell, player in state:
-        x, y = cell_to_grid(cell, hex_size)
-        if player == RED:
-            grid[x][y] = "R"
-        elif player == BLUE:
-            grid[x][y] = "B"
-        else:
-            grid[x][y] = " "
-    return "\n".join("".join(c for c in line) for line in grid)
-
-
 # Initialisation de l'environnement
 def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time: Time):
     """
@@ -380,7 +364,7 @@ def launch_multi_game(
 
 # Fonction principale de jeu Dodo
 def main():
-
+    """ Fonction principale """
     # mcts first player alpha-beta second player
     launch_multi_game(1, "Dodo", strategy_random, strategy_minmax)
 
