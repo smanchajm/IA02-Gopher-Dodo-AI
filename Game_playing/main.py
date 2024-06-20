@@ -59,6 +59,7 @@ def dodo(
 
     # Boucle de jeu tant que la partie n'est pas dans un état final
     res = env.final()
+    print(res)
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
@@ -381,7 +382,7 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", strategy_random, strategy_minmax)
+    launch_multi_game(1, "Dodo", strategy_random, strategy_minmax)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")

@@ -155,7 +155,7 @@ class GameDodo(Environment):
         return list(actions.keys())
 
     # Fonction retournant le score si nous sommes dans un état final (fin de partie)
-    def final(self, debug: bool = False) -> int:
+    def final(self) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
