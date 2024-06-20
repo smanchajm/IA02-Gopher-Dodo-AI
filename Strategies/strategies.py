@@ -194,7 +194,7 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
-    
+
     try:
         depth_factor = 1 / (log(len(env.legals(player)), 2) / 5) * 1.2
     except ZeroDivisionError:
@@ -207,7 +207,7 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
         bonus = 1.5
 
     depth = 6 + round(depth_factor * bonus)
-    
+
     if env.game == "Gopher":
         depth += 1
 

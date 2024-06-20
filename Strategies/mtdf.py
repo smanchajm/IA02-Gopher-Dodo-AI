@@ -1,33 +1,37 @@
+""" Minimax with NegaScout algorithm """
 import time
 from cmath import inf
 from copy import deepcopy
 
-from Game_playing.grid import INIT_GRID4
 from Game_playing.structures_classes import (
     Action,
-    Environment, convert_grid, PlayerLocal, ALL_DIRECTIONS, GameGopher, new_gopher, GridDict,
+    Environment, PlayerLocal, ALL_DIRECTIONS, GameGopher, new_gopher
 )
 
-from Strategies.strategies import evaluate_dynamic, strategy_minmax
+from strategies import evaluate_dynamic, strategy_minmax
 
 
 class NegaScoutEngine:
+    """ NegaScout Engine """
     def __init__(self, board: Environment, depth: int):
         self.board = board
         self.depth = depth
 
     def negascout(self, alpha, beta, depth, player):
+        """ NegaScout algorithm """
         best = -float('inf')
         b = beta
 
         if depth == 0:
             return evaluate_dynamic(self.board, self.board.grid, player)
 
-        opponent = self.board.min_player if player == self.board.max_player else self.board.max_player
+        opponent = self.board.min_player if player == self.board.max_player \
+                                            else self.board.max_player
 
         legal_moves = self.board.legals(player)
         if not legal_moves:  # Pas de coups légaux possibles
-            return evaluate_dynamic(self.board, self.board.grid, player)  # Ou retournez une valeur appropriée
+            # Ou retournez une valeur appropriée
+            return evaluate_dynamic(self.board, self.board.grid, player)
 
         first_move = True
 
@@ -58,7 +62,8 @@ class NegaScoutEngine:
 
         self.board.grid = deepcopy(self.board.grid)
         legals = self.board.legals(player)
-        opponent = self.board.min_player if player == self.board.max_player else self.board.max_player
+        opponent = self.board.min_player if player == self.board.max_player \
+                                            else self.board.max_player
         best = -inf
         best_move = legals[0]
 
@@ -94,7 +99,8 @@ def main():
         4,
         300,
         0,
-        init_grid
+        init_grid,
+        "Gopher",
     )
 
     # best move with NegaScout
