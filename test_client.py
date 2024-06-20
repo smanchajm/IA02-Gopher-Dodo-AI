@@ -6,7 +6,7 @@ import ast
 from Strategies.mcts import MCTS
 from Strategies.strategies import (strategy_first_legal, strategy_minmax,
                                    strategy_random)
-from Game_playing.main import initialize
+from main import initialize
 from Game_playing.structures_classes import (Action, Environment, GridDict,
                                              Score, State, Time)
 from Server.gndclient import DODO_STR, GOPHER_STR, Player, start
@@ -171,9 +171,8 @@ def strategy_dodo(
     """
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)
-
     # Calcul du temps de jeu en fonction du nombre de tours restants (voir article ReadMe)
-    play_time = time_left / (30 + max(60 - env.current_round, 0))
+    play_time = time_left / (25 + max(50 - env.current_round, 0))
     print("play_time", play_time)
     print(f"time left {time_left}")
 
@@ -198,8 +197,13 @@ def strategy_gopher(
     if env.max_player.id == 1 and (env.current_round == 0 or env.current_round == 1):
         return env, (0, env.hex_size - 1)
 
-    # Stratégie de survie si le temps restant est inférieur à 5 secondes
-    if time_left < 5:
+    # Stratégie de survie si le temps restant est trop faible pour alpha-beta
+    if time_left < 15:
+        play_time = time_left / (20 + max(33 - env.current_round, 0))
+        mcts = MCTS()
+        action = mcts.search(env, round_time=play_time)
+        return env, action
+    if time_left < 3:
         return env, strategy_first_legal(env, env.max_player)
 
     # Appel de l'algorithme alpha-beta

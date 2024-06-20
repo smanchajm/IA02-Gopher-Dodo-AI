@@ -6,6 +6,7 @@ from typing import Callable
 
 from Game_playing.structures_classes import (Action, Cell, Environment,
                                              GridDict, PlayerLocal)
+from Strategies.mcts import MCTS
 
 StrategyLocal = Callable[[Environment, PlayerLocal], Action]
 
@@ -213,3 +214,12 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
         depth = min(depth, 10)
 
     return minmax_action_alpha_beta_pruning(env, player, depth)[1]
+
+
+def strategy_mcts(env: Environment, player: PlayerLocal) -> Action:
+    """
+    Stratégie qui retourne l'action calculée par l'algorithme MCTS
+    """
+    mcts = MCTS()
+
+    return mcts.search(env, player, round_time=10)

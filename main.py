@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
 from Strategies.mcts import MCTS
-from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
+from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random, strategy_mcts)
 from Game_playing.benchmark import add_to_benchmark
 import Game_playing.hexagonal_board as hexa
 from Game_playing.grid import INIT_GRID, INIT_GRID4
@@ -407,14 +407,14 @@ def main():
         "--games", type=int, default=1, help="Number of games to play (default: 1)"
     )
     parser.add_argument(
-        "--strategy1", choices=["minmax", "random"], default="random",
+        "--strategy1", choices=["minmax", "random", "mcts"], default="random",
         # "--strategy1", choices=["minmax", "random", "mcts"], default="random",
         help="Strategy for player 1 (default: random)"
     )
     parser.add_argument(
-        "--strategy2", choices=["minmax", "random"], default="minmax",
-        # "--strategy2", choices=["minmax", "random", "mcts"], default="minmax",
-        help="Strategy for player 2 (default: minmax)"
+        "--strategy2", choices=["minmax", "random", "mcts"], default="mcts",
+        # "--strategy2", choices=["minmax", "random", "mcts"], default="mcts",
+        help="Strategy for player 2 (default: mcts)"
     )
 
     args = parser.parse_args()
@@ -422,7 +422,7 @@ def main():
     strategies = {
         "minmax": strategy_minmax,
         "random": strategy_random,
-        # "mcts": MCTS().search
+        "mcts": strategy_mcts,
     }
 
     strategy_1 = strategies[args.strategy1]
@@ -442,6 +442,7 @@ def main():
             strategy_1=strategy_1,
             strategy_2=strategy_2,
         )
+
 
 if __name__ == "__main__":
     main()

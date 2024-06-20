@@ -6,7 +6,7 @@ import ast
 from Strategies.mcts import MCTS
 from Strategies.strategies import (strategy_first_legal, strategy_minmax,
                                    strategy_random)
-from Game_playing.main import initialize
+from main import initialize
 from Game_playing.structures_classes import (Action, Environment, GridDict,
                                              Score, State, Time)
 from Server.gndclient import DODO_STR, GOPHER_STR, Player, start
