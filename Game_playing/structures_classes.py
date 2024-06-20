@@ -122,6 +122,7 @@ class GameDodo(Environment):
 
         self.max_positions.positions.clear()
         self.min_positions.positions.clear()
+
         for cell in self.grid:
             if self.grid[cell] == self.max_player.id:
                 self.max_positions.positions[cell] = self.max_player.id
@@ -154,7 +155,6 @@ class GameDodo(Environment):
                             actions[(position, neighbor)] = None
         return list(actions.keys())
 
-    # Fonction retournant le score si nous sommes dans un état final (fin de partie)
     def final(self) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)

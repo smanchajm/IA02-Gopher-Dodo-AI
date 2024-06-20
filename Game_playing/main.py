@@ -1,5 +1,6 @@
 """ Module concernant l'environnement du jeu Gopher-Dodo """
 
+import argparse
 import time
 from typing import Any, List
 
@@ -10,8 +11,7 @@ from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
 from Game_playing.benchmark import add_to_benchmark
 import Game_playing.hexagonal_board as hexa
-from Game_playing.grid import GRID2, GRID4, INIT_GRID4
-from Game_playing.hexagonal_board import Grid
+from Game_playing.grid import INIT_GRID, INIT_GRID4
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, GameDodo,
                                              GameGopher, GridDict, PlayerLocal,
@@ -58,7 +58,7 @@ def dodo(
 
     # Boucle de jeu tant que la partie n'est pas dans un état final
     res = env.final()
-    print(res)
+
     while res not in (1, -1):
         iteration_time_start = time.time()  # Chronomètre une itération de jeu
         if debug and env.current_player.id == 1:
@@ -82,7 +82,7 @@ def dodo(
         )  # Fin du chronomètre pour la durée de cette itération
 
         if debug:
-            print_dodo(env, GRID4)
+            print_dodo(env, INIT_GRID)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
                 f" secondes"
@@ -249,7 +249,8 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
         )
 
     # Initialisation de l'environnement du jeu Gopher
-    grid = new_gopher(hex_size)  # Création de la grille de jeu Gopher
+    grid = new_gopher(hex_size) # Création de la grille de jeu Gopher
+
     # Initialisation de l'environnement du jeu Gopher si nous jouons en premier
     if player == 1:
         player_param = PlayerLocal(1, ALL_DIRECTIONS)
@@ -390,15 +391,49 @@ def launch_multi_game(
     )
 
 
-# Fonction principale de jeu Dodo
 def main():
-    """ Fonction principale """
-    # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", strategy_random, strategy_minmax)
+    """Main function to launch the game based on command-line arguments."""
+    parser = argparse.ArgumentParser(description="Launch Gopher or Dodo game")
+    parser.add_argument("game", choices=["dodo", "gopher"], help="Specify the game to launch")
+    parser.add_argument(
+        "--games", type=int, default=1, help="Number of games to play (default: 1)"
+    )
+    parser.add_argument(
+        "--strategy1", choices=["minmax", "random"], default="random",
+        # "--strategy1", choices=["minmax", "random", "mcts"], default="random",
+        help="Strategy for player 1 (default: random)"
+    )
+    parser.add_argument(
+        "--strategy2", choices=["minmax", "random"], default="minmax",
+        # "--strategy2", choices=["minmax", "random", "mcts"], default="minmax",
+        help="Strategy for player 2 (default: minmax)"
+    )
 
-    # alpha-beta first player mcts second player
-    # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")
+    args = parser.parse_args()
 
+    strategies = {
+        "minmax": strategy_minmax,
+        "random": strategy_random,
+        # "mcts": MCTS().search
+    }
+
+    strategy_1 = strategies[args.strategy1]
+    strategy_2 = strategies[args.strategy2]
+
+    if args.game == "dodo":
+        launch_multi_game(
+            game_number=args.games,
+            name="Dodo",
+            strategy_1=strategy_1,
+            strategy_2=strategy_2,
+        )
+    else:
+        launch_multi_game(
+            game_number=args.games,
+            name="Gopher",
+            strategy_1=strategy_1,
+            strategy_2=strategy_2,
+        )
 
 if __name__ == "__main__":
     main()
