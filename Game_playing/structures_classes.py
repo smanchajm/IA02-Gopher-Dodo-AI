@@ -159,6 +159,7 @@ class GameDodo(Environment):
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """
+
         if not self.legals(self.max_positions.player):
             return 1
         if not self.legals(self.min_positions.player):

@@ -11,7 +11,7 @@ from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random)
 
 import Game_playing.hexagonal_board as hexa
-from Game_playing.grid import GRID2, GRID4, INIT_GRID4
+from Game_playing.grid import GRID2, GRID4, INIT_GRID4, INIT_GRID
 from Game_playing.hexagonal_board import Grid
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, GameDodo,
@@ -172,7 +172,7 @@ def gopher(
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
-            print_gopher(env, GRID2)
+            print_gopher(env, GRID4)
             print(
                 f"Temps écoulé pour cette itération: {time.time() - iteration_time_start}"
                 f" secondes"
@@ -330,7 +330,7 @@ def launch_multi_game(
         graphics = False
 
     list_results = []  # Liste pour stocker les résultats des parties
-    size_init_grid = 7  # Taille de la grille de jeu
+    size_init_grid = 4  # Taille de la grille de jeu
 
     if name == "Dodo":
         print("Lancement de Dodo")
@@ -354,6 +354,7 @@ def launch_multi_game(
         init_grid = new_gopher(size_init_grid)
         for i in range(game_number):
             game = initialize("Gopher", init_grid, 1, size_init_grid, 720)
+
             res = gopher(
                 game,
                 strategy_1,
@@ -379,7 +380,7 @@ def launch_multi_game(
 def main():
 
     # mcts first player alpha-beta second player
-    launch_multi_game(1, "Gopher", "mcts", strategy_random)
+    launch_multi_game(1, "Dodo", strategy_random, strategy_random)
 
     # alpha-beta first player mcts second player
     # launch_multi_game(10, "Gopher", strategy_minmax, "mcts")

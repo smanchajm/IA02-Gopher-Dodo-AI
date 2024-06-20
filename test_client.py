@@ -237,8 +237,7 @@ if __name__ == "__main__":
     available_games = [DODO_STR, GOPHER_STR]
     if args.disable_dodo:
         available_games.remove(DODO_STR)
-    if args.disable_gopher:
-        available_games.remove(GOPHER_STR)
+    if args.disable_gopher:        available_games.remove(GOPHER_STR)
 
     start(
         args.server_url,
@@ -248,13 +247,6 @@ if __name__ == "__main__":
         available_games,
         initialize_for_network,
         main_strategy,
-        #strategy_dodo,
-        # strategy_gopher,
-        # strategy_mcts_network,
-        # strategy_min_max_network,
-        #strategy_random_network,
-        # strategy_brain,
-        # strategy_first_legal_network,
         final_result,
         gui=True,
     )
