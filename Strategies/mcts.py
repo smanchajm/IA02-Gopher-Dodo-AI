@@ -100,7 +100,7 @@ class MCTS:
 
         # Tant que la partie n'est pas terminée on joue des coups aléatoires
         while param_env.legals(param_env.max_player) and param_env.legals(
-            param_env.min_player
+                param_env.min_player
         ):
             i += 1
             action: Action = random.choice(param_env.legals(param_env.current_player))
@@ -201,7 +201,7 @@ class MCTS:
         Implémentation de la stratégie STOP pour déterminer si la recherche peut s'arrêter
         """
 
-        return (n * (time_left / time_spent) * 1.2) < (visits_best - visits_second_best)
+        return (n * (time_left / time_spent) * 1.1) < (visits_best - visits_second_best)
 
     def search(self, initial_state: Environment, nb_simulations=800, round_time=None):
         """
@@ -264,8 +264,7 @@ class MCTS:
                 time_spent = time.time() - start_time
                 time_left = round_time - time_spent if round_time else 0
                 if time_spent > 0 and \
-                    self.stop(n, time_left, time_spent, visits_best, visits_second_best):
-                    print("\nSTOP\n")
+                        self.stop(n, time_left, time_spent, visits_best, visits_second_best):
                     print(f"temps économisé: {time_left}")
                     break
 

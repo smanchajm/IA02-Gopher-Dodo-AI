@@ -215,7 +215,9 @@ def strategy_gopher(
         return env, (0, env.hex_size - 1)
 
     # Stratégie de survie si le temps restant est trop faible pour alpha-beta
-    if time_left < 15:
+    if time_left < 20:
+        #print("mcts")
+        #print("time left", env.total_time)
         play_time = time_left / (20 + max(33 - env.current_round, 0))
         mcts = MCTS()
         action = mcts.search(env, round_time=play_time)
@@ -290,7 +292,8 @@ if __name__ == "__main__":
     available_games = [DODO_STR, GOPHER_STR]
     if args.disable_dodo:
         available_games.remove(DODO_STR)
-    if args.disable_gopher:        available_games.remove(GOPHER_STR)
+    if args.disable_gopher:
+        available_games.remove(GOPHER_STR)
 
     start(
         args.server_url,

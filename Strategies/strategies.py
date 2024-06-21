@@ -1,6 +1,7 @@
 """ Module contenant les différentes stratégies pour le jeu Strategies """
 
 import random
+import time
 from cmath import log
 from typing import Callable
 
@@ -130,7 +131,7 @@ def minmax_action(
 
 
 def minmax_action_alpha_beta_pruning(
-    env: Environment, player: PlayerLocal, depth: int = 0
+    env: Environment, player: PlayerLocal, depth: int = 0, start_time: float = 0
 ) -> tuple[float, Action]:
     """
     Stratégie qui retourne le résultat de l'algorithme Minimax avec élagage Alpha-Beta
@@ -142,6 +143,7 @@ def minmax_action_alpha_beta_pruning(
         depth: int,
         alpha: float,
         beta: float,
+        start_time: float,
     ) -> tuple[float, Action]:
 
         # Si la profondeur est nulle ou si la partie est terminée
@@ -156,12 +158,17 @@ def minmax_action_alpha_beta_pruning(
             score = evaluate_dynamic(env, env.grid, player)
             return score, (-1, -1)
 
+        # Si le temps est écoulé on arrête la recherche
+        if env.total_time - time.time() - start_time >= 20:
+            print("break")
+            return -5, (int("-inf"), int("inf"))
+
         if player.id == env.max_player.id:  # Maximizing player
             best_max: tuple[float, Action] = (float("-inf"), (-1, -1))
             for action in env.legals(player):
                 env.play(action)
                 returned_values = minmax_alpha_beta_pruning(
-                    env, env.min_player, depth - 1, alpha, beta
+                    env, env.min_player, depth - 1, alpha, beta, start_time
                 )
                 env.reverse_action(action)
                 if returned_values[0] > best_max[0]:
@@ -176,7 +183,7 @@ def minmax_action_alpha_beta_pruning(
             for item in env.legals(player):
                 env.play(item)
                 returned_values = minmax_alpha_beta_pruning(
-                    env, env.max_player, depth - 1, alpha, beta
+                    env, env.max_player, depth - 1, alpha, beta, start_time
                 )
                 env.reverse_action(item)
                 if returned_values[0] < best_min[0]:
@@ -188,14 +195,14 @@ def minmax_action_alpha_beta_pruning(
             return best_min
         return 0, (-3, -3)
 
-    return minmax_alpha_beta_pruning(env, player, depth, float("-inf"), float("inf"))
+    return minmax_alpha_beta_pruning(env, player, depth, float("-inf"), float("inf"), start_time)
 
 
 def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
     """
     Stratégie qui retourne l'action calculée par l'algorithme Minimax
     """
-
+    start_time = time.time()
     try:
         depth_factor = 1 / (log(len(env.legals(player)), 2) / 5) * 1.2
     except ZeroDivisionError:
@@ -205,15 +212,25 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
     bonus = 1.0
 
     if env.hex_size <= 4:
-        bonus = 1.5
+        bonus = 2
 
     depth = 6 + round(depth_factor * bonus)
 
     if env.game == "Gopher":
         depth += 1
-        depth = min(depth, 10)
+        if len(env.legals(player)) >= 8:
+            depth = min(depth, 8)
+    print(f"len {len(env.legals(player))}")
+    print(f"depth {depth}")
 
-    return minmax_action_alpha_beta_pruning(env, player, depth)[1]
+    res = minmax_action_alpha_beta_pruning(env, player, depth, start_time)
+    action: Action = res[1]
+    score: float = res[0]
+    if score < 0:
+        print("\ntime out\n")
+        return random.choice(env.legals(player))
+    print("normal")
+    return action
 
 
 def strategy_mcts(env: Environment, player: PlayerLocal) -> Action:
