@@ -178,7 +178,7 @@ def gopher(
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
-            print_gopher(env)
+            print_grid(env)
             print(
                 f"Temps écoulé pour cette itération: {time.time() - iteration_time_start}"
                 f" secondes"
