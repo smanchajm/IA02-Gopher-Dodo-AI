@@ -116,6 +116,7 @@ class GameDodo(Environment):
         )
 
         self.precedent_state = self.grid.copy()
+        self.one_line = False
 
         self.max_positions = MaxPositionsCr(player=self.max_player, positions={})
         self.min_positions = MinPositionsCr(player=self.min_player, positions={})

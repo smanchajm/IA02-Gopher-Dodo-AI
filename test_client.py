@@ -80,8 +80,17 @@ def initialize_for_network(
     else:
         game_param = "Gopher"
 
+    env = initialize(game_param, grid, player, hex_size, total_time)
+    i = 0
+    for cell in env.grid:
+        if env.grid[cell] != 0:
+            i += 1
+
+    if i == 74 and game_param == "Dodo":
+        env.one_line = True
+
     # Appel de la fonction d'initialisation du jeu
-    return initialize(game_param, grid, player, hex_size, total_time)
+    return env
 
 
 def strategy_brain(
@@ -168,7 +177,7 @@ def strategy_dodo(
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)
     # Calcul du temps de jeu en fonction du nombre de tours restants (voir article ReadMe)
-    if env.hex_size == 7:
+    if env.hex_size == 7 or env.hex_size == 6:
         play_time = time_left / (100 + max(100 - env.current_round, 0))
     else:
         play_time = time_left / (25 + max(50 - env.current_round, 0))
@@ -238,7 +247,6 @@ def optimal_strategy(env: Environment, state: State, player: Player, time_left: 
     return env, action
 
 
-
 def main_strategy(
     env: Environment, state: State, player: Player, time_left: Time
 ) -> tuple[Environment, Action]:
@@ -264,8 +272,8 @@ if __name__ == "__main__":
     parser.add_argument("group_id")
     parser.add_argument("members")
     parser.add_argument("password")
-    parser.add_argument("-s", "--server-url", default="http://lagrue.ninja/")
-    # parser.add_argument("-s", "--server-url", default="http://localhost:8080/")
+    #parser.add_argument("-s", "--server-url", default="http://lagrue.ninja/")
+    parser.add_argument("-s", "--server-url", default="http://localhost:8080/")
     parser.add_argument("-d", "--disable-dodo", action="store_true")
     parser.add_argument("-g", "--disable-gopher", action="store_true")
     args = parser.parse_args()
