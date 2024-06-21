@@ -320,7 +320,7 @@ class GameGopher(Environment):
 
         return result
 
-    def final(self, debug: bool = False) -> int:
+    def final(self) -> int:
         """
         Fonction retournant le score si nous sommes dans un état final (fin de partie)
         """

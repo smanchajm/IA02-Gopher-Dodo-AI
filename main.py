@@ -153,10 +153,7 @@ def gopher(
             if tour == 1 and env.current_player == env.max_player:
                 current_action = (0, env.hex_size - 1)
             else:
-                # current_action = strategy_1(env, env.current_player)
-                mcts = MCTS()
-
-                current_action = mcts.search(env)
+                current_action = strategy_1(env, env.current_player)
 
             time_history_max.append(
                 time.time() - iteration_time_start
@@ -178,7 +175,7 @@ def gopher(
 
         # Affichage de la grille de jeu et du temps d'itération
         if debug:
-            print_gopher(env)
+            print_grid(env)
             print(
                 f"Temps écoulé pour cette itération: {time.time() - iteration_time_start}"
                 f" secondes"
@@ -334,6 +331,8 @@ def launch_multi_game(
     name: str = "Dodo",
     strategy_1: Any = strategy_minmax,
     strategy_2: Any = strategy_minmax,
+    timer: Time = 720,
+    size_init_grid: int = 4,
 ):
     """
     Fonction permettant de lancer plusieurs parties de jeu à la suite
@@ -346,7 +345,6 @@ def launch_multi_game(
         graphics = False
 
     list_results = []  # Liste pour stocker les résultats des parties
-    size_init_grid = 4  # Taille de la grille de jeu
 
     if name == "Dodo":
         print("Lancement de Dodo")
@@ -356,7 +354,7 @@ def launch_multi_game(
                 init_grid = convert_grid(INIT_GRID4, size_init_grid)
             else:
                 init_grid = convert_grid(INIT_GRID, size_init_grid)
-            game = initialize("Dodo", init_grid, 1, size_init_grid, 720)
+            game = initialize("Dodo", init_grid, 1, size_init_grid, timer)
             res = dodo(
                 game,
                 strategy_1,
@@ -408,13 +406,19 @@ def main():
     )
     parser.add_argument(
         "--strategy1", choices=["minmax", "random", "mcts"], default="random",
-        # "--strategy1", choices=["minmax", "random", "mcts"], default="random",
         help="Strategy for player 1 (default: random)"
     )
     parser.add_argument(
         "--strategy2", choices=["minmax", "random", "mcts"], default="mcts",
-        # "--strategy2", choices=["minmax", "random", "mcts"], default="mcts",
         help="Strategy for player 2 (default: mcts)"
+    )
+    parser.add_argument(
+        "--time", type=int, default=360, 
+        help="Time for the mcts strategy (default: 720)"
+    )
+    parser.add_argument(
+        "--size", type=int, default=4,
+        help="Size of the initial grid (default: 4)"
     )
 
     args = parser.parse_args()
@@ -434,6 +438,8 @@ def main():
             name="Dodo",
             strategy_1=strategy_1,
             strategy_2=strategy_2,
+            timer=Time(args.time*2),
+            size_init_grid=args.size,
         )
     else:
         launch_multi_game(
@@ -441,6 +447,8 @@ def main():
             name="Gopher",
             strategy_1=strategy_1,
             strategy_2=strategy_2,
+            timer=Time(args.time*2),
+            size_init_grid=args.size,
         )
 
 
