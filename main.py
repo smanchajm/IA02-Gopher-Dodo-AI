@@ -348,6 +348,8 @@ def launch_multi_game(
 
     if name == "Dodo":
         print("Lancement de Dodo")
+        print(f"Stratégie 1: {strategy_1.__name__} pour le joueur R")
+        print(f"Stratégie 2: {strategy_2.__name__} pour le joueur B")
         # Lancement de n parties de jeu Dodo
         for i in range(game_number):
             if size_init_grid == 4:
@@ -369,10 +371,11 @@ def launch_multi_game(
     else:
         name = "Gopher"
         print("Lancement de Gopher")
+        print(f"Stratégie 1: {strategy_1.__name__} pour le joueur R")
+        print(f"Stratégie 2: {strategy_2.__name__} pour le joueur B")
         init_grid = new_gopher(size_init_grid)
         for i in range(game_number):
             game = initialize("Gopher", init_grid, 1, size_init_grid, 720)
-
             res = gopher(
                 game,
                 strategy_1,
