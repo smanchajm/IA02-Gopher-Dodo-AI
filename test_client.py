@@ -171,7 +171,7 @@ def strategy_dodo(
     if env.hex_size == 7:
         play_time = time_left / (100 + max(100 - env.current_round, 0))
     else:
-        play_time = time_left / (25 + max(50 - env.current_round, 0))
+        play_time = time_left / (25 + max(27 - env.current_round, 0))
     print("play_time", play_time)
     print(f"time left {time_left}")
 
