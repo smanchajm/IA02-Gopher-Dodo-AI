@@ -168,24 +168,6 @@ def strategy_dodo(
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)
     # Calcul du temps de jeu en fonction du nombre de tours restants (voir article ReadMe)
-
-    """
-    if player == 1:
-        leg: List[Action] = env.legals(env.max_player)
-        print(f"leg {leg}")
-        for action in up_oppenings:
-            if action not in leg:
-                print("opening")
-                return env, action
-    else:
-        leg: List[Action] = env.legals(env.min_player)
-        print(f"leg {leg}")
-        for action in down_oppenings:
-            if action not in leg:
-                print("opening")
-                print(f"action {action}")
-                return env, action """
-
     if env.hex_size == 7:
         play_time = time_left / (100 + max(100 - env.current_round, 0))
     else:
@@ -215,9 +197,7 @@ def strategy_gopher(
         return env, (0, env.hex_size - 1)
 
     # Stratégie de survie si le temps restant est trop faible pour alpha-beta
-    if time_left < 20:
-        #print("mcts")
-        #print("time left", env.total_time)
+    if time_left < 25:
         play_time = time_left / (20 + max(33 - env.current_round, 0))
         mcts = MCTS()
         action = mcts.search(env, round_time=play_time)

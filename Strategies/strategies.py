@@ -212,15 +212,20 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
     bonus = 1.0
 
     if env.hex_size <= 4:
-        bonus = 2
+        bonus = 1.5
 
     depth = 6 + round(depth_factor * bonus)
 
     if env.game == "Gopher":
-        depth += 1
+        # Profondeur maximale pour le jeu Gopher
         if len(env.legals(player)) >= 8:
-            depth = min(depth, 8)
-    print(f"len {len(env.legals(player))}")
+            depth = min(depth, 7)
+        # Si la taille de la grille est supérieure ou égale à 6 on limite la profondeur
+        if env.hex_size >= 6:
+            depth = min(depth, 10)
+
+        # On limite la profondeur à 15
+        depth = min(depth, 15)
     print(f"depth {depth}")
 
     res = minmax_action_alpha_beta_pruning(env, player, depth, start_time)
@@ -229,7 +234,6 @@ def strategy_minmax(env: Environment, player: PlayerLocal) -> Action:
     if score < 0:
         print("\ntime out\n")
         return random.choice(env.legals(player))
-    print("normal")
     return action
 
 
