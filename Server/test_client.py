@@ -4,12 +4,14 @@ import argparse
 import ast
 
 from Game_playing.hexagonal_board import neighbor_gopher
+from Game_playing.structures_classes import (Action, Environment, GridDict,
+                                             Score, State, Time)
+
 from Strategies.mcts import MCTS
 from Strategies.strategies import (strategy_first_legal, strategy_minmax,
                                    strategy_random)
 from main import initialize
-from Game_playing.structures_classes import (Action, Environment, GridDict,
-                                             Score, State, Time)
+
 from Server.gndclient import DODO_STR, GOPHER_STR, Player, start
 
 
@@ -175,7 +177,7 @@ def strategy_dodo(
     # Réinitialisation de l'environnement
     env = reinit(env, time_left, state, player)
     # Calcul du temps de jeu en fonction du nombre de tours restants (voir article ReadMe)
-    if env.hex_size == 7 or env.hex_size == 6:
+    if env.hex_size in (6, 7):
         play_time = time_left / (100 + max(100 - env.current_round, 0))
     else:
         play_time = time_left / (25 + max(27 - env.current_round, 0))
@@ -200,7 +202,7 @@ def strategy_gopher(
     env = reinit(env, time_left, state, player)
 
     # Ouverture déterministe dans un coin
-    if env.max_player.id == 1 and (env.current_round == 0 or env.current_round == 1):
+    if env.max_player.id == 1 and (env.current_round in (0, 1)):
         return env, (0, env.hex_size - 1)
 
     # Stratégie de survie si le temps restant est trop faible pour alpha-beta
@@ -219,7 +221,8 @@ def strategy_gopher(
     return env, action
 
 
-def optimal_strategy(env: Environment, state: State, player: Player, time_left: Time) -> tuple[Environment, Action]:
+def optimal_strategy(env: Environment, state: State, player: Player, time_left: Time) \
+    -> tuple[Environment, Action]:
     """
     Fonction permettant de jouer la stratégie optimale pour Gopher
     si nous sommes joueur un et que nous sommes sur une grille impaire
@@ -228,7 +231,7 @@ def optimal_strategy(env: Environment, state: State, player: Player, time_left: 
     env = reinit(env, time_left, state, player)
 
     # Ouverture déterministe dans un coin
-    if env.max_player.id == 1 and (env.current_round == 0 or env.current_round == 1):
+    if env.max_player.id == 1 and (env.current_round in (0, 1)):
         env.precedent_action = (0, env.hex_size - 1)
         return env, (0, env.hex_size - 1)
 
@@ -236,7 +239,6 @@ def optimal_strategy(env: Environment, state: State, player: Player, time_left: 
     for cell in neighbor_gopher(opponent_action[0], opponent_action[1], env.max_player.directions):
         if cell in env.grid and env.grid[cell] == env.max_player.id:
             neighbor_action = cell
-
 
     delta = (opponent_action[0] - neighbor_action[0], opponent_action[1] - neighbor_action[1])
     action = (opponent_action[0] + delta[0], opponent_action[1] + delta[1])
