@@ -411,7 +411,7 @@ def main():
     )
     parser.add_argument(
         "--time", type=int, default=360, 
-        help="Time for the mcts strategy (default: 720)"
+        help="Time for the mcts strategy (default: 360)"
     )
     parser.add_argument(
         "--size", type=int, default=4,

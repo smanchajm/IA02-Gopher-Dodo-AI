@@ -31,7 +31,6 @@ Both games are played on a hexagonal board. The implementation is freely inspire
 
 ```sh
 git clone https://github.com/smanchajm/gopher-dodo.git
-cd Game_playing
 ```
 
 2. Install the required Python packages:
@@ -40,7 +39,9 @@ cd Game_playing
 pip install matplotlib
 ```
 
-## Usage
+3. Add the project path to the PYTHONPATH environment variable
+
+## Normal usage
 
 You can run the simulations from the command line by specifying the game type and various options:
 
@@ -57,6 +58,8 @@ python3 main.py <game> [options]
 * `--games`: Number of games to play (default: 1).
 * `--strategy1`: Strategy for player 1 (`minmax`, `random`, `mcts`; default: `minmax`).
 * `--strategy2`: Strategy for player 2 (`minmax`, `random`, `mcts`; default: `minmax`).
+* `--size`: Size of the board (default: 4).
+* `--time`: Time limit for one player (default: 360 seconds).
 
 ### Examples
 
@@ -72,6 +75,53 @@ python3 main.py <game> [options]
    python3 main.py gopher --games 5 --strategy1 mcts --strategy2 mcts
    ```
 
+## Server usage
+
+The server runs on the command line (terminal under Linux and macOS, powershell under Windows)
+
+1. Go in the directory `Server`
+2. Add execution rights (if necessary under Linux and MaxOS): `chmod a+x <gndserver-1.0.2-...>`
+3. Check operation and see the options: `./gndserver-1.0.2-...`
+
+```bash
+# all options
+./gndserver -h
+```
+
+```bash
+# launch a dodo server against a random player
+./gndserver -game dodo -random
+```
+
+```bash
+# run a gopher server against a random player
+./gndserver -game gopher -random
+```
+
+```bash
+# launch a gopher server against a random gopher player who will be the blue player
+./gndserver -game gopher -rcolor blue -random
+```
+
+```bash
+# reset all
+rm config.json server.json
+```
+
+## Client usage
+
+You could use the client to connect to the server and play the game.
+The format of the command is as follows:
+
+```bash
+python test_client.py <id_group> <player_name> <player_key>
+```
+
+```bash
+# launch the client
+python test_client.py 12 toto totovelo
+```
+
 ## Code Structure
 
 * `view_graphic`: Displays iteration time as a graph.
@@ -81,13 +131,13 @@ python3 main.py <game> [options]
 * `grid_state_color`: Converts the game state into a colored grid representation.
 * `print_gopher`: Prints the current state of the "Gopher" game board.
 * `launch_multi_game`: Runs multiple game sessions consecutively and stores the results.
-* `main`: 
-
+* `main`: Main script to run the simulations.
 
 ## Implementation
 
 ### Game Representation
-Afin de représenter les deux jeux, nous avons utilisé une grille hexagonale. Chaque case de la grille est représentée par un tuple (x, y) qui correspond à ses coordonnées. Les cases sont stockées dans un dictionnaire où la clé est le tuple (x, y) et la valeur est l'état de la case (0, 1, 2) en fonction du joueur. L'accès aux cases et donc en O(1). 
+
+Afin de représenter les deux jeux, nous avons utilisé une grille hexagonale. Chaque case de la grille est représentée par un tuple (x, y) qui correspond à ses coordonnées. Les cases sont stockées dans un dictionnaire où la clé est le tuple (x, y) et la valeur est l'état de la case (0, 1, 2) en fonction du joueur. L'accès aux cases et donc en O(1).
 De plus, deux autres dictionnaires sont utilisés pour stocker les positions des joueurs et les cases adjacentes à chaque case, afin de réduire la complexité.
 
 ### Game Environment
@@ -98,7 +148,6 @@ De plus, deux autres dictionnaires sont utilisés pour stocker les positions des
 
 &rarr; Cette implémentation permet de facilement ajouter de nouveaux jeux en héritant de la classe `Environment`. De plus, chaque stratégie peut être utilisée pour n'importe quel jeu (GGP MCTS).
 
-
 ### Optimisations
 
 * **Cache des scores** : Pour éviter de recalculer les scores des cases à chaque itération, un cache a été mis en place. Ainsi, les scores des cases sont calculés une seule fois et stockés dans un dictionnaire.
@@ -107,17 +156,21 @@ De plus, deux autres dictionnaires sont utilisés pour stocker les positions des
 * **numpy** : L'utilisation de la bibliothèque `numpy` a été envisagée pour optimiser les calculs. Cependant, l'implémentation n'a pas pu être réalisée par manque de temps.
 
 ## Minimax variant
+
 ### Classic Minimax
 
-Un minimax classique a été implémenté pour les deux jeux. Cependant, même avec la mémoïsation le temps de calcul est très long pour le jeu Gopher. Pour le jeu Dodo, le temps de calcul est acceptable pour une profondeur de 5. 
+Un minimax classique a été implémenté pour les deux jeux. Cependant, même avec la mémoïsation le temps de calcul est très long pour le jeu Gopher. Pour le jeu Dodo, le temps de calcul est acceptable pour une profondeur de 5.
 
 ### Alpha-Beta Pruning
-* Implémentation de l'élagage alpha-bêta pour réduire le nombre de nœuds explorés. 
+
+* Implémentation de l'élagage alpha-bêta pour réduire le nombre de nœuds explorés.
 * Ajout d'un cache pour stocker les valeurs des nœuds explorés.
 * Implémentation d'un stop time afin de breaker la recherche en profondeur si le temps restant est trop faible.
 
 ### Evaluation function
+
 Pour le jeu **Dodo**
+
 * Nombre de coups légaux
 * Distance entre les deux joueurs
 * Distance entre les joueurs et les bords
@@ -129,17 +182,19 @@ Une profondeur adaptative a été implémentée. L'idée est de calculer la prof
 En effet, la profondeur a besoin d'être différente en fonction de l'avancement de la partie.
 
 Fonction de calcul de la profondeur adaptative :
+
 * **depth_factor** = 1 / (log(len(env.legals(player)), 2) / 5) * 1.2
 
 &rarr; Ceci donne de bons résultats. Néanmoins, il est compliqué de trouver un bon facteur car l'explosion combinatoire est très rapide et ne dépend pas que du nombre de coups possibles.
 
-
 ## Monte Carlo Tree Search (MCTS) UCB 1
 
 ### Structure
+
 L'implémentation de ce MCTS a fortement été inspirée de l'article de l'article de [Monte Carlo Tree Search (MCTS) algorithm for dummies!](https://medium.com/@_michelangelo_/monte-carlo-tree-search-mcts-algorithm-for-dummies-74b2bae53bfa) et de * [MCTS python](https://ai-boson.github.io/mcts/)
 
 L'implémentation est donc composée de 2 classes :
+
 * **Node** : Représente un noeud de l'arbre de recherche. Contient les informations suivantes :
   * `state` : L'état du jeu à ce noeud.
   * `parent` : Le noeud parent.
@@ -158,8 +213,6 @@ L'implémentation est donc composée de 2 classes :
 
 Pour optimiser la complexité spatiale, seules les actions possibles sont stockées dans les noeuds. Les états du jeu ne sont pas stockés. Néanmoins pour mieux coller à notre structure de jeu, nous avons stocké les noeuds joués afin de pouvoir reverse les coups.
 
-
-
 ### Time Management
 
 Un des gros avantages de MCTS est qu'il est possible de le stopper à tout moment pour récupérer le meilleur coup trouvé. Cependant, il est important de gérer le temps de calcul pour ne pas dépasser le temps imparti. Pour cela, nous avons implémenté un système de time management basé sur le nombre de simulations effectuées.
@@ -168,7 +221,9 @@ Un des gros avantages de MCTS est qu'il est possible de le stopper à tout momen
 * **Stop time** : Pour éviter de dépasser le temps imparti, nous avons implémenté un système de stop time inspiré de l'article de [Maastricht University](https://dke.maastrichtuniversity.nl/m.winands/documents/time_management_for_monte_carlo_tree_search.pdf). Après chaque simulation, nous vérifions la différence de visite entre l'enfant le plus visité et le second. Si cette différence est trop grande pour être rattrapée, nous stoppons la recherche.
 
 ## Optimisations MCTS
+
 Optimisations non implémentées par manque de temps :
+
 * **Parallelisations** : Il est possible de paralléliser les simulations pour accélérer le temps de calcul
   * **Root parallelisation** : Chaque simulation est lancée dans un thread différent. Se pose la question de la concaténation des résultats.
   * **Leaf parallelisation** : Implémentation d'une virtual loss [Parallel Monte-Carlo Tree Search - Maastricht University](https://dke.maastrichtuniversity.nl/m.winands/documents/multithreadedMCTS2.pdf)
@@ -209,4 +264,3 @@ Optimisations non implémentées par manque de temps :
 ## License
 
 [GNU GPL v3.0](https://choosealicense.com/licenses/gpl-3.0/)
-
