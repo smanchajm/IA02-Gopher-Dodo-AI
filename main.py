@@ -7,10 +7,8 @@ from typing import Any, List
 import matplotlib
 import matplotlib.pyplot as plt
 from Server.gndclient import BLUE, RED, State, cell_to_grid, empty_grid
-from Strategies.mcts import MCTS
 from Strategies.strategies import (StrategyLocal, strategy_minmax, strategy_random, strategy_mcts)
 from Game_playing.benchmark import add_to_benchmark
-import Game_playing.hexagonal_board as hexa
 from Game_playing.grid import INIT_GRID, INIT_GRID4
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, Environment, GameDodo,
@@ -81,10 +79,6 @@ def dodo(
         )  # Fin du chronomètre pour la durée de cette itération
 
         if debug:
-            # if env.hex_size == 4:
-                # print_dodo(env, INIT_GRID4)
-            # else:
-                # print_dodo(env, INIT_GRID)
             print_grid(env)
             print(
                 f"Temps écoulé pour cette itération: {iteration_time_end - iteration_time_start}"
