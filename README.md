@@ -251,7 +251,7 @@ Optimizations not implemented due to lack of time:
 
 * **Random**: A player who plays randomly.
 * **First legal move**: A player who plays the first legal move found.
-* **Ngascout**: We also tried to implement a Negascout. However, alpha-beta was already working well, so we decided not to use it to focus on MCTS.
+* **Ngascout**: We also tried to implement a Negascout based on [Beat my chess ai](https://github.com/danthurston/BeatMyChessAI/tree/main) implementation. However, alpha-beta was already working well, so we decided not to use it to focus on MCTS.
 
 ## Results
 
