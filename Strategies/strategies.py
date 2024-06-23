@@ -7,7 +7,7 @@ from typing import Callable
 
 from Game_playing.structures_classes import (Action, Cell, Environment,
                                              GridDict, PlayerLocal)
-from mcts import MCTS
+from Strategies.mcts import MCTS
 
 StrategyLocal = Callable[[Environment, PlayerLocal], Action]
 

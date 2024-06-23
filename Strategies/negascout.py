@@ -1,11 +1,10 @@
 """ Minimax with NegaScout algorithm """
-import time
 from cmath import inf
 from copy import deepcopy
 
 from Game_playing.structures_classes import (
     Action,
-    Environment, PlayerLocal, ALL_DIRECTIONS, GameGopher, generate_grid
+    Environment, PlayerLocal
 )
 
 from strategies import evaluate_dynamic, strategy_minmax
