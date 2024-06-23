@@ -4,23 +4,38 @@ The aim of this project is to create artificial Gopher and Dodo players capable 
 
 ## Table of Contents
 
-1. [Rules](#rules)
-2. [Features](#features)
-3. [Requirements](#requirements)
-4. [Installation](#installation)
-5. [Normal Usage](#normal-usage)
-6. [Server Usage](#server-usage)
-7. [Client Usage](#client-usage)
-8. [Code Structure](#code-structure)
-9. [Implementation](#implementation)
-10. [Minimax Variant](#minimax-variant)
-11. [Monte Carlo Tree Search (MCTS) UCB 1](#monte-carlo-tree-search-mcts-ucb-1)
-12. [Other Strategies](#other-strategies)
-13. [Results](#results)
-14. [Conclusion](#conclusion)
-15. [Resources](#resources)
-16. [Contributors](#contributors)
-17. [License](#license)
+- [Board Game AI Challenge: Dodo and Gopher AI](#board-game-ai-challenge-dodo-and-gopher-ai)
+  - [Table of Contents](#table-of-contents)
+  - [Rules](#rules)
+  - [Features](#features)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Normal Usage](#normal-usage)
+    - [Arguments](#arguments)
+    - [Options](#options)
+    - [Examples](#examples)
+  - [Server Usage](#server-usage)
+  - [Client Usage](#client-usage)
+  - [Code Structure](#code-structure)
+  - [Implementation](#implementation)
+    - [Game Representation](#game-representation)
+    - [Game Environment](#game-environment)
+    - [Optimizations](#optimizations)
+  - [Minimax Variant](#minimax-variant)
+    - [Classic Minimax](#classic-minimax)
+    - [Alpha-Beta Pruning](#alpha-beta-pruning)
+    - [Evaluation Function](#evaluation-function)
+    - [Adaptive Depth](#adaptive-depth)
+  - [Monte Carlo Tree Search (MCTS) UCB 1](#monte-carlo-tree-search-mcts-ucb-1)
+    - [Structure](#structure)
+    - [Time Management](#time-management)
+    - [MCTS Optimizations](#mcts-optimizations)
+  - [Other Strategies](#other-strategies)
+  - [Results](#results)
+  - [Conclusion](#conclusion)
+  - [Resources](#resources)
+  - [Contributors](#contributors)
+  - [License](#license)
 
 ## Rules
 
@@ -146,7 +161,7 @@ python test_client.py 12 toto totovelo
 * `gopher`: Game loop for "Gopher" with specific initialization for the first move.
 * `initialize`: Initializes the game environment.
 * `grid_state_color`: Converts the game state into a colored grid representation.
-* `print_gopher`: Prints the current state of the "Gopher" game board.
+* `print_grid`: Prints the current state of a Gopher or Dodo game board.
 * `launch_multi_game`: Runs multiple game sessions consecutively and stores the results.
 * `main`: Main script to run the simulations.
 
