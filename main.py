@@ -414,7 +414,7 @@ def main():
         help="Time for the mcts strategy (default: 360)"
     )
     parser.add_argument(
-        "--size", type=int, default=4,
+        "--size", type=int, default=4, choices=[4, 7],
         help="Size of the initial grid (default: 4)"
     )
 
