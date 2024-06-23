@@ -13,7 +13,7 @@ from Game_playing.grid import INIT_GRID, INIT_GRID4
 from Game_playing.structures_classes import (ALL_DIRECTIONS, DOWN_DIRECTIONS,
                                              UP_DIRECTIONS, Action, Environment, GameDodo,
                                              GameGopher, GridDict, PlayerLocal,
-                                             Time, convert_grid, new_gopher)
+                                             Time, convert_grid, generate_grid)
 
 matplotlib.use("TkAgg")
 
@@ -243,7 +243,7 @@ def initialize(game: str, grid: GridDict, player: int, hex_size: int, total_time
         )
 
     # Initialisation de l'environnement du jeu Gopher
-    grid = new_gopher(hex_size) # Création de la grille de jeu Gopher
+    grid = generate_grid(hex_size)  # Création de la grille de jeu Gopher
 
     # Initialisation de l'environnement du jeu Gopher si nous jouons en premier
     if player == 1:
@@ -367,7 +367,7 @@ def launch_multi_game(
         print("Lancement de Gopher")
         print(f"Stratégie 1: {strategy_1.__name__} pour le joueur R")
         print(f"Stratégie 2: {strategy_2.__name__} pour le joueur B")
-        init_grid = new_gopher(size_init_grid)
+        init_grid = generate_grid(size_init_grid)
         for i in range(game_number):
             game = initialize("Gopher", init_grid, 1, size_init_grid, 720)
             res = gopher(

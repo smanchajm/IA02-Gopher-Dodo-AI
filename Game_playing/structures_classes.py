@@ -380,18 +380,15 @@ class GameGopher(Environment):
 Strategy = Callable[[Environment, PlayerLocal, GridDict, dict], Action]
 
 
-def new_gopher(h: int) -> GridDict:
+def generate_grid(t: int) -> GridDict:
     """
-    Fonction permettant de créer une nouvelle grille de jeu pour Gopher
+    Fonction permettant de créer une nouvelle grille vide
     """
-    h = h - 1  # pour avoir un plateau de taille h
-    res: GridDict = {}
-    for r in range(h, -h - 1, -1):
-        qmin = max(-h, r - h)
-        qmax = min(h, r + h)
-        for q in range(qmin, qmax + 1):
-            res[(q, r)] = EMPTY
-    return res
+    grid: GridDict = {}
+    for r in range(t-1, -(t-1) - 1, -1):
+        for q in range(min((t-1), r + (t-1)), max(-(t-1), r - (t-1)) + 1):
+            grid[(q, r)] = EMPTY
+    return grid
 
 
 def print_dodo(env: GameDodo, empty_grid: Grid):
@@ -412,7 +409,7 @@ def convert_grid(grid: Grid, hex_size: int) -> GridDict:
     """
     Fonction permettant de convertir une grille de jeu (tuple) en dictionnaire
     """
-    new_gopher(hex_size)
+    generate_grid(hex_size)
     res: GridDict = {}
     for i in range(0, len(grid)):
         for j in range(0, len(grid[i])):

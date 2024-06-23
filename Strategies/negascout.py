@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from Game_playing.structures_classes import (
     Action,
-    Environment, PlayerLocal, ALL_DIRECTIONS, GameGopher, new_gopher
+    Environment, PlayerLocal, ALL_DIRECTIONS, GameGopher, generate_grid
 )
 
 from strategies import evaluate_dynamic, strategy_minmax
@@ -81,43 +81,3 @@ class NegaScoutEngine:
 
 
 
-def main():
-    """
-    Main function
-    """
-    init_grid = new_gopher(4)
-
-
-    # Creation of the board
-    player_param: PlayerLocal = PlayerLocal(1, ALL_DIRECTIONS)
-    player_opponent: PlayerLocal = PlayerLocal(2, ALL_DIRECTIONS)
-    game = GameGopher(
-        init_grid,
-        player_param,
-        player_opponent,
-        player_param,
-        4,
-        300,
-        0,
-        init_grid,
-        "Gopher",
-    )
-
-    # best move with NegaScout
-    start = time.time()
-    best_move = strategy_minmax(game, player_param)
-    print(f"Best move alpha: {best_move}")
-    print(f"Time: {time.time() - start}")
-
-
-    engine = NegaScoutEngine(game, 7)
-    start = time.time()
-    best_move = engine.get_move(player_param)
-    print(f"Best move nega: {best_move}")
-    print(f"Time: {time.time() - start}")
-
-
-
-
-if __name__ == '__main__':
-    main()

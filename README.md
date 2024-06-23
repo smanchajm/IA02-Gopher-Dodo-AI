@@ -1,9 +1,26 @@
-# Board Game AI Challenge : Dodo and Gopher AI
+# Board Game AI Challenge: Dodo and Gopher AI
 
-The aim of this project is to create artificial Gopher and Dodo players capable of playing in an AI competition.
-This project was carried out as part of the IA02 (Problem-Solving and Logic Programming) course at the Compiegne University of Technology (UTC).
+The aim of this project is to create artificial Gopher and Dodo players capable of competing in an AI challenge. This project was carried out as part of the IA02 (Problem-Solving and Logic Programming) course at the Compiegne University of Technology (UTC). These two games were created by Mark Steere.
 
-These two games were created by Mark Steere.
+## Table of Contents
+
+1. [Rules](#rules)
+2. [Features](#features)
+3. [Requirements](#requirements)
+4. [Installation](#installation)
+5. [Normal Usage](#normal-usage)
+6. [Server Usage](#server-usage)
+7. [Client Usage](#client-usage)
+8. [Code Structure](#code-structure)
+9. [Implementation](#implementation)
+10. [Minimax Variant](#minimax-variant)
+11. [Monte Carlo Tree Search (MCTS) UCB 1](#monte-carlo-tree-search-mcts-ucb-1)
+12. [Other Strategies](#other-strategies)
+13. [Results](#results)
+14. [Conclusion](#conclusion)
+15. [Resources](#resources)
+16. [Contributors](#contributors)
+17. [License](#license)
 
 ## Rules
 
@@ -41,7 +58,7 @@ pip install matplotlib
 
 3. Add the project path to the PYTHONPATH environment variable
 
-## Normal usage
+## Normal Usage
 
 You can run the simulations from the command line by specifying the game type and various options:
 
@@ -75,7 +92,7 @@ python3 main.py <game> [options]
    python3 main.py gopher --games 5 --strategy1 mcts --strategy2 mcts
    ```
 
-## Server usage
+## Server Usage
 
 The server runs on the command line (terminal under Linux and macOS, powershell under Windows)
 
@@ -108,7 +125,7 @@ The server runs on the command line (terminal under Linux and macOS, powershell 
 rm config.json server.json
 ```
 
-## Client usage
+## Client Usage
 
 You could use the client to connect to the server and play the game.
 The format of the command is as follows:
@@ -137,116 +154,117 @@ python test_client.py 12 toto totovelo
 
 ### Game Representation
 
-Afin de représenter les deux jeux, nous avons utilisé une grille hexagonale. Chaque case de la grille est représentée par un tuple (x, y) qui correspond à ses coordonnées. Les cases sont stockées dans un dictionnaire où la clé est le tuple (x, y) et la valeur est l'état de la case (0, 1, 2) en fonction du joueur. L'accès aux cases et donc en O(1).
-De plus, deux autres dictionnaires sont utilisés pour stocker les positions des joueurs et les cases adjacentes à chaque case, afin de réduire la complexité.
+To represent the two games, we used a hexagonal grid. Each cell in the grid is represented by a tuple (x, y) corresponding to its coordinates. The cells are stored in a dictionary where the key is the tuple (x, y) and the value is the state of the cell (0, 1, 2) depending on the player. Access to the cells is O(1). Additionally, two other dictionaries are used to store the players' positions and the cells adjacent to each cell to reduce complexity.
 
 ### Game Environment
 
-* **Environment** : Afin que les deux jeux puissent utiliser les mêmes stratégies et structures de données une classe abstraite `Environment` a été créée. Cette classe contient les méthodes nécessaires pour initialiser le jeu, effectuer un mouvement, vérifier la fin du jeu, obtenir les mouvements possibles, etc.
-* **Dodo** : La classe `Dodo` hérite de la classe `Environment` et implémente les règles spécifiques au jeu Dodo.
-* **Gopher** : La classe `Gopher` hérite de la classe `Environment` et implémente les règles spécifiques au jeu Gopher.
+* **Environment**: To allow both games to use the same strategies and data structures, an abstract class `Environment` was created. This class contains the necessary methods to initialize the game, make a move, check the end of the game, get possible moves, etc.
+* **Dodo**: The `Dodo` class inherits from the `Environment` class and implements the specific rules of the Dodo game.
+* **Gopher**: The `Gopher` class inherits from the `Environment` class and implements the specific rules of the Gopher game.
 
-&rarr; Cette implémentation permet de facilement ajouter de nouveaux jeux en héritant de la classe `Environment`. De plus, chaque stratégie peut être utilisée pour n'importe quel jeu (GGP MCTS).
+&rarr; This implementation makes it easy to add new games by inheriting from the `Environment` class. Moreover, each strategy can be used for any game (GGP MCTS).
 
-### Optimisations
+### Optimizations
 
-* **Cache des scores** : Pour éviter de recalculer les scores des cases à chaque itération, un cache a été mis en place. Ainsi, les scores des cases sont calculés une seule fois et stockés dans un dictionnaire.
-* **Calcul des mouvements possibles** : Pour chaque joueur, les mouvements possibles sont calculés une seule fois et stockés dans un dictionnaire.
-* **Gestion des symétries** : Pour réduire le nombre de calculs, les symétries de la grille ont voulu être prises en compte. Néanmoins, après implémentation, il s'est avéré que le calcul des symétries prenait plus de temps que le calcul des mouvements possibles. Cette optimisation n'a donc pas été retenue.
-* **numpy** : L'utilisation de la bibliothèque `numpy` a été envisagée pour optimiser les calculs. Cependant, l'implémentation n'a pas pu être réalisée par manque de temps.
+* **Score Cache**: To avoid recalculating cell scores at each iteration, a cache has been implemented. Thus, cell scores are calculated once and stored in a dictionary.
+* **Calculation of Possible Moves**: For each player, the possible moves are calculated once and stored in a dictionary.
+* **Handling Symmetries**: To reduce the number of calculations, grid symmetries were considered. However, after implementation, it turned out that symmetry calculations took more time than calculating possible moves, so this optimization was discarded.
+* **numpy**: The use of the `numpy` library was considered to optimize calculations. However, the implementation was not completed due to a lack of time.
 
-## Minimax variant
+## Minimax Variant
 
 ### Classic Minimax
 
-Un minimax classique a été implémenté pour les deux jeux. Cependant, même avec la mémoïsation le temps de calcul est très long pour le jeu Gopher. Pour le jeu Dodo, le temps de calcul est acceptable pour une profondeur de 5.
+A classic minimax was implemented for both games. However, even with memoization, the calculation time is very long for the Gopher game. For the Dodo game, the calculation time is acceptable for a depth of 5.
 
 ### Alpha-Beta Pruning
 
-* Implémentation de l'élagage alpha-bêta pour réduire le nombre de nœuds explorés.
-* Ajout d'un cache pour stocker les valeurs des nœuds explorés.
-* Implémentation d'un stop time afin de breaker la recherche en profondeur si le temps restant est trop faible.
+* Implementation of alpha-beta pruning to reduce the number of nodes explored.
+* Adding a cache to store the values of explored nodes.
+* Implementation of a stop time to break the depth search if the remaining time is too short.
 
-### Evaluation function
+### Evaluation Function
 
-Pour le jeu **Dodo**
+For the **Dodo** game
 
-* Nombre de coups légaux
-* Distance entre les deux joueurs
-* Distance entre les joueurs et les bords
-* Nombre de pions définitivement bloqués
+* Number of legal moves
+* Distance between the two players
+* Distance between the players and the edges
+* Number of permanently blocked pieces
 
-### adaptive depth
+### Adaptive Depth
 
-Une profondeur adaptative a été implémentée. L'idée est de calculer la profondeur en fonction du nombre de coups légaux possibles. Plus il y a de coups possibles, plus la profondeur est grande.
-En effet, la profondeur a besoin d'être différente en fonction de l'avancement de la partie.
+An adaptive depth was implemented. The idea is to calculate the depth based on the number of possible legal moves. The more possible moves, the greater the depth. The depth needs to vary depending on the progress of the game.
 
-Fonction de calcul de la profondeur adaptative :
+Adaptive depth calculation function:
 
 * **depth_factor** = 1 / (log(len(env.legals(player)), 2) / 5) * 1.2
 
-&rarr; Ceci donne de bons résultats. Néanmoins, il est compliqué de trouver un bon facteur car l'explosion combinatoire est très rapide et ne dépend pas que du nombre de coups possibles.
+&rarr; This gives good results. However, finding a good factor is complicated because the combinatorial explosion is very rapid and depends not only on the number of possible moves.
 
 ## Monte Carlo Tree Search (MCTS) UCB 1
 
 ### Structure
 
-L'implémentation de ce MCTS a fortement été inspirée de l'article de l'article de [Monte Carlo Tree Search (MCTS) algorithm for dummies!](https://medium.com/@_michelangelo_/monte-carlo-tree-search-mcts-algorithm-for-dummies-74b2bae53bfa) et de * [MCTS python](https://ai-boson.github.io/mcts/)
+The implementation of this MCTS was heavily inspired by the article [Monte Carlo Tree Search (MCTS) algorithm for dummies!](https://medium.com/@_michelangelo_/monte-carlo-tree-search-mcts-algorithm-for-dummies-74b2
 
-L'implémentation est donc composée de 2 classes :
+bae53bfa) and [MCTS python](https://ai-boson.github.io/mcts/)
 
-* **Node** : Représente un noeud de l'arbre de recherche. Contient les informations suivantes :
-  * `state` : L'état du jeu à ce noeud.
-  * `parent` : Le noeud parent.
-  * `children` : Les noeuds enfants.
-  * `untried_moves` : Les mouvements non explorés.
-  * `player_just_moved` : Le joueur qui vient de jouer.
-  * `wins` : Le nombre de victoires.
-  * `visits` : Le nombre de visites.
+The implementation consists of two classes:
 
-* **MCTS** : Représente l'algorithme MCTS. Contient les méthodes suivantes :
-  * `selection` : Sélection du noeud à explorer.
-  * `expansion` : Expansion du noeud sélectionné.
-  * `simulation` : Simulation d'une partie aléatoire.
-  * `backpropagation` : Mise à jour des statistiques des noeuds explorés.
-  * `get_best_move` : Récupération du meilleur mouvement.
+* **Node**: Represents a node in the search tree. Contains the following information:
+  * `state`: The game state at this node.
+  * `parent`: The parent node.
+  * `children`: The child nodes.
+  * `untried_moves`: The unexplored moves.
+  * `player_just_moved`: The player who just moved.
+  * `wins`: The number of wins.
+  * `visits`: The number of visits.
 
-Pour optimiser la complexité spatiale, seules les actions possibles sont stockées dans les noeuds. Les états du jeu ne sont pas stockés. Néanmoins pour mieux coller à notre structure de jeu, nous avons stocké les noeuds joués afin de pouvoir reverse les coups.
+* **MCTS**: Represents the MCTS algorithm. Contains the following methods:
+  * `selection`: Selection of the node to explore.
+  * `expansion`: Expansion of the selected node.
+  * `simulation`: Simulation of a random game.
+  * `backpropagation`: Update of the statistics of the explored nodes.
+  * `get_best_move`: Retrieval of the best move.
+
+To optimize spatial complexity, only possible actions are stored in the nodes. Game states are not stored. However, to better fit our game structure, we stored the played nodes to be able to reverse the moves.
 
 ### Time Management
 
-Un des gros avantages de MCTS est qu'il est possible de le stopper à tout moment pour récupérer le meilleur coup trouvé. Cependant, il est important de gérer le temps de calcul pour ne pas dépasser le temps imparti. Pour cela, nous avons implémenté un système de time management basé sur le nombre de simulations effectuées.
+One of the major advantages of MCTS is that it can be stopped at any time to retrieve the best found move. However, it is important to manage the calculation time to not exceed the allotted time. For this, we implemented a time management system based on the number of simulations performed.
 
-* **Iteration time** : Pour calculer le temps alloué à chaque appel de MCTS nous nous sommes appuyés sur l'article de [Remi Coulom](https://www.remi-coulom.fr/Publications/TimeManagement.pdf). L'idée est de calculer le temps moyen d'une itération et de le multiplier par un facteur pour obtenir le temps alloué à chaque itération.
-* **Stop time** : Pour éviter de dépasser le temps imparti, nous avons implémenté un système de stop time inspiré de l'article de [Maastricht University](https://dke.maastrichtuniversity.nl/m.winands/documents/time_management_for_monte_carlo_tree_search.pdf). Après chaque simulation, nous vérifions la différence de visite entre l'enfant le plus visité et le second. Si cette différence est trop grande pour être rattrapée, nous stoppons la recherche.
+* **Iteration time**: To calculate the time allocated to each MCTS call, we relied on the article by [Remi Coulom](https://www.remi-coulom.fr/Publications/TimeManagement.pdf). The idea is to calculate the average time of an iteration and multiply it by a factor to get the time allocated to each iteration.
+* **Stop time**: To avoid exceeding the allotted time, we implemented a stop time system inspired by the article by [Maastricht University](https://dke.maastrichtuniversity.nl/m.winands/documents/time_management_for_monte_carlo_tree_search.pdf). After each simulation, we check the visit difference between the most visited child and the second. If this difference is too large to be caught up, we stop the search.
 
-## Optimisations MCTS
+### MCTS Optimizations
 
-Optimisations non implémentées par manque de temps :
+Optimizations not implemented due to lack of time:
 
-* **Parallelisations** : Il est possible de paralléliser les simulations pour accélérer le temps de calcul
-  * **Root parallelisation** : Chaque simulation est lancée dans un thread différent. Se pose la question de la concaténation des résultats.
-  * **Leaf parallelisation** : Implémentation d'une virtual loss [Parallel Monte-Carlo Tree Search - Maastricht University](https://dke.maastrichtuniversity.nl/m.winands/documents/multithreadedMCTS2.pdf)
+* **Parallelizations**: It is possible to parallelize simulations to speed up calculation time.
+  * **Root parallelization**: Each simulation is launched in a different thread. The question of concatenating the results arises.
+  * **Leaf parallelization**: Implementation of a virtual loss [Parallel Monte-Carlo Tree Search - Maastricht University](https://dke.maastrichtuniversity.nl/m.winands/documents/multithreadedMCTS2.pdf)
 
-* **Heuristique** : Il est possible d'ajouter une heuristique pour guider l'exploration de l'arbre. Néanmoins, nous avons décidé de ne pas l'implémenter pour garder un MCTS sans biais.
+* **Heuristic**: It is possible to add a heuristic to guide the tree exploration. However, we decided not to implement it to keep an unbiased MCTS.
 
 ## Other Strategies
 
-* **Random** : Un joueur qui joue aléatoirement.
-* **First legal move** : Un joueur qui joue le premier coup légal trouvé.
+* **Random**: A player who plays randomly.
+* **First legal move**: A player who plays the first legal move found.
+* **Ngascout**: We also tried to implement a Negascout. However, alpha-beta was already working well, so we decided not to use it to focus on MCTS.
 
-## Résultats
+## Results
 
-* **Dodo MCTS vs random** : Le MCTS gagne 100% des parties.
-* **Gopher alpha-beta vs random** : L'alpha-beta gagne 100% des parties.
-* **Gopher MCTS vs alpha-beta** : Les deux algorithmes sont équivalents, même si l'alpha-beta a un léger avantage si on lui laisse plus de temps. Néanmoins, MCTS est bien plus flexible.
+* **Dodo MCTS vs random**: The MCTS wins 100% of the games.
+* **Gopher alpha-beta vs random**: The alpha-beta wins 100% of the games.
+* **Gopher MCTS vs alpha-beta**: The two algorithms are equivalent, although alpha-beta has a slight advantage if given more time. However, MCTS is much more flexible.
 
 ## Conclusion
 
-* **MCTS** : L'algorithme MCTS est très puissant et flexible. Il est capable de s'adapter à n'importe quel jeu et de rivaliser avec des algorithmes plus classiques comme l'alpha-beta. Néanmoins, il est très gourmand en temps de calcul et nécessite une bonne gestion du temps.
-* **Alpha-beta** : L'algorithme alpha-beta est très efficace pour les jeux avec une profondeur de recherche limitée. Il est capable de rivaliser avec MCTS. Néamoins, il est très peu flexible et nécessite une bonne évaluation heuristique.
+* **DODO**: For playing the DODO game, we decided to use the MCTS algorithm which is very powerful and flexible. It is capable of adapting to any grid size with its adaptive time and long games. However, it can still be greatly improved to increase the number of simulations.
+* **GOPHER**: Conversely, for GOPHER we used the alpha-beta algorithm which is very effective for games with limited search depth like Gopher. Indeed, GOPHER is a game with a bounded number of moves, making it more predictable than DODO. In this game, alpha-beta can compete with MCTS. However, it is very inflexible and requires significant improvement in heuristic evaluation.
 
-## Ressources
+## Resources
 
 * [Hexagonal Grids](https://www.redblobgames.com/grids/hexagons/)
 * [Monte Carlo Tree Search](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search)
